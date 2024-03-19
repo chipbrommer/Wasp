@@ -39,13 +39,13 @@ public:
 protected:
 
 private:
-    JsonFileUtility<Settings> mSettings;
-    JsonFileUtility<Build> mBuild;
-    JsonFileUtility<Configuration> mConfig;
+    JsonFileUtility<Settings> mSettings;        /// Settings file 
+    JsonFileUtility<Build> mBuild;              /// Build log file
+    JsonFileUtility<Configuration> mConfig;     /// Configuration file
     
-    PWM mFin1;
-    PWM mFin2;
-    PWM mFin3;
-    PWM mFin4;
+    PWM mFin1;                                  /// PWM connected to Fin 1
+    PWM mFin2;                                  /// PWM connected to Fin 2
+    PWM mFin3;                                  /// PWM connected to Fin 3
+    PWM mFin4;                                  /// PWM connected to Fin 4
 
 };
