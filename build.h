@@ -21,7 +21,7 @@ struct Build : JsonType
 {
     std::string imuSerialNumber = "";
     std::string gpsSerialNumber = "";
-    std::string osVersion = "";
+    std::string osVersion       = "";
 
     /// @brief map for json item to variables
     std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> jsonMapping
@@ -45,7 +45,7 @@ struct Build : JsonType
         return nlohmann::json{
             {"imuSerialNumber", imuSerialNumber},
             {"gpsSerialNumber", gpsSerialNumber},
-            {"osVersion", osVersion}
+            {"osVersion",       osVersion}
         };
     }
        

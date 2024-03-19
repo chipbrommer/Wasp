@@ -19,6 +19,19 @@ add_executable (Wasp-M
     "build.h" 
     "wasp_m.h" 
     "wasp_m.cpp"
+    "gps/ublox.h" 
+    "gps/ublox.cpp" 
+    "imu/inertial_labs.h" 
+    "imu/inertial_labs.cpp" 
+    "utilities/serial_client.cpp" 
+    "utilities/serial_client.h" 
+    "utilities/udp_client.h" 
+    "utilities/udp_client.cpp" 
+    "utilities/pwm_interface.h"  
+    "utilities/pwm_interface.cpp"
+    "configuration.h" 
+    "utilities/log_client.h" 
+    "utilities/log_client.cpp"
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
