@@ -16,13 +16,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+/// @brief A structure representing a build log
 struct Build : JsonType
 {
     std::string imuSerialNumber = "";
     std::string gpsSerialNumber = "";
     std::string osVersion = "";
 
-    /// @brief 
+    /// @brief map for json item to variables
     std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> jsonMapping
     {
         {"imuSerialNumber", [this](const nlohmann::json& j) { j.at("imuSerialNumber").get_to(imuSerialNumber);  }},
@@ -30,23 +31,31 @@ struct Build : JsonType
         {"osVersion",       [this](const nlohmann::json& j) { j.at("osVersion").get_to(osVersion);              }}
     };
 
-    /// @brief 
-    /// @param j 
-    void to_json(nlohmann::json& j) const
+    /// @brief Mandatory function for serializing settings to json
+    /// @param j - out - json object containing settings
+    void ToJson(nlohmann::json& j) const
     {
-        j = nlohmann::json{ 
-            {"imuSerialNumber", imuSerialNumber},
-            {"gpsSerialNumber", gpsSerialNumber},
-            {"osVersion", osVersion} 
-        };
+        j = ToJson();
     }
 
-    /// @brief 
-    /// @param j 
-    void from_json(const nlohmann::json& j)
+    /// @brief Serialize structure to json
+    /// @return json structure containing structure data
+    nlohmann::json ToJson() const
     {
-        j.at("imuSerialNumber").get_to(imuSerialNumber);
-        j.at("gpsSerialNumber").get_to(gpsSerialNumber);
-        j.at("osVersion").get_to(osVersion);
+        return nlohmann::json{
+            {"imuSerialNumber", imuSerialNumber},
+            {"gpsSerialNumber", gpsSerialNumber},
+            {"osVersion", osVersion}
+        };
+    }
+       
+    /// @brief Mandatory function for deserializing settings from json
+    /// @param j - in - json object containing settings
+    void FromJson(const nlohmann::json& j)
+    {
+        for (const auto& [key, func] : jsonMapping)
+        {
+            if (j.contains(key)) { func(j); }
+        }
     }
 };

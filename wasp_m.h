@@ -18,18 +18,19 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
+/// @brief Wasp Munition
 class Wasp
 {
 public:
-    /// @brief 
-    /// @param settingsLocation 
-    /// @param buildLocation 
+    /// @brief Default constructure
+    /// @param settingsLocation - Location of the settings file
+    /// @param buildLocation - Location of the build file
     Wasp(const std::string& settingsLocation, const std::string& buildLocation);
 
-    /// @brief 
+    /// @brief Default deconstructor
     ~Wasp();
 
-    /// @brief 
+    /// @brief Main entry point to start Wasp
     void Execute();
 
 protected:

@@ -18,6 +18,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+/// @brief A structure representing a setting file
 struct Settings : JsonType
 {
     // Ports
@@ -32,10 +33,10 @@ struct Settings : JsonType
     double altitudeHAE = 0.0;
     double altitudeMSL = 0.0;
 
-    // Test
+    // Test Flags
     bool testMode1 = false;
 
-    /// @brief 
+    /// @brief map for json item to variables
     std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> jsonMapping
     {
         {"imuPort",     [this](const nlohmann::json& j) { j.at("imuPort").get_to(imuPort);          }},
@@ -49,11 +50,11 @@ struct Settings : JsonType
         {"testMode1",   [this](const nlohmann::json& j) { j.at("testMode1").get_to(testMode1);      }},
     };
 
-    /// @brief 
-    /// @param j 
-    void to_json(nlohmann::json& j) const
+    /// @brief Serialize structure to json
+    /// @return json structure containing structure data
+    nlohmann::json ToJson() const
     {
-        j = nlohmann::json{
+        return nlohmann::json {
             {"imuPort", imuPort},
             {"imuBaud", imuBaud},
             {"gpsPort", gpsPort},
@@ -66,9 +67,16 @@ struct Settings : JsonType
         };
     }
 
-    /// @brief 
-    /// @param j 
-    void from_json(const nlohmann::json& j) 
+    /// @brief Mandatory function for serializing settings to json
+    /// @param j - out - json object containing settings
+    void ToJson(nlohmann::json& j) const
+    {
+        j = ToJson();
+    }
+
+    /// @brief Mandatory function for deserializing settings from json
+    /// @param j - in - json object containing settings
+    void FromJson(const nlohmann::json& j) 
     {
         for (const auto& [key, func] : jsonMapping) 
         {
