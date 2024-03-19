@@ -119,7 +119,8 @@ public:
         return data;
     }
 
-private:
     T data;                 // A copy of instance data
+
+private:
     std::string filePath;   // A copy of the passing in file path 
 };

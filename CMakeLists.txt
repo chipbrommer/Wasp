@@ -32,7 +32,7 @@ add_executable (Wasp-M
     "files/configuration.h" 
     "utilities/log_client.h" 
     "utilities/log_client.cpp"
-)
+ "signal_manager.h" "signal_manager.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp-M PROPERTY CXX_STANDARD 20)

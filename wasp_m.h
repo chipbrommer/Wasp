@@ -16,11 +16,10 @@
 #include "files/build.h"                    // build information
 #include "files/configuration.h"            // configuration information
 #include "utilities/json_file_utility.hpp"  // settings utility
-#include "utilities/pwm_interface.h"        // pwms
+#include "signal_manager.h"                 // signal manager
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-/// @brief Wasp Munition
 class Wasp
 {
 public:
@@ -43,9 +42,5 @@ private:
     JsonFileUtility<Build> mBuild;              /// Build log file
     JsonFileUtility<Configuration> mConfig;     /// Configuration file
     
-    PWM mFin1;                                  /// PWM connected to Fin 1
-    PWM mFin2;                                  /// PWM connected to Fin 2
-    PWM mFin3;                                  /// PWM connected to Fin 3
-    PWM mFin4;                                  /// PWM connected to Fin 4
-
+    SignalManager mSignals;                     /// Manager for PWMs and GPIOs
 };
