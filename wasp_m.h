@@ -12,9 +12,9 @@
 #include <string>                           // strings
 #include <cstdint>                          // standard ints
 //
-#include "settings.h"                       // program settings
-#include "build.h"                          // build information
-#include "configuration.h"                  // configuration information
+#include "files/settings.h"                 // program settings
+#include "files/build.h"                    // build information
+#include "files/configuration.h"            // configuration information
 #include "utilities/json_file_utility.hpp"  // settings utility
 #include "utilities/pwm_interface.h"        // pwms
 // 

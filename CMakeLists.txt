@@ -15,8 +15,8 @@ project ("Wasp-M")
 add_executable (Wasp-M 
     "main.cpp" 
     "utilities/json_file_utility.hpp" 
-    "settings.h" 
-    "build.h" 
+    "files/settings.h" 
+    "files/build.h" 
     "wasp_m.h" 
     "wasp_m.cpp"
     "gps/ublox.h" 
@@ -29,7 +29,7 @@ add_executable (Wasp-M
     "utilities/udp_client.cpp" 
     "utilities/pwm_interface.h"  
     "utilities/pwm_interface.cpp"
-    "configuration.h" 
+    "files/configuration.h" 
     "utilities/log_client.h" 
     "utilities/log_client.cpp"
 )

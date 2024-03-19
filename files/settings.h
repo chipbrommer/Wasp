@@ -22,22 +22,22 @@
 struct Settings : JsonType
 {    
     // Target
-    double targetLatitude   = 0.0;
-    double targetLongitude  = 0.0;
-    double altitudeHAE      = 0.0;
-    double altitudeMSL      = 0.0;
+    double targetLatitude       = 0.0;
+    double targetLongitude      = 0.0;
+    double targetAltitudeHAE    = 0.0;
+    double targetAltitudeMSL    = 0.0;
 
     // Test Flags
-    bool testMode1          = false;
+    bool testMode1              = false;
 
     /// @brief map for json item to variables
     std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> jsonMapping
     {
-        {"targetLatitude",  [this](const nlohmann::json& j) { j.at("targetLatitude").get_to(targetLatitude);    }},
-        {"targetLongitude", [this](const nlohmann::json& j) { j.at("targetLongitude").get_to(targetLongitude);  }},
-        {"altitudeHAE",     [this](const nlohmann::json& j) { j.at("altitudeHAE").get_to(altitudeHAE);          }},
-        {"altitudeMSL",     [this](const nlohmann::json& j) { j.at("altitudeMSL").get_to(altitudeMSL);          }},
-        {"testMode1",       [this](const nlohmann::json& j) { j.at("testMode1").get_to(testMode1);              }},
+        {"targetLatitude",      [this](const nlohmann::json& j) { j.at("targetLatitude").get_to(targetLatitude);        }},
+        {"targetLongitude",     [this](const nlohmann::json& j) { j.at("targetLongitude").get_to(targetLongitude);      }},
+        {"targetAltitudeHAE",   [this](const nlohmann::json& j) { j.at("targetAltitudeHAE").get_to(targetAltitudeHAE);  }},
+        {"targetAltitudeMSL",   [this](const nlohmann::json& j) { j.at("targetAltitudeMSL").get_to(targetAltitudeMSL);  }},
+        {"testMode1",           [this](const nlohmann::json& j) { j.at("testMode1").get_to(testMode1);                  }},
     };
 
     /// @brief Serialize structure to json
@@ -45,11 +45,11 @@ struct Settings : JsonType
     nlohmann::json ToJson() const
     {
         return nlohmann::json {
-            {"targetLatitude",  targetLatitude},
-            {"targetLongitude", targetLongitude},
-            {"altitudeHAE",     altitudeHAE},
-            {"altitudeMSL",     altitudeMSL},
-            {"testMode1",       testMode1}
+            {"targetLatitude",      targetLatitude},
+            {"targetLongitude",     targetLongitude},
+            {"targetAltitudeHAE",   targetAltitudeHAE},
+            {"targetAltitudeMSL",   targetAltitudeMSL},
+            {"testMode1",           testMode1}
         };
     }
 
