@@ -1,4 +1,4 @@
-﻿# CMakeList.txt : CMake project for Wasp-M, include source and define
+﻿# CMakeList.txt : CMake project for Wasp, include source and define
 # project specific logic here.
 #
 cmake_minimum_required (VERSION 3.8)
@@ -9,16 +9,16 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-project ("Wasp-M")
+project ("Wasp")
 
 # Add source to this project's executable.
-add_executable (Wasp-M 
+add_executable (Wasp 
     "main.cpp" 
     "utilities/json_file_utility.hpp" 
     "files/settings.h" 
     "files/build.h" 
-    "wasp_m.h" 
-    "wasp_m.cpp"
+    "wasp.h" 
+    "wasp.cpp"
     "gps/ublox.h" 
     "gps/ublox.cpp" 
     "imu/inertial_labs.h" 
@@ -35,7 +35,7 @@ add_executable (Wasp-M
  "signal_manager.h" "signal_manager.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET Wasp-M PROPERTY CXX_STANDARD 20)
+  set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)
 endif()
 
 # TODO: Add tests and install targets if needed.

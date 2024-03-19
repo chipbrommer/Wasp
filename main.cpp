@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include "wasp_m.h"
+#include "wasp.h"
 
 int main()
 {

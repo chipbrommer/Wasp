@@ -16,6 +16,7 @@
 #include "files/build.h"                    // build information
 #include "files/configuration.h"            // configuration information
 #include "utilities/json_file_utility.hpp"  // settings utility
+#include "utilities/log_client.h"           // log client
 #include "signal_manager.h"                 // signal manager
 // 
 /////////////////////////////////////////////////////////////////////////////////
@@ -38,9 +39,16 @@ public:
 protected:
 
 private:
-    JsonFileUtility<Settings> mSettings;        /// Settings file 
-    JsonFileUtility<Build> mBuild;              /// Build log file
-    JsonFileUtility<Configuration> mConfig;     /// Configuration file
-    
-    SignalManager mSignals;                     /// Manager for PWMs and GPIOs
+    // Input Files
+    JsonFileUtility<Settings>       mSettings;          /// Settings file 
+    JsonFileUtility<Build>          mBuild;             /// Build log file
+    JsonFileUtility<Configuration>  mConfig;            /// Configuration file
+
+    // Clients / Managers
+    std::string                     mName;              /// Name for when using logger.
+    LogClient                       mLogger;            /// Client for logging to console and file
+    SignalManager                   mSignals;           /// Manager for PWMs and GPIOs
+
+    // Threads
+    std::thread                     mLoggingThread;     /// Thread for logging
 };

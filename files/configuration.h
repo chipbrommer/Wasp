@@ -11,8 +11,8 @@
 //          ------------------              ------------------------
 #include <string>                           // strings
 //
-#include "external/nlohmann/json.hpp"       // json
-#include "utilities/json_file_utility.hpp"  // file utility type
+#include "../external/nlohmann/json.hpp"       // json
+#include "../utilities/json_file_utility.hpp"  // file utility type
 //
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -21,7 +21,7 @@ struct Configuration : JsonType
 {
     // Ports
     std::string imuPort     = "";
-    int imuBaudRate         = 11520;
+    int imuBaudRate         = 115200;
     std::string gpsPort     = "";
     int gpsBaudRate         = 921600;
 
@@ -37,23 +37,29 @@ struct Configuration : JsonType
     double finMinDegrees    = -25.0;
     double finMaxDegrees    = 25.0;
 
+    // Preferences
+    std::string logFilePath = "";
+    bool fileLoggingEnabled = false;
+
     /// @brief map for json item to variables
     std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> jsonMapping
     {
-        {"imuPort",         [this](const nlohmann::json& j) { j.at("imuPort").get_to(imuPort);              }},
-        {"imuBaudRate",     [this](const nlohmann::json& j) { j.at("imuBaudRate").get_to(imuBaudRate);      }},
-        {"gpsPort",         [this](const nlohmann::json& j) { j.at("gpsPort").get_to(gpsPort);              }},
-        {"gpsBaudRate",     [this](const nlohmann::json& j) { j.at("gpsBaudRate").get_to(gpsBaudRate);      }},
-        {"fin1Path",        [this](const nlohmann::json& j) { j.at("fin1Path").get_to(fin1Path);            }},
-        {"fin1Channel",     [this](const nlohmann::json& j) { j.at("fin1Channel").get_to(fin1Channel);      }},
-        {"fin2Path",        [this](const nlohmann::json& j) { j.at("fin2Path").get_to(fin2Path);            }},
-        {"fin2Channel",     [this](const nlohmann::json& j) { j.at("fin2Channel").get_to(fin2Channel);      }},
-        {"fin3Path",        [this](const nlohmann::json& j) { j.at("fin3Path").get_to(fin3Path);            }},
-        {"fin3Channel",     [this](const nlohmann::json& j) { j.at("fin3Channel").get_to(fin3Channel);      }},
-        {"fin4Path",        [this](const nlohmann::json& j) { j.at("fin4Path").get_to(fin4Path);            }},
-        {"fin4Channel",     [this](const nlohmann::json& j) { j.at("fin4Channel").get_to(fin4Channel);      }},
-        {"finMinDegrees",   [this](const nlohmann::json& j) { j.at("finMinDegrees").get_to(finMinDegrees);  }},
-        {"finMaxDegrees",   [this](const nlohmann::json& j) { j.at("finMaxDegrees").get_to(finMaxDegrees);  }}
+        {"imuPort",             [this](const nlohmann::json& j) { j.at("imuPort").get_to(imuPort);                          }},
+        {"imuBaudRate",         [this](const nlohmann::json& j) { j.at("imuBaudRate").get_to(imuBaudRate);                  }},
+        {"gpsPort",             [this](const nlohmann::json& j) { j.at("gpsPort").get_to(gpsPort);                          }},
+        {"gpsBaudRate",         [this](const nlohmann::json& j) { j.at("gpsBaudRate").get_to(gpsBaudRate);                  }},
+        {"fin1Path",            [this](const nlohmann::json& j) { j.at("fin1Path").get_to(fin1Path);                        }},
+        {"fin1Channel",         [this](const nlohmann::json& j) { j.at("fin1Channel").get_to(fin1Channel);                  }},
+        {"fin2Path",            [this](const nlohmann::json& j) { j.at("fin2Path").get_to(fin2Path);                        }},
+        {"fin2Channel",         [this](const nlohmann::json& j) { j.at("fin2Channel").get_to(fin2Channel);                  }},
+        {"fin3Path",            [this](const nlohmann::json& j) { j.at("fin3Path").get_to(fin3Path);                        }},
+        {"fin3Channel",         [this](const nlohmann::json& j) { j.at("fin3Channel").get_to(fin3Channel);                  }},
+        {"fin4Path",            [this](const nlohmann::json& j) { j.at("fin4Path").get_to(fin4Path);                        }},
+        {"fin4Channel",         [this](const nlohmann::json& j) { j.at("fin4Channel").get_to(fin4Channel);                  }},
+        {"finMinDegrees",       [this](const nlohmann::json& j) { j.at("finMinDegrees").get_to(finMinDegrees);              }},
+        {"finMaxDegrees",       [this](const nlohmann::json& j) { j.at("finMaxDegrees").get_to(finMaxDegrees);              }},
+        {"logFilePath",         [this](const nlohmann::json& j) { j.at("logFilePath").get_to(logFilePath);                  }},
+        {"fileLoggingEnabled",  [this](const nlohmann::json& j) { j.at("fileLoggingEnabled").get_to(fileLoggingEnabled);    }}
     };
 
     /// @brief Serialize structure to json
@@ -61,20 +67,22 @@ struct Configuration : JsonType
     nlohmann::json ToJson() const
     {
         return nlohmann::json{
-            {"imuPort",         imuPort},
-            {"imuBaudRate",     imuBaudRate},
-            {"gpsPort",         gpsPort},
-            {"gpsBaudRate",     gpsBaudRate},
-            {"fin1Path",        fin1Path},
-            {"fin1Channel",     fin1Channel},
-            {"fin2Path",        fin2Path},
-            {"fin2Channel",     fin2Channel},
-            {"fin3Path",        fin3Path},
-            {"fin3Channel",     fin3Channel},
-            {"fin4Path",        fin4Path},
-            {"fin4Channel",     fin4Channel},
-            {"finMinDegrees",   finMinDegrees},
-            {"finMaxDegrees",   finMaxDegrees}
+            {"imuPort",             imuPort},
+            {"imuBaudRate",         imuBaudRate},
+            {"gpsPort",             gpsPort},
+            {"gpsBaudRate",         gpsBaudRate},
+            {"fin1Path",            fin1Path},
+            {"fin1Channel",         fin1Channel},
+            {"fin2Path",            fin2Path},
+            {"fin2Channel",         fin2Channel},
+            {"fin3Path",            fin3Path},
+            {"fin3Channel",         fin3Channel},
+            {"fin4Path",            fin4Path},
+            {"fin4Channel",         fin4Channel},
+            {"finMinDegrees",       finMinDegrees},
+            {"finMaxDegrees",       finMaxDegrees},
+            {"logFilePath",         logFilePath},
+            {"fileLoggingEnabled",  fileLoggingEnabled}
         };
     }
 
