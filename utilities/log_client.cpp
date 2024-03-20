@@ -87,12 +87,20 @@ void LogClient::Run()
     }
 }
 
-void LogClient::Stop()
+void LogClient::Stop(bool waitForEmptyQueue)
 {
     if (mRun)
     {
         // Create a notice and write it. 
         WriteLog({0, LogLevel::INFO, CreateLogString(mName, LogLevelToStringMap.at(LogLevel::INFO), "Stopping.")});
+
+        if (waitForEmptyQueue)
+        {
+            while (!mLogQueue.empty())
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            }
+        }
 
         // Signal the run to stop
         mRun = false;
@@ -110,10 +118,11 @@ void LogClient::ClearLogQueue()
     // Clear the queue
     std::scoped_lock lock(mQueueMutex);
     std::queue<LogItem> empty;
+    size_t numInQueue = mLogQueue.size();
     std::swap(mLogQueue, empty);
 
     // Notify the number of cleared items. 
-    std::string temp = "Cleared " + std::to_string(mLogQueue.size()) + " logs.";
+    std::string temp = "Cleared " + std::to_string(numInQueue) + " logs.";
     WriteLog({0, LogLevel::INFO, CreateLogString(mName, LogLevelToStringMap.at(LogLevel::INFO), temp) });
 }
 

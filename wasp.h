@@ -47,8 +47,9 @@ private:
     // Clients / Managers
     std::string                     mName;              /// Name for when using logger.
     LogClient                       mLogger;            /// Client for logging to console and file
-    SignalManager                   mSignals;           /// Manager for PWMs and GPIOs
+    SignalManager                   mSignalManger;      /// Manager for PWMs and GPIOs
 
     // Threads
+    std::thread                     mSignalThread;      /// Thread for Signal manager
     std::thread                     mLoggingThread;     /// Thread for logging
 };

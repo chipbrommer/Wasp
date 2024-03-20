@@ -15,73 +15,152 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-/// @brief Default constructor
-SignalManager::SignalManager() : mFin1(""), mFin2(""), mFin3(""), mFin4("")
+SignalManager::SignalManager(LogClient& logger) : mFin1(""), mFin2(""), mFin3(""), mFin4(""), mLogger(logger)
 {}
 
-/// @brief Constructor
-/// @param fin1Path - Path to PWM for Fin 1
-/// @param fin1Channel - Channel number for Fin 1
-/// @param fin2Path - Path to PWM for Fin 1
-/// @param fin2Channel - Channel number for Fin 1 
-/// @param fin3Path - Path to PWM for Fin 1 
-/// @param fin3Channel - Channel number for Fin 1 
-/// @param fin4Path - Path to PWM for Fin 1 
-/// @param fin4Channel - Channel number for Fin 1 
-/// @param finMinDegrees - opt - Value to set for Fin minimum degree location of movement 
-/// @param finMaxDegrees - opt - Value to set for Fin maximum degree location of movement
 SignalManager::SignalManager(const std::string fin1Path, const int fin1Channel,
     const std::string fin2Path, const int fin2Channel,
     const std::string fin3Path, const int fin3Channel,
     const std::string fin4Path, const int fin4Channel,
-    const double finMinDegrees, const double finMaxDegrees
-) : mFin1(fin1Path, fin1Channel, finMinDegrees, finMaxDegrees),
-    mFin2(fin2Path, fin2Channel, finMinDegrees, finMaxDegrees),
-    mFin3(fin3Path, fin3Channel, finMinDegrees, finMaxDegrees),
-    mFin4(fin4Path, fin4Channel, finMinDegrees, finMaxDegrees)
+    const double finMinDegrees, const double finMaxDegrees, LogClient& logger
+) : SignalManager(logger)
 {
-    // Make sure the PWMs are exported. 
-    if (mFin1.ExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin1 failed to export.";
-    if (mFin2.ExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin2 failed to export.";
-    if (mFin3.ExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin3 failed to export.";
-    if (mFin4.ExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin4 failed to export.";
-
-    // Enable the PWMs
-    PWM::PWMStatus status = PWM::PWMStatus::InvalidInput;
-
-    status = mFin1.EnablePWM();
-    if (status == PWM::PWMStatus::Error)            std::cerr << "[SIG MGR] - Error - Fin1 failed to enable.";
-    else if (status == PWM::PWMStatus::NotExported) std::cerr << "[SIG MGR] - Error - Fin1 not exported.";
-
-    status = mFin2.EnablePWM();
-    if (status == PWM::PWMStatus::Error)            std::cerr << "[SIG MGR] - Error - Fin2 failed to enable.";
-    else if (status == PWM::PWMStatus::NotExported) std::cerr << "[SIG MGR] - Error - Fin2 not exported.";
-
-    status = mFin3.EnablePWM();
-    if (status == PWM::PWMStatus::Error)            std::cerr << "[SIG MGR] - Error - Fin3 failed to enable.";
-    else if (status == PWM::PWMStatus::NotExported) std::cerr << "[SIG MGR] - Error - Fin3 not exported.";
-
-    status = mFin4.EnablePWM();
-    if (status == PWM::PWMStatus::Error)            std::cerr << "[SIG MGR] - Error - Fin4 failed to enable.";
-    else if (status == PWM::PWMStatus::NotExported) std::cerr << "[SIG MGR] - Error - Fin4 not exported.";
+    ReadyFin(FIN::ONE,      fin1Path, fin1Channel, finMinDegrees, finMaxDegrees);
+    ReadyFin(FIN::TWO,      fin2Path, fin2Channel, finMinDegrees, finMaxDegrees);
+    ReadyFin(FIN::THREE,    fin3Path, fin3Channel, finMinDegrees, finMaxDegrees);
+    ReadyFin(FIN::FOUR,     fin4Path, fin4Channel, finMinDegrees, finMaxDegrees);
 }
 
 /// @brief Deconstructor. UnExports PWMs. 
 SignalManager::~SignalManager()
 {
     // Unexport the PWMs
-    if (mFin1.UnExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin1 failed to unexport.";
-    if (mFin2.UnExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin2 failed to unexport.";
-    if (mFin3.UnExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin3 failed to unexport.";
-    if (mFin4.UnExportPWM() == PWM::PWMStatus::Error) std::cerr << "[SIG MGR] - Error - Fin4 failed to unexport.";
+    if (mFin1.UnExportPWM() == PWM::PWMStatus::Error) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin1 failed to Unexport.");
+    if (mFin2.UnExportPWM() == PWM::PWMStatus::Error) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin2 failed to Unexport.");
+    if (mFin3.UnExportPWM() == PWM::PWMStatus::Error) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin3 failed to Unexport.");
+    if (mFin4.UnExportPWM() == PWM::PWMStatus::Error) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin4 failed to Unexport.");
 }
 
 void SignalManager::Start()
 {
+    mRun = true;
 
+    while (mRun)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+}
+
+void SignalManager::Stop()
+{
+    if (mRun)
+    {
+        // Create a notice and write it. 
+        mLogger.AddLog(mName, LogClient::LogLevel::INFO, "Closing.");
+
+        // Signal the run to stop
+        mRun = false;
+    }
+}
+
+bool SignalManager::ReadyFin(const FIN fin, const std::string finPath, const int finChannel,
+    const double finMinDegrees, const double finMaxDegrees)
+{
+    // Holder for status return
+    PWM::PWMStatus status = PWM::PWMStatus::InvalidInput;
+
+    switch (fin)
+    {
+    case FIN::ONE:
+        mFin1.SetPath(finPath);
+        mFin1.SetChannel(finChannel);
+        mFin1.UpdateDegreeClamp(finMinDegrees, finMaxDegrees);
+
+        if (mFin1.ExportPWM() == PWM::PWMStatus::Error)
+        {
+            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin1 failed to export.");
+            return false;
+        }
+
+        status = mFin1.EnablePWM();
+        if (status == PWM::PWMStatus::Error)            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin1 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin1 not exported.");
+        else mFin1Ready = true;
+        
+        return mFin1Ready;
+
+    case FIN::TWO:
+        mFin2.SetPath(finPath);
+        mFin2.SetChannel(finChannel);
+        mFin2.UpdateDegreeClamp(finMinDegrees, finMaxDegrees);
+
+        if (mFin2.ExportPWM() == PWM::PWMStatus::Error) 
+        {
+            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin2 failed to export.");
+            return false;
+        }
+
+        status = mFin2.EnablePWM();
+        if (status == PWM::PWMStatus::Error)            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin2 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin2 not exported.");
+        else mFin2Ready = true;
+
+        return mFin2Ready;
+
+    case FIN::THREE:
+        mFin3.SetPath(finPath);
+        mFin3.SetChannel(finChannel);
+        mFin3.UpdateDegreeClamp(finMinDegrees, finMaxDegrees);
+
+        if (mFin3.ExportPWM() == PWM::PWMStatus::Error) 
+        {
+            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin3 failed to export.");
+            return false;
+        }
+
+        status = mFin3.EnablePWM();
+        if (status == PWM::PWMStatus::Error)            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin3 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin3 not exported.");
+        else mFin3Ready = true;
+
+        return mFin3Ready;
+
+    case FIN::FOUR:
+        mFin4.SetPath(finPath);
+        mFin4.SetChannel(finChannel);
+        mFin4.UpdateDegreeClamp(finMinDegrees, finMaxDegrees);
+
+        if (mFin4.ExportPWM() == PWM::PWMStatus::Error)
+        {
+            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin4 failed to export.");
+            return false;
+        }
+
+        status = mFin4.EnablePWM();
+        if (status == PWM::PWMStatus::Error)            mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin4 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Fin4 not exported.");
+        else mFin4Ready = true;
+
+        return mFin4Ready;
+
+    default:
+        return false;
+    }
 }
 
 bool SignalManager::UpdateFin_Degrees(const FIN fin, const double degrees)
 {
+    switch (fin)
+    {
+    case FIN::ONE:
+        break;
+    case FIN::TWO:
+        break;
+    case FIN::THREE:
+        break;
+    case FIN::FOUR:
+        break;
+    }
+
     return true;
 }

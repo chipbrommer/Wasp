@@ -13,6 +13,27 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+bool PWM::SetPath(const std::string& pwmPath)
+{
+    if (pwmPath.empty()) return false;
+
+    m_pwmPath = pwmPath;
+    return m_pwmPath == pwmPath;
+}
+
+bool PWM::SetChannel(const int pwmChannel)
+{
+    m_pwmChannel = pwmChannel;
+    return m_pwmChannel == pwmChannel;
+}
+
+bool PWM::UpdateDegreeClamp(const double pwmMinDegrees, const double pwmMaxDegrees)
+{
+    m_minDegrees = pwmMinDegrees;
+    m_maxDegrees = pwmMaxDegrees;
+    return m_minDegrees == pwmMinDegrees && m_maxDegrees == pwmMaxDegrees;
+}
+
 PWM::PWMStatus PWM::ExportPWM()
 {
     if (IsExported() == PWMStatus::Success) { return PWMStatus::Success; }

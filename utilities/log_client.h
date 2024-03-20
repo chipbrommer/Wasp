@@ -61,7 +61,8 @@ public:
     void Run();
 
     /// @brief Stop the main running loop. 
-    void Stop();
+    /// @param waitForEmptyQueue - opt - Flag to wait to Stop until queue is empty
+    void Stop(bool waitForEmptyQueue = false);
 
     /// @brief Clear the log queue of all items
     void ClearLogQueue();
