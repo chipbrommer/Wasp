@@ -11,8 +11,8 @@
 //          ------------------              ------------------------
 #include <string>                           // strings
 //
-#include "external/nlohmann/json.hpp"       // json
-#include "utilities/json_file_utility.hpp"  // file utility type
+#include "../external/nlohmann/json.hpp"       // json
+#include "../utilities/json_file_utility.hpp"  // file utility type
 //
 /////////////////////////////////////////////////////////////////////////////////
 

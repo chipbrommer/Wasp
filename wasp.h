@@ -40,16 +40,17 @@ protected:
 
 private:
     // Input Files
-    JsonFileUtility<Settings>       mSettings;          /// Settings file 
-    JsonFileUtility<Build>          mBuild;             /// Build log file
-    JsonFileUtility<Configuration>  mConfig;            /// Configuration file
+    JsonFileUtility<Settings>       m_settings;             /// Settings file 
+    JsonFileUtility<Build>          m_build;                /// Build log file
+    JsonFileUtility<Configuration>  m_config;               /// Configuration file
 
     // Clients / Managers
-    std::string                     mName;              /// Name for when using logger.
-    LogClient                       mLogger;            /// Client for logging to console and file
-    SignalManager                   mSignalManger;      /// Manager for PWMs and GPIOs
+    std::string                     m_name;                 /// Name for when using logger.
+    LogClient                       m_logger;               /// Client for logging to console and file
+    SignalManager                   m_signalManger;         /// Manager for PWMs and GPIOs
 
     // Threads
-    std::thread                     mSignalThread;      /// Thread for Signal manager
-    std::thread                     mLoggingThread;     /// Thread for logging
+    std::thread                     m_signalThread;         /// Thread for Signal manager
+    std::thread                     m_loggingThread;        /// Thread for logging
+    std::thread                     mProcessingThread;      /// Main thread for program processing
 };

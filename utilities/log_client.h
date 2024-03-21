@@ -36,7 +36,7 @@ public:
     /// @brief Default Constructor
     /// @param logFilePath - opt - filepath for desired log file to enable logging to file
     LogClient(const std::string& logFilePath = "")
-        : mName("LOGGER"), mLogQueue(), mQueueMutex(), mFileLoggingEnabled(false),
+        : m_name("LOGGER"), mLogQueue(), mQueueMutex(), mFileLoggingEnabled(false),
         mLogFile(logFilePath)
     {
         // If we received a logFilePath, attempt to enable file logging. 
@@ -86,7 +86,7 @@ private:
         std::string message;
     };
 
-    std::string mName;              /// name of the logger when writing logs
+    std::string m_name;              /// name of the logger when writing logs
     std::queue<LogItem> mLogQueue;  /// queue of log items 
     std::mutex mQueueMutex;         /// mutex for queue protection
     bool mFileLoggingEnabled;       /// flag for file logging being enabled

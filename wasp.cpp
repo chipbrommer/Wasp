@@ -14,71 +14,56 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation, const std::string& configLocation) : 
-    mSettings(settingsLocation), mBuild(buildLocation), mConfig(configLocation), 
-    mName("WASP"), mLogger(), mSignalManger(mLogger)
+    m_settings(settingsLocation), m_build(buildLocation), m_config(configLocation), 
+    m_name("WASP"), m_logger(), m_signalManger(m_logger)
 {
     // Load the configs and catch any failures
-    if (!mSettings.Load())
+    if (!m_settings.Load())
     {
         std::cerr << "[WASP] - ERROR - Failed to Load/Create settings file.\n";
     }
 
-    if (!mBuild.Load())
+    if (!m_build.Load())
     {
         std::cerr << "[WASP] - ERROR - Failed to Load/Create build file.\n";
     }
 
-    if (!mConfig.Load())
+    if (!m_config.Load())
     {
         std::cerr << "[WASP] - ERROR - Failed to Load/Create config file.\n";
     }
 
-    // Start the logger
-    if (mConfig.data.fileLoggingEnabled)
+    // Start the logger, if file logging is enabled in config, enable it. 
+    if (m_config.data.fileLoggingEnabled && !m_config.data.logFilePath.empty())
     {
-        mLogger.EnableFileLogging(mConfig.data.logFilePath);
+        m_logger.EnableFileLogging(m_config.data.logFilePath);
     }
-    mLoggingThread = std::thread([this] { mLogger.Run(); });
+    m_loggingThread = std::thread([this] { m_logger.Run(); });
 
-    // Initialize the signal managers PWMs
-    mLogger.AddLog(mName, LogClient::LogLevel::INFO, "Starting Signal Manager.");
-    mSignalManger.ReadyFin(SignalManager::FIN::ONE,      mConfig.data.fin1Path, mConfig.data.fin1Channel, mConfig.data.finMinDegrees, mConfig.data.finMaxDegrees);
-    mSignalManger.ReadyFin(SignalManager::FIN::TWO,      mConfig.data.fin2Path, mConfig.data.fin2Channel, mConfig.data.finMinDegrees, mConfig.data.finMaxDegrees);
-    mSignalManger.ReadyFin(SignalManager::FIN::THREE,    mConfig.data.fin3Path, mConfig.data.fin3Channel, mConfig.data.finMinDegrees, mConfig.data.finMaxDegrees);
-    mSignalManger.ReadyFin(SignalManager::FIN::FOUR,     mConfig.data.fin4Path, mConfig.data.fin4Channel, mConfig.data.finMinDegrees, mConfig.data.finMaxDegrees);
-    mSignalThread = std::thread([this] {mSignalManger.Start(); });
+    // Initialize the signal manager PWMs
+    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Starting Signal Manager.");
+    m_signalManger.ReadyFin(SignalManager::FIN::ONE,      m_config.data.fin1Path, m_config.data.fin1Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
+    m_signalManger.ReadyFin(SignalManager::FIN::TWO,      m_config.data.fin2Path, m_config.data.fin2Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
+    m_signalManger.ReadyFin(SignalManager::FIN::THREE,    m_config.data.fin3Path, m_config.data.fin3Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
+    m_signalManger.ReadyFin(SignalManager::FIN::FOUR,     m_config.data.fin4Path, m_config.data.fin4Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
+    m_signalThread = std::thread([this] { m_signalManger.Start(); });
 
 }
 
 Wasp::~Wasp() 
 {
-    mSignalManger.Stop();
-    if (mSignalThread.joinable()) mSignalThread.join();
+    m_signalManger.Stop();
+    if (m_signalThread.joinable()) m_signalThread.join();
 
     // Close the logger last but wait until all logs have been written
-    mLogger.Stop(true);
-    if (mLoggingThread.joinable()) mLoggingThread.join();
+    m_logger.Stop(true);
+    if (m_loggingThread.joinable()) m_loggingThread.join();
 }
 
 void Wasp::Execute()
 {
-
-
-    std::cout << "Welcome to wasp.\n";
-
-    mLogger.AddLog(mName, LogClient::LogLevel::INFO, "Welcome!");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    mLogger.AddLog(mName, LogClient::LogLevel::ERROR, "Error Test!");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    mLogger.AddLog(mName, LogClient::LogLevel::WARNING, "Warning Test!");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    mLogger.AddLog(mName, LogClient::LogLevel::INFO, "Closing!");
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (true)
+    {
+        
+    }
 }

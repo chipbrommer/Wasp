@@ -42,7 +42,8 @@ bool LogClient::EnableFileLogging(const std::string& filename)
 
     // Check if the filename has an extension. If not append '.log' to it. 
     std::string file = filename;
-    if (file.find('.') == std::string::npos) {
+    if (file.find('.') == std::string::npos) 
+    {
         file += ".log";
     }
 
@@ -59,7 +60,7 @@ bool LogClient::EnableFileLogging(const std::string& filename)
 
     // Write a notice
     WriteLog({0, LogLevel::INFO, 
-        CreateLogString(mName, LogLevelToStringMap.at(LogLevel::INFO), 
+        CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), 
             "File Logging Enabled at: " + filename) }
     );
     
@@ -92,7 +93,7 @@ void LogClient::Stop(bool waitForEmptyQueue)
     if (mRun)
     {
         // Create a notice and write it. 
-        WriteLog({0, LogLevel::INFO, CreateLogString(mName, LogLevelToStringMap.at(LogLevel::INFO), "Stopping.")});
+        WriteLog({0, LogLevel::INFO, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), "Stopping.")});
 
         if (waitForEmptyQueue)
         {
@@ -113,7 +114,7 @@ void LogClient::Stop(bool waitForEmptyQueue)
 void LogClient::ClearLogQueue()
 {
     // Create a notice and write it. 
-    WriteLog({0, LogLevel::INFO, CreateLogString(mName, LogLevelToStringMap.at(LogLevel::INFO), "Clearing Queue.") });
+    WriteLog({0, LogLevel::INFO, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), "Clearing Queue.") });
     
     // Clear the queue
     std::scoped_lock lock(mQueueMutex);
@@ -123,7 +124,7 @@ void LogClient::ClearLogQueue()
 
     // Notify the number of cleared items. 
     std::string temp = "Cleared " + std::to_string(numInQueue) + " logs.";
-    WriteLog({0, LogLevel::INFO, CreateLogString(mName, LogLevelToStringMap.at(LogLevel::INFO), temp) });
+    WriteLog({0, LogLevel::INFO, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), temp) });
 }
 
 std::string LogClient::CreateLogString(const std::string& name, const std::string& level, const std::string& message)

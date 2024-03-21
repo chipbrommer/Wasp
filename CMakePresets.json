@@ -13,7 +13,7 @@
             },
             "condition": {
                 "type": "equals",
-                "lhs": "${hostSystemName}",
+                "lhs": "${hostSystem_name}",
                 "rhs": "Windows"
             }
         },
@@ -68,7 +68,7 @@
             },
             "condition": {
                 "type": "equals",
-                "lhs": "${hostSystemName}",
+                "lhs": "${hostSystem_name}",
                 "rhs": "Linux"
             },
             "vendor": {
@@ -88,7 +88,7 @@
             },
             "condition": {
                 "type": "equals",
-                "lhs": "${hostSystemName}",
+                "lhs": "${hostSystem_name}",
                 "rhs": "Darwin"
             },
             "vendor": {

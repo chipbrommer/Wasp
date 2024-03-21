@@ -89,6 +89,6 @@ private:
     bool mFin3Ready         = false;        /// Indicator flag for Fin 3
     bool mFin4Ready         = false;        /// Indicator flag for Fin 4
 
-    std::string mName       = "SIG MGR";    /// Name for logging
-    LogClient& mLogger;                     /// Logger
+    std::string m_name       = "SIG MGR";    /// Name for logging
+    LogClient& m_logger;                     /// Logger
 };
