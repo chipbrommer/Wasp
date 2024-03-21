@@ -34,9 +34,9 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     }
 
     // Start the logger, if file logging is enabled in config, enable it. 
-    if (m_config.data.fileLoggingEnabled && !m_config.data.logFilePath.empty())
+    if (m_settings.data.fileLoggingEnabled && !m_settings.data.logFilePath.empty())
     {
-        m_logger.EnableFileLogging(m_config.data.logFilePath);
+        m_logger.EnableFileLogging(m_settings.data.logFilePath);
     }
     m_loggingThread = std::thread([this] { m_logger.Run(); });
 
@@ -47,6 +47,8 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     m_signalManger.ReadyFin(SignalManager::FIN::THREE,    m_config.data.fin3Path, m_config.data.fin3Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
     m_signalManger.ReadyFin(SignalManager::FIN::FOUR,     m_config.data.fin4Path, m_config.data.fin4Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
     m_signalThread = std::thread([this] { m_signalManger.Start(); });
+
+
 
 }
 

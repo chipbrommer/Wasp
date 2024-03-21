@@ -13,6 +13,8 @@
 //
 #include "../external/nlohmann/json.hpp"       // json
 #include "../utilities/json_file_utility.hpp"  // file utility type
+#include "../managers/gps_manager.h"
+#include "../managers/imu_manager.h"
 //
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -37,9 +39,9 @@ struct Configuration : JsonType
     double finMinDegrees    = -25.0;
     double finMaxDegrees    = 25.0;
 
-    // Preferences
-    std::string logFilePath = "";
-    bool fileLoggingEnabled = false;
+    // Hardware Selection
+    GpsManager::GpsOptions gpsUnit       = GpsManager::GpsOptions::Ublox_M9;
+    ImuManager::ImuOptions imuUnit       = ImuManager::ImuOptions::IL_Kernel210;
 
     /// @brief map for json item to variables
     std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> jsonMapping
@@ -58,8 +60,8 @@ struct Configuration : JsonType
         {"fin4Channel",         [this](const nlohmann::json& j) { j.at("fin4Channel").get_to(fin4Channel);                  }},
         {"finMinDegrees",       [this](const nlohmann::json& j) { j.at("finMinDegrees").get_to(finMinDegrees);              }},
         {"finMaxDegrees",       [this](const nlohmann::json& j) { j.at("finMaxDegrees").get_to(finMaxDegrees);              }},
-        {"logFilePath",         [this](const nlohmann::json& j) { j.at("logFilePath").get_to(logFilePath);                  }},
-        {"fileLoggingEnabled",  [this](const nlohmann::json& j) { j.at("fileLoggingEnabled").get_to(fileLoggingEnabled);    }}
+        {"gpsUnit",             [this](const nlohmann::json& j) { j.at("gpsUnit").get_to(gpsUnit);                          }},
+        {"imuUnit",             [this](const nlohmann::json& j) { j.at("imuUnit").get_to(imuUnit);                          }}
     };
 
     /// @brief Serialize structure to json
@@ -81,8 +83,8 @@ struct Configuration : JsonType
             {"fin4Channel",         fin4Channel},
             {"finMinDegrees",       finMinDegrees},
             {"finMaxDegrees",       finMaxDegrees},
-            {"logFilePath",         logFilePath},
-            {"fileLoggingEnabled",  fileLoggingEnabled}
+            {"gpsUnit",             gpsUnit},
+            {"imuUnit",             imuUnit}
         };
     }
 

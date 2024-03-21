@@ -1,10 +1,9 @@
-#pragma once
 /////////////////////////////////////////////////////////////////////////////////
 // @file            signal_manager.h
 // @brief           A manager for controlling signals for Wasp
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
-
+#pragma once
 /////////////////////////////////////////////////////////////////////////////////
 //
 // Includes:
@@ -12,8 +11,8 @@
 //          ------------------              ------------------------
 #include <string>                           // strings
 //
-#include "utilities/pwm_interface.h"        // pwms
-#include "utilities/log_client.h"           // logger
+#include "../utilities/pwm_interface.h"        // pwms
+#include "../utilities/log_client.h"           // logger
 // 
 /////////////////////////////////////////////////////////////////////////////////
 

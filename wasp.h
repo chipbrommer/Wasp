@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 // @file            wasp_m.h
-// @brief           Main application
+// @brief           A full operational flight software implementation
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +17,9 @@
 #include "files/configuration.h"            // configuration information
 #include "utilities/json_file_utility.hpp"  // settings utility
 #include "utilities/log_client.h"           // log client
-#include "signal_manager.h"                 // signal manager
+#include "managers/signal_manager.h"        // signal manager
+#include "managers/imu_manager.h"           // imu manager
+#include "managers/gps_manager.h"           // gps manager
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -48,6 +50,7 @@ private:
     std::string                     m_name;                 /// Name for when using logger.
     LogClient                       m_logger;               /// Client for logging to console and file
     SignalManager                   m_signalManger;         /// Manager for PWMs and GPIOs
+
 
     // Threads
     std::thread                     m_signalThread;         /// Thread for Signal manager
