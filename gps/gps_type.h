@@ -25,11 +25,6 @@ struct GpsData
 
     bool hardwareError = false; // @todo fix these with some proper error types ??? 
     bool softwareError = false; // @todo fix these with some proper error types ??? 
-
-    long txCount = 0;
-    long txErrorCount = 0;
-    long rxCount = 0;
-    long rxErrorCount = 0;
 };
 
 /// @brief The base class for a GPS unit for WASP
@@ -42,14 +37,7 @@ public:
     GpsType(const std::string& name) : m_name(name) {}
     
     /// @brief 
-    ~GpsType() {}
-
-    /// @brief 
-    /// @return 
-    virtual bool Connect() = 0;
-
-    /// @brief 
-    virtual void Disconnect() = 0;
+    virtual ~GpsType() {}
 
     /// @brief 
     /// @return 
@@ -57,11 +45,7 @@ public:
 
     /// @brief 
     /// @return 
-    virtual bool ProcessData() = 0;
-
-    /// @brief 
-    /// @return 
-    virtual bool SendData() = 0;
+    virtual int SendData() = 0;
 
     /// @brief 
     /// @return 
@@ -75,6 +59,9 @@ protected:
     std::string m_name;                     /// name of the unit
     GpsData m_commonData;                   /// Holds common data 
 
-private:
+    long txCount = 0;
+    long txErrorCount = 0;
+    long rxCount = 0;
+    long rxErrorCount = 0;
 
 };

@@ -45,13 +45,6 @@ public:
 
     /// @brief 
     /// @return 
-    virtual bool Connect() = 0;
-
-    /// @brief 
-    virtual void Disconnect() = 0;
-
-    /// @brief 
-    /// @return 
     virtual int ReadData() = 0;
 
     /// @brief 

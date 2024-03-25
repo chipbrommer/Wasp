@@ -1,8 +1,18 @@
-#include "inertial_labs.h"
 
-InertialLabs::InertialLabs() : ImuType("") {}
+/////////////////////////////////////////////////////////////////////////////////
+// @file            inertial_labs.cpp
+// @brief           Implementation for the inertial labs Imu class
+// @author          Chip Brommer
+/////////////////////////////////////////////////////////////////////////////////
 
-InertialLabs::~InertialLabs() {}
+/////////////////////////////////////////////////////////////////////////////////
+//
+// Includes:
+//          name                            reason included
+//          ------------------              ------------------------
+#include    "inertial_labs.h"                 // Header
+// 
+/////////////////////////////////////////////////////////////////////////////////
 
 int InertialLabs::ReadData()
 {

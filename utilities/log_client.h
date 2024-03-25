@@ -86,7 +86,7 @@ private:
         std::string message;
     };
 
-    std::string m_name;              /// name of the logger when writing logs
+    std::string m_name;             /// name of the logger when writing logs
     std::queue<LogItem> mLogQueue;  /// queue of log items 
     std::mutex mQueueMutex;         /// mutex for queue protection
     bool mFileLoggingEnabled;       /// flag for file logging being enabled

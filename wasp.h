@@ -57,5 +57,5 @@ private:
     // Threads
     std::thread                     m_signalThread;         /// Thread for Signal manager
     std::thread                     m_loggingThread;        /// Thread for logging
-    std::thread                     mProcessingThread;      /// Main thread for program processing
+    std::thread                     m_ProcessingThread;     /// Main thread for program processing
 };

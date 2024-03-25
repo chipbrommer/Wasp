@@ -1,7 +1,7 @@
 #pragma once
 /////////////////////////////////////////////////////////////////////////////////
 // @file            gps_manager.h
-// @brief           A manager for controlling gps for wasp
+// @brief           A manager for controlling GPS for wasp
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -13,7 +13,8 @@
 #include <string>                           // strings
 #include <unordered_map>                    // unordered map
 //
-#include "../utilities/log_client.h"           // logger
+#include "../utilities/log_client.h"        // logger
+#include "ublox.h"                          // ublox gps
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -37,10 +38,11 @@ public:
     ~GpsManager();
 
     /// @brief Configure the serial port for the desired GPS unit
-    /// @param imu - desired GPS to be used
+    /// @param option - desired GPS to be used
     /// @param port - in - port to connect to for communications
     /// @param baudrate - in - baudrate for the connection
-    void Configure(const GpsOptions imu, const std::string port, const double baudrate);
+    /// @return - true if successful, false if already configured and connection is opened. 
+    bool Configure(const GpsOptions option, const std::string port, const double baudrate);
 
     /// @brief Start the connection to the GPS
     void Start();
@@ -59,10 +61,11 @@ private:
         {GpsOptions::Ublox,     "Ublox"}
     };
 
-    GpsOptions m_gps;                       /// Desired GPS unit
+    GpsOptions m_gpsOption;                 /// Desired GPS unit
     std::string m_name;                     /// Name for logging
     bool m_configured;                      /// Flag for if the class is configured
     LogClient& m_logger;                    /// Logger
     std::string m_port;                     /// Holds the port
     double m_baudrate;                      /// Holds the baudrate
+    std::unique_ptr<GpsType> m_gps;         /// Holds a pointer to the utilizes GPS type.  
 };
