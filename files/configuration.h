@@ -13,8 +13,8 @@
 //
 #include "../external/nlohmann/json.hpp"       // json
 #include "../utilities/json_file_utility.hpp"  // file utility type
-#include "../managers/gps_manager.h"
-#include "../managers/imu_manager.h"
+#include "../gps/gps_manager.h"
+#include "../imu/imu_manager.h"
 //
 /////////////////////////////////////////////////////////////////////////////////
 

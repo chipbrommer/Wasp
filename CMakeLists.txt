@@ -36,7 +36,15 @@ add_executable (Wasp
     "managers/signal_manager.cpp" 
     "utilities/web_server.h" 
     "utilities/web_server.cpp"
- "utilities/tcp_server.h" "utilities/tcp_server.cpp" "managers/imu_manager.h" "managers/imu_manager.cpp" "managers/gps_manager.h" "managers/gps_manager.cpp")
+    "utilities/tcp_server.h" 
+    "utilities/tcp_server.cpp" 
+    "imu/imu_manager.h" 
+    "imu/imu_manager.cpp" 
+    "gps/gps_manager.h" 
+    "gps/gps_manager.cpp" 
+    "imu/imu_type.h" 
+    "imu/imu_type.cpp"
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)

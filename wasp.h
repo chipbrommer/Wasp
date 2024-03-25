@@ -18,8 +18,8 @@
 #include "utilities/json_file_utility.hpp"  // settings utility
 #include "utilities/log_client.h"           // log client
 #include "managers/signal_manager.h"        // signal manager
-#include "managers/imu_manager.h"           // imu manager
-#include "managers/gps_manager.h"           // gps manager
+#include "imu/imu_manager.h"                // imu manager
+#include "gps/gps_manager.h"                // gps manager
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
