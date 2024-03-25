@@ -15,7 +15,6 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-
 ImuManager::ImuManager(LogClient& logger, ImuOptions imu) : m_logger(logger), m_imu(imu) {}
 
 ImuManager::~ImuManager()

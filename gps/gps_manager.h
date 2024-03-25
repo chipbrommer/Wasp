@@ -29,9 +29,6 @@ public:
     /// @brief Default constructor
     GpsManager(LogClient& logger, GpsOptions gps);
 
-    /// @brief Constructor
-    GpsManager();
-
     /// @brief Default deconstructor
     ~GpsManager();
 

@@ -50,7 +50,8 @@ private:
     std::string                     m_name;                 /// Name for when using logger.
     LogClient                       m_logger;               /// Client for logging to console and file
     SignalManager                   m_signalManger;         /// Manager for PWMs and GPIOs
-
+    GpsManager                      m_gpsManager;           /// Manager for GPS units
+    ImuManager                      m_imuManager;           /// Manager for IMU units
 
     // Threads
     std::thread                     m_signalThread;         /// Thread for Signal manager

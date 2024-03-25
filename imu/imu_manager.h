@@ -28,9 +28,6 @@ public:
     /// @brief Default constructor
     ImuManager(LogClient& logger, ImuOptions imu);
 
-    /// @brief Constructor
-    ImuManager();
-
     /// @brief Default deconstructor
     ~ImuManager();
 

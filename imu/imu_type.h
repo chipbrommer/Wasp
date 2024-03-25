@@ -39,4 +39,5 @@ protected:
 private:
     std::string m_port;
     double m_baudrate;
+
 };

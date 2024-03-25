@@ -13,9 +13,10 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation, const std::string& configLocation) : 
-    m_settings(settingsLocation), m_build(buildLocation), m_config(configLocation), 
-    m_name("WASP"), m_logger(), m_signalManger(m_logger)
+Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation, const std::string& configLocation) :
+    m_settings(settingsLocation), m_build(buildLocation), m_config(configLocation),
+    m_name("WASP"), m_logger(), m_signalManger(m_logger), m_imuManager(m_logger, ImuManager::ImuOptions::IL_Kernel110),
+    m_gpsManager(m_logger, GpsManager::GpsOptions::Ublox_M10)
 {
     // Load the configs and catch any failures
     if (!m_settings.Load())
@@ -49,7 +50,7 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     m_signalThread = std::thread([this] { m_signalManger.Start(); });
 
 
-
+    //m_imuManager(m_logger, m_config.data.imuUnit);
 }
 
 Wasp::~Wasp() 
