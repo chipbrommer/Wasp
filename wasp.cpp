@@ -15,8 +15,8 @@
 
 Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation, const std::string& configLocation) :
     m_settings(settingsLocation), m_build(buildLocation), m_config(configLocation),
-    m_name("WASP"), m_logger(), m_signalManger(m_logger), m_imuManager(m_logger, ImuManager::ImuOptions::IL_Kernel110),
-    m_gpsManager(m_logger, GpsManager::GpsOptions::Ublox_M10)
+    m_name("WASP"), m_logger(), m_signalManger(m_logger), m_imuManager(m_logger),
+    m_gpsManager(m_logger)
 {
     // Load the configs and catch any failures
     if (!m_settings.Load())
@@ -49,8 +49,11 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     m_signalManger.ReadyFin(SignalManager::FIN::FOUR,     m_config.data.fin4Path, m_config.data.fin4Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
     m_signalThread = std::thread([this] { m_signalManger.Start(); });
 
+    // Configure the IMU
+    m_imuManager.Configure(m_config.data.imuUnit, m_config.data.imuPort, m_config.data.imuBaudRate);
 
-    //m_imuManager(m_logger, m_config.data.imuUnit);
+    // Configure the GPS
+    m_gpsManager.Configure(m_config.data.gpsUnit, m_config.data.gpsPort, m_config.data.gpsBaudRate);
 }
 
 Wasp::~Wasp() 
@@ -67,6 +70,6 @@ void Wasp::Execute()
 {
     while (true)
     {
-        
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 }

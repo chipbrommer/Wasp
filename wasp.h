@@ -1,3 +1,4 @@
+#pragma once
 /////////////////////////////////////////////////////////////////////////////////
 // @file            wasp_m.h
 // @brief           A full operational flight software implementation

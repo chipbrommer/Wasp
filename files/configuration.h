@@ -40,7 +40,7 @@ struct Configuration : JsonType
     double finMaxDegrees    = 25.0;
 
     // Hardware Selection
-    GpsManager::GpsOptions gpsUnit       = GpsManager::GpsOptions::Ublox_M9;
+    GpsManager::GpsOptions gpsUnit       = GpsManager::GpsOptions::Ublox;
     ImuManager::ImuOptions imuUnit       = ImuManager::ImuOptions::IL_Kernel210;
 
     /// @brief map for json item to variables

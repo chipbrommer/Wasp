@@ -13,19 +13,14 @@ class InertialLabs : ImuType
 public:
     InertialLabs();
     ~InertialLabs();
-    int ReadData();
-    void ProcessData();
-    int SendData();
+    int ReadData() override;
+    int SendData() override;
 
 protected:
 
 private:
-    void UpdateCommonData();
+    void ProcessData();
+    void UpdateCommonData() override;
 
-    InertialLabsData m_data;
-
-    long m_txCount;
-    long m_txErrorCount;
-    long m_rxCount;
-    long m_rxErrorCount;
+    InertialLabsData m_data = {};
 };

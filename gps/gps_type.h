@@ -1,7 +1,7 @@
 #pragma once
 /////////////////////////////////////////////////////////////////////////////////
-// @file            imu_type.h
-// @brief           Base class for an IMU unit for WASP 
+// @file            gps_type.h
+// @brief           Base class for a GPS unit for WASP 
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -16,32 +16,33 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-/// @brief The template of common IMU data
-struct ImuData
+/// @brief The template of common GPS data
+struct GpsData
 {
-    double roll = 0.0;
-    double pitch = 0.0;
-    double yaw = 0.0;
-    double rollDelta = 0.0;
-    double pitchDelta = 0.0;
-    double yawDelta = 0.0;
+    double latitude = 0.0;
+    double longitude = 0.0;
+    double altitude = 0.0;
 
     bool hardwareError = false; // @todo fix these with some proper error types ??? 
     bool softwareError = false; // @todo fix these with some proper error types ??? 
 
+    long txCount = 0;
+    long txErrorCount = 0;
+    long rxCount = 0;
+    long rxErrorCount = 0;
 };
 
-/// @brief The base class for an IMU unit for WASP
-class ImuType
+/// @brief The base class for a GPS unit for WASP
+class GpsType
 {
 public:
 
     /// @brief 
     /// @param name 
-    ImuType(const std::string& name) : m_name(name) {}
-
+    GpsType(const std::string& name) : m_name(name) {}
+    
     /// @brief 
-    ~ImuType() {}
+    ~GpsType() {}
 
     /// @brief 
     /// @return 
@@ -56,23 +57,23 @@ public:
 
     /// @brief 
     /// @return 
-    virtual int SendData() = 0;
+    virtual bool ProcessData() = 0;
 
     /// @brief 
     /// @return 
-    ImuData GetCommonData() const { return m_commonData; }
+    virtual bool SendData() = 0;
+
+    /// @brief 
+    /// @return 
+    GpsData GetCommonData() const { return m_commonData; }
 
 protected:
+
     /// @brief 
     virtual void UpdateCommonData() = 0;
 
-    std::string m_name;
-    ImuData m_commonData;
-
-    long m_txCount = 0;
-    long m_txErrorCount = 0;
-    long m_rxCount = 0;
-    long m_rxErrorCount = 0;
+    std::string m_name;                     /// name of the unit
+    GpsData m_commonData;                   /// Holds common data 
 
 private:
 

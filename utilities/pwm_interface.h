@@ -1,3 +1,4 @@
+#pragma once
 /////////////////////////////////////////////////////////////////////////////////
 // @file            pwm_interface.cpp
 // @brief           Class to interface with system pwm's

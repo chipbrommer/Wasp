@@ -1,4 +1,4 @@
-#pragma once
+
 /////////////////////////////////////////////////////////////////////////////////
 // @file            log_client.cpp
 // @brief           Implementation for the LogClient static logger

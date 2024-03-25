@@ -40,10 +40,10 @@ add_executable (Wasp
     "utilities/tcp_server.cpp" 
     "imu/imu_manager.h" 
     "imu/imu_manager.cpp" 
+    "imu/imu_type.h" 
     "gps/gps_manager.h" 
     "gps/gps_manager.cpp" 
-    "imu/imu_type.h" 
-    "imu/imu_type.cpp"
+    "gps/gps_type.h" 
 )
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
