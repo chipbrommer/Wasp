@@ -19,15 +19,15 @@
 /// @brief The template of common IMU data
 struct ImuData
 {
-    double roll = 0.0;
-    double pitch = 0.0;
-    double yaw = 0.0;
-    double rollDelta = 0.0;
-    double pitchDelta = 0.0;
-    double yawDelta = 0.0;
+    double roll             = 0.0;
+    double pitch            = 0.0;
+    double yaw              = 0.0;
+    double rollDelta        = 0.0;
+    double pitchDelta       = 0.0;
+    double yawDelta         = 0.0;
 
-    bool hardwareError = false; // @todo fix these with some proper error types ??? 
-    bool softwareError = false; // @todo fix these with some proper error types ??? 
+    bool hardwareError      = false;        // @todo fix these with some proper error types ??? 
+    bool softwareError      = false;        // @todo fix these with some proper error types ??? 
 
 };
 
@@ -57,15 +57,15 @@ public:
 
 protected:
     /// @brief 
-    virtual void UpdateCommonData() = 0;
+    virtual void UpdateCommonData()     = 0;
 
-    std::string m_name;
-    ImuData m_commonData;
+    std::string m_name                  = "";           /// name of the unit
+    ImuData m_commonData                = {};           /// Holds common data 
 
-    long m_txCount = 0;
-    long m_txErrorCount = 0;
-    long m_rxCount = 0;
-    long m_rxErrorCount = 0;
+    long m_txCount                      = 0;            /// transmit count
+    long m_txErrorCount                 = 0;            /// transmit error count
+    long m_rxCount                      = 0;            /// receive count
+    long m_rxErrorCount                 = 0;            /// receive error count
 
 private:
 

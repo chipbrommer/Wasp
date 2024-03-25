@@ -19,12 +19,12 @@
 /// @brief The template of common GPS data
 struct GpsData
 {
-    double latitude = 0.0;
-    double longitude = 0.0;
-    double altitude = 0.0;
+    double latitude         = 0.0;
+    double longitude        = 0.0;
+    double altitude         = 0.0;
 
-    bool hardwareError = false; // @todo fix these with some proper error types ??? 
-    bool softwareError = false; // @todo fix these with some proper error types ??? 
+    bool hardwareError      = false;    // @todo fix these with some proper error types ??? 
+    bool softwareError      = false;    // @todo fix these with some proper error types ??? 
 };
 
 /// @brief The base class for a GPS unit for WASP
@@ -56,12 +56,12 @@ protected:
     /// @brief 
     virtual void UpdateCommonData() = 0;
 
-    std::string m_name;                     /// name of the unit
-    GpsData m_commonData;                   /// Holds common data 
+    std::string m_name              = "";           /// name of the unit
+    GpsData m_commonData            = {};           /// Holds common data 
 
-    long txCount = 0;
-    long txErrorCount = 0;
-    long rxCount = 0;
-    long rxErrorCount = 0;
+    long txCount                    = 0;            /// transmit count
+    long txErrorCount               = 0;            /// transmit error count
+    long rxCount                    = 0;            /// receive count
+    long rxErrorCount               = 0;            /// receive error count
 
 };
