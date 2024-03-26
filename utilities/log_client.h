@@ -27,10 +27,10 @@ public:
     /// @brief enum for acceptable log levels
     enum class LogLevel
     {
-        DEBUG,
-        INFO,
-        WARNING,
-        ERROR,
+        Debug,
+        Info,
+        Warning,
+        Error,
     };
 
     /// @brief Default Constructor
@@ -72,10 +72,10 @@ protected:
 private:
     /// @brief Convenience mapping for LogLevel to string value
     const std::map<LogClient::LogLevel, std::string> LogLevelToStringMap = {
-        {LogClient::LogLevel::DEBUG,    "DEBUG"},
-        {LogClient::LogLevel::INFO,     "INFO"},
-        {LogClient::LogLevel::WARNING,  "WARNING"},
-        {LogClient::LogLevel::ERROR,    "ERROR"}
+        {LogClient::LogLevel::Debug,    "DEBUG"},
+        {LogClient::LogLevel::Info,     "INFO"},
+        {LogClient::LogLevel::Warning,  "WARNING"},
+        {LogClient::LogLevel::Error,    "ERROR"}
     };
 
     /// @brief A struct to represent a log

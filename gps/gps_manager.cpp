@@ -17,7 +17,7 @@
 GpsManager::GpsManager(LogClient& logger) : m_gpsOption(GpsOptions::Unknown), m_name("GPS MGR"),
     m_configured(false), m_logger(logger), m_port(""), m_baudrate(0) 
 {
-    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Initialized.");
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
 
 GpsManager::GpsManager(LogClient& logger, const GpsOptions option, const std::string port, const double baudrate) :
@@ -33,7 +33,7 @@ GpsManager::~GpsManager()
 
 bool GpsManager::Configure(const GpsOptions option, const std::string port, const double baudrate)
 {
-    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Configuring for " + GpsOptionsMap.at(option));
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configuring for " + GpsOptionsMap.at(option));
     m_gpsOption = option;
     m_port = port;
     m_baudrate = baudrate;
@@ -46,11 +46,11 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
     case GpsOptions::Unknown:
         // Intentionally do nothing... 
     default:
-        m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Unsupported GPS option selected.");
+        m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Unsupported GPS option selected.");
         return false;
     };
 
-    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Configured");
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured");
 }
 
 void GpsManager::Start()

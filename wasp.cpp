@@ -42,7 +42,7 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     m_loggingThread = std::thread([this] { m_logger.Run(); });
 
     // Initialize the signal manager PWMs
-    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Starting Signal Manager.");
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Starting Signal Manager.");
     m_signalManger.ReadyFin(SignalManager::FIN::ONE,      m_config.data.fin1Path, m_config.data.fin1Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
     m_signalManger.ReadyFin(SignalManager::FIN::TWO,      m_config.data.fin2Path, m_config.data.fin2Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
     m_signalManger.ReadyFin(SignalManager::FIN::THREE,    m_config.data.fin3Path, m_config.data.fin3Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);

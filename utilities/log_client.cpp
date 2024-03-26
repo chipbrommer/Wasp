@@ -25,7 +25,7 @@ void LogClient::AddLog(const std::string& name, const LogLevel level, const std:
     if (static_cast<int>(level) < 0 || static_cast<int>(level) >= LogLevelToStringMap.size())
     {
         // Log an error if the log level is out of range
-        WriteLog({ 0, LogLevel::ERROR, "Invalid log level: " + std::to_string(static_cast<int>(level)) + " from " + name });
+        WriteLog({ 0, LogLevel::Error, "Invalid log level: " + std::to_string(static_cast<int>(level)) + " from " + name });
         return;
     }
 
@@ -51,7 +51,7 @@ bool LogClient::EnableFileLogging(const std::string& filename)
     mLogFile.open(file);
     if (!mLogFile.is_open()) 
     {
-        WriteLog({ 0, LogLevel::ERROR, "Failed to open log file: " + file });
+        WriteLog({ 0, LogLevel::Error, "Failed to open log file: " + file });
         return false;
     }
 
@@ -59,8 +59,8 @@ bool LogClient::EnableFileLogging(const std::string& filename)
     mFileLoggingEnabled = true;
 
     // Write a notice
-    WriteLog({0, LogLevel::INFO, 
-        CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), 
+    WriteLog({0, LogLevel::Info, 
+        CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::Info), 
             "File Logging Enabled at: " + filename) }
     );
     
@@ -93,7 +93,7 @@ void LogClient::Stop(bool waitForEmptyQueue)
     if (mRun)
     {
         // Create a notice and write it. 
-        WriteLog({0, LogLevel::INFO, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), "Stopping.")});
+        WriteLog({0, LogLevel::Info, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::Info), "Stopping.")});
 
         if (waitForEmptyQueue)
         {
@@ -114,7 +114,7 @@ void LogClient::Stop(bool waitForEmptyQueue)
 void LogClient::ClearLogQueue()
 {
     // Create a notice and write it. 
-    WriteLog({0, LogLevel::INFO, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), "Clearing Queue.") });
+    WriteLog({0, LogLevel::Info, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::Info), "Clearing Queue.") });
     
     // Clear the queue
     std::scoped_lock lock(mQueueMutex);
@@ -124,7 +124,7 @@ void LogClient::ClearLogQueue()
 
     // Notify the number of cleared items. 
     std::string temp = "Cleared " + std::to_string(numInQueue) + " logs.";
-    WriteLog({0, LogLevel::INFO, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::INFO), temp) });
+    WriteLog({0, LogLevel::Info, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::Info), temp) });
 }
 
 std::string LogClient::CreateLogString(const std::string& name, const std::string& level, const std::string& message)
@@ -138,15 +138,15 @@ void LogClient::WriteLog(const LogItem log)
     switch (log.level)
     {
         // Print to console as basic color
-    case LogLevel::DEBUG:
-    case LogLevel::INFO:
+    case LogLevel::Debug:
+    case LogLevel::Info:
         std::cout << log.message << "\n";
         break;
         // print to console as yellow
-    case LogLevel::WARNING:
+    case LogLevel::Warning:
         std::cout << "\033[33m" << log.message << "\033[0m\n";
         break;
-    case LogLevel::ERROR:
+    case LogLevel::Error:
         std::cout << "\033[31m" << log.message << "\033[0m\n";
         break;
     }

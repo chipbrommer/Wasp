@@ -1,9 +1,19 @@
+#pragma once
+#include <string>
+#include <optional>
+#include <cstdint>
+#include <functional>
+#include <filesystem>
 
-#ifdef __linux__
-	
-#endif
-
+#ifdef _WIN32
+#include <windows.h>
+#else
 typedef int HANDLE;
+constexpr int INVALID_HANDLE_VALUE = -1;
+#include <fcntl.h>
+#include <termios.h>
+#include <unistd.h>
+#endif
 
 class SerialClient
 {
@@ -59,39 +69,25 @@ public:
 		INVALID,
 	};
 
-	/// @brief enum for the stop bits options for the port.
-	enum class StopBits
-	{
-		ONE,
-		TWO,
-		ONE_FIVE,
-		INVALID
-	};
-
-	/// @brief enum for the flow control options for the port.
-	enum class FlowControl
-	{
-		NONE,
-		SOFTWARE,
-		HARDWARE,
-	};
-
-    SerialClient();
+	SerialClient() {}
 	SerialClient(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity);
     ~SerialClient();
-	int Configure();
+	int Configure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity,
+		const bool Blocking = false);
 	int Open();
 	int OpenConfigure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity,
 		const bool Blocking = false);
-	int Reconfigure();
-	int Flush();
-	int FlushInputBuffer();
-	int FlushOutputBuffer();
-	int Read(uint8_t* buffer, size_t size);
-	int Write(const uint8_t* buffer, size_t size);
+	int Reconfigure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity,
+		const bool Blocking = false);
+	bool Flush();
+	bool FlushInputBuffer();
+	bool FlushOutputBuffer();
+	int Read(std::byte* buffer, size_t size);
+	int Write(const std::byte* buffer, size_t size);
+	int Start();
 	int Close();
-	HANDLE GetHandle();
-	bool IsOpen();
+	HANDLE GetHandle() const { return m_fd; }
+	bool IsOpen() const { return m_fd != INVALID_HANDLE_VALUE; }
 	int BytesInQueue();
 	int SetTimeout(int timeout);
 	int GetTimeout();
@@ -101,5 +97,14 @@ public:
 protected:
 
 private:
-	HANDLE m_fd;
+	HANDLE			m_fd					= INVALID_HANDLE_VALUE;
+	size_t			m_bufferSize			= 0;
+	std::byte*		m_buffer				= {};
+	std::string		m_port					= "";
+	BaudRate		m_baudRate				= BaudRate::BAUDRATE_INVALID;
+	ByteSize		m_byteSize				= ByteSize::INVALID;
+	Parity			m_parity				= Parity::INVALID;
+	bool			m_blocking				= false;
+	std::function<void(const std::byte*, size_t)> m_dataCallback;
+	std::function<void(int)> m_errorCallback;
 };

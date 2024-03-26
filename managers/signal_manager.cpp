@@ -36,10 +36,10 @@ SignalManager::SignalManager(const std::string fin1Path, const int fin1Channel,
 SignalManager::~SignalManager()
 {
     // Unexport the PWMs
-    if (mFin1.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin1 failed to Unexport.");
-    if (mFin2.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin2 failed to Unexport.");
-    if (mFin3.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin3 failed to Unexport.");
-    if (mFin4.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin4 failed to Unexport.");
+    if (mFin1.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin1 failed to Unexport.");
+    if (mFin2.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin2 failed to Unexport.");
+    if (mFin3.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin3 failed to Unexport.");
+    if (mFin4.UnExportPWM() == PWM::PWMStatus::Error) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin4 failed to Unexport.");
 }
 
 void SignalManager::Start()
@@ -57,7 +57,7 @@ void SignalManager::Stop()
     if (mRun)
     {
         // Create a notice and write it. 
-        m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Closing.");
+        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Closing.");
 
         // Signal the run to stop
         mRun = false;
@@ -79,13 +79,13 @@ bool SignalManager::ReadyFin(const FIN fin, const std::string finPath, const int
 
         if (mFin1.ExportPWM() == PWM::PWMStatus::Error)
         {
-            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin1 failed to export.");
+            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin1 failed to export.");
             return false;
         }
 
         status = mFin1.EnablePWM();
-        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin1 failed to enable.");
-        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin1 not exported.");
+        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin1 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin1 not exported.");
         else mFin1Ready = true;
         
         return mFin1Ready;
@@ -97,13 +97,13 @@ bool SignalManager::ReadyFin(const FIN fin, const std::string finPath, const int
 
         if (mFin2.ExportPWM() == PWM::PWMStatus::Error) 
         {
-            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin2 failed to export.");
+            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin2 failed to export.");
             return false;
         }
 
         status = mFin2.EnablePWM();
-        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin2 failed to enable.");
-        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin2 not exported.");
+        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin2 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin2 not exported.");
         else mFin2Ready = true;
 
         return mFin2Ready;
@@ -115,13 +115,13 @@ bool SignalManager::ReadyFin(const FIN fin, const std::string finPath, const int
 
         if (mFin3.ExportPWM() == PWM::PWMStatus::Error) 
         {
-            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin3 failed to export.");
+            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin3 failed to export.");
             return false;
         }
 
         status = mFin3.EnablePWM();
-        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin3 failed to enable.");
-        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin3 not exported.");
+        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin3 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin3 not exported.");
         else mFin3Ready = true;
 
         return mFin3Ready;
@@ -133,13 +133,13 @@ bool SignalManager::ReadyFin(const FIN fin, const std::string finPath, const int
 
         if (mFin4.ExportPWM() == PWM::PWMStatus::Error)
         {
-            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin4 failed to export.");
+            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin4 failed to export.");
             return false;
         }
 
         status = mFin4.EnablePWM();
-        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin4 failed to enable.");
-        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Fin4 not exported.");
+        if (status == PWM::PWMStatus::Error)            m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin4 failed to enable.");
+        else if (status == PWM::PWMStatus::NotExported) m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Fin4 not exported.");
         else mFin4Ready = true;
 
         return mFin4Ready;

@@ -54,6 +54,6 @@ void WebServer::Stop()
         m_running = false;
 
         // Log server stop
-        m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Stopped.");
+        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Stopped.");
     }
 }

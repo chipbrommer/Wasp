@@ -19,7 +19,7 @@
 ImuManager::ImuManager(LogClient& logger) : m_imuOption(ImuOptions::Unknown), m_name("IMU MGR"),
     m_configured(false), m_logger(logger), m_port(""), m_baudrate(0)
 {
-    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Initialized.");
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
 
 ImuManager::ImuManager(LogClient& logger, const ImuOptions option, const std::string port, const double baudrate) :
@@ -41,7 +41,7 @@ bool ImuManager::Configure(const ImuOptions option, const std::string port, cons
         return false;
     }
 
-    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Configuring for " + ImuOptionsMap.at(option));
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configuring for " + ImuOptionsMap.at(option));
     m_imuOption = option;
     m_port = port;
     m_baudrate = baudrate;
@@ -56,11 +56,11 @@ bool ImuManager::Configure(const ImuOptions option, const std::string port, cons
     case ImuOptions::Unknown:
         // Intentionally do nothing... 
     default:
-        m_logger.AddLog(m_name, LogClient::LogLevel::ERROR, "Unsupported IMU option selected.");
+        m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Unsupported IMU option selected.");
         return false;
     };
 
-    m_logger.AddLog(m_name, LogClient::LogLevel::INFO, "Configured");
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured");
 
     return true;
 }

@@ -68,4 +68,5 @@ private:
     std::string m_port;                     /// Holds the port
     double m_baudrate;                      /// Holds the baudrate
     std::unique_ptr<GpsType> m_gps;         /// Holds a pointer to the utilizes GPS type.  
+    SerialClient m_commPort;                /// Holds connection to serial port
 };

@@ -70,4 +70,5 @@ private:
     std::string m_port;                     /// Holds the port
     double m_baudrate;                      /// Holds the baudrate
     std::unique_ptr<ImuType> m_imu;         /// Holds a pointer to the utilized IMU type. 
+    SerialClient m_commPort;                /// Holds connection to serial port
 };
