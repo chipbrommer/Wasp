@@ -14,19 +14,9 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-int Ublox::ReadData()
-{
-    return 0;
-}
-
-void Ublox::ProcessData()
+void Ublox::ProcessData(std::byte* data)
 {
 
-}
-
-int Ublox::SendData()
-{
-    return 0;
 }
 
 void Ublox::UpdateCommonData()

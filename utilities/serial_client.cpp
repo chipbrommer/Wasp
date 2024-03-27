@@ -74,7 +74,7 @@ int SerialClient::Read(std::byte* buffer, size_t size)
     return 0;
 }
 
-int SerialClient::Write(const std::byte* buffer, size_t size)
+int SerialClient::Write(const std::byte& buffer, size_t size)
 {
     return 0;
 }
@@ -123,11 +123,11 @@ int SerialClient::SetTimeout(int timeout_ms) {
 #else
     struct termios options;
     if (tcgetattr(m_fd, &options) == -1) { return -1; }
-    options.c_cc[VTIME] = timeout_ms / 100; // Convert timeout to tenths of a second
-    options.c_cc[VMIN] = 0;                 // Return immediately
+    options.c_cc[VTIME] = timeout_ms / 100;         // Convert timeout to tenths of a second
+    options.c_cc[VMIN] = 0;                         // Return immediately
     if (tcsetattr(m_fd, TCSANOW, &options) == -1) { return -1; }
 #endif
-    return 0; // Success
+    return 0;                                       // Success
 }
 
 int SerialClient::GetTimeout() {
@@ -142,11 +142,7 @@ int SerialClient::GetTimeout() {
 #else
     struct termios options;
     if (tcgetattr(m_fd, &options) == -1) { timeout = -1; }
-    else 
-    {
-        // Timeout in tenths of a second
-        timeout = options.c_cc[VTIME] * 100;
-    }
+    else { timeout = options.c_cc[VTIME] * 100; }   // Timeout in tenths of a second
 #endif
     return timeout;
 }
@@ -156,9 +152,9 @@ int SerialClient::SetBlockingMode(bool onoff) {
     // Not needed on Windows - non-blocking mode is not supported, needs timeout
 #else
     int flags = fcntl(m_fd, F_GETFL, 0);
-    if (flags == -1) { return -1; } // Error getting current flags
-    if (onoff) { flags &= ~O_NONBLOCK; } // Turn off non-blocking mode
-    else { flags |= O_NONBLOCK; } // Turn on non-blocking mode
+    if (flags == -1) { return -1; }                 // Error getting current flags
+    if (onoff) { flags &= ~O_NONBLOCK; }            // Turn off non-blocking mode
+    else { flags |= O_NONBLOCK; }                   // Turn on non-blocking mode
 
     if (fcntl(m_fd, F_SETFL, flags) == -1) { return -1; }
 #endif
@@ -169,11 +165,11 @@ bool SerialClient::GetBlockingMode()
 {
 #ifdef _WIN32
     // Not supported on Windows
-    return true;                        // Assume blocking mode by default
+    return true;                                    // Assume blocking mode by default
 #else
     int flags = fcntl(m_fd, F_GETFL, 0);
-    if (flags == -1) { return true; }   // Assume blocking mode by default
-    return !(flags & O_NONBLOCK);       // Return true if blocking mode is enabled
+    if (flags == -1) { return true; }               // Assume blocking mode by default
+    return !(flags & O_NONBLOCK);                   // Return true if blocking mode is enabled
 #endif
 }
 

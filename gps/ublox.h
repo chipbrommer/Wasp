@@ -31,25 +31,17 @@ class Ublox : public GpsType
 public:
 
     /// @brief 
-    Ublox() : GpsType("") {}
+    Ublox(LogClient& logger) : GpsType("UBLOX", logger) {}
 
     /// @brief 
     ~Ublox() {}
 
     /// @brief 
-    /// @return 
-    int ReadData() override;
-
-    /// @brief 
-    /// @return 
-    int SendData() override;
+    void ProcessData(std::byte* data) override;
 
 protected:
 
 private:
-
-     // @brief 
-    void ProcessData();
 
     /// @brief 
     void UpdateCommonData() override;

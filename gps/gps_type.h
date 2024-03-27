@@ -13,6 +13,7 @@
 #include <string>                           // strings
 //
 #include "../utilities/serial_client.h"     // serial client
+#include "../utilities/log_client.h"        // log client
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -34,18 +35,20 @@ public:
 
     /// @brief 
     /// @param name 
-    GpsType(const std::string& name) : m_name(name) {}
+    GpsType(const std::string& name, LogClient& logger) : m_name(name), m_logger(logger) 
+    {
+        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
+    }
     
     /// @brief 
-    virtual ~GpsType() {}
+    virtual ~GpsType() 
+    {
+        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Uninitialized.");
+    }
 
     /// @brief 
     /// @return 
-    virtual int ReadData() = 0;
-
-    /// @brief 
-    /// @return 
-    virtual int SendData() = 0;
+    virtual void ProcessData(std::byte* data) = 0;
 
     /// @brief 
     /// @return 
@@ -58,6 +61,7 @@ protected:
 
     std::string m_name              = "";           /// name of the unit
     GpsData m_commonData            = {};           /// Holds common data 
+    LogClient& m_logger;
 
     long txCount                    = 0;            /// transmit count
     long txErrorCount               = 0;            /// transmit error count

@@ -51,6 +51,16 @@ public:
     /// @brief Stop the connection to the IMU
     void Stop();
 
+    /// @brief Read and Process data from the configured IMU
+    /// @return -1 on error, else number of bytes read
+    int CheckForData();
+
+    /// @brief Send data for the configured IMU
+    /// @param data - in - reference to the data to be sent
+    /// @param length - in - number of bytes to send
+    /// @return -1 on error, else number of bytes sent
+    int Send(const std::byte& data, const size_t length);
+
 protected:
 
 private:
@@ -58,17 +68,15 @@ private:
     // enum to string conversion for convenience mapping
     std::unordered_map<ImuOptions, std::string> ImuOptionsMap
     {
-        {ImuOptions::Unknown, "Unknown"},
-        {ImuOptions::IL_Kernel210, "Inertial Labs Kernel-210"},
-        {ImuOptions::IL_Kernel110, "Inertial Labs Kernel-110"},
+        {ImuOptions::Unknown,           "Unknown"},
+        {ImuOptions::IL_Kernel210,      "Inertial Labs Kernel-210"},
+        {ImuOptions::IL_Kernel110,      "Inertial Labs Kernel-110"},
     };
 
-    ImuOptions m_imuOption;                 /// Desired IMU for usage
-    std::string m_name;                     /// Name for logging
-    bool m_configured;                      /// Flag for if the class is configured
-    LogClient& m_logger;                    /// Logger
-    std::string m_port;                     /// Holds the port
-    double m_baudrate;                      /// Holds the baudrate
-    std::unique_ptr<ImuType> m_imu;         /// Holds a pointer to the utilized IMU type. 
-    SerialClient m_commPort;                /// Holds connection to serial port
+    ImuOptions                  m_imuOption;        /// Desired IMU for usage
+    std::string                 m_name;             /// Name for logging
+    bool                        m_configured;       /// Flag for if the class is configured
+    LogClient&                  m_logger;           /// Logger
+    std::unique_ptr<ImuType>    m_imu;              /// Holds a pointer to the utilized IMU type. 
+    SerialClient                m_commPort;         /// Holds connection to serial port
 };

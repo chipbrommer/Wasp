@@ -41,7 +41,7 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
     switch (option)
     {
     case GpsOptions::Ublox:
-        m_gps = std::make_unique<Ublox>();
+        m_gps = std::make_unique<Ublox>(m_logger);
         break;
     case GpsOptions::Unknown:
         // Intentionally do nothing... 
@@ -51,6 +51,7 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
     };
 
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured");
+    return true;
 }
 
 void GpsManager::Start()

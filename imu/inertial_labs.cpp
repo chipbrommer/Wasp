@@ -14,19 +14,9 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-int InertialLabs::ReadData()
+int InertialLabs::ProcessData()
 {
-    return 0;
-}
-
-void InertialLabs::ProcessData()
-{
-
-}
-
-int InertialLabs::SendData()
-{
-    return 0;
+    return -1;
 }
 
 void InertialLabs::UpdateCommonData()

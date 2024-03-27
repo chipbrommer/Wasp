@@ -31,25 +31,19 @@ class InertialLabs : public ImuType
 public:
 
     /// @brief 
-    InertialLabs() : ImuType("") {}
+    InertialLabs(LogClient& logger, const std::string path, const double baudrate) : 
+        ImuType("ILABS", logger, path, baudrate) {}
 
     /// @brief 
     ~InertialLabs() {}
     
     /// @brief 
-    /// @return 
-    int ReadData() override;
-
-    /// @brief 
-    /// @return 
-    int SendData() override;
+    /// @return -1 on error, else number of bytes read and processed
+    int ProcessData() override;
 
 protected:
 
 private:
-
-    /// @brief 
-    void ProcessData();
 
     /// @brief 
     void UpdateCommonData() override;

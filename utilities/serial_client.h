@@ -83,7 +83,7 @@ public:
 	bool FlushInputBuffer();
 	bool FlushOutputBuffer();
 	int Read(std::byte* buffer, size_t size);
-	int Write(const std::byte* buffer, size_t size);
+	int Write(const std::byte& buffer, size_t size);
 	int Start();
 	int Close();
 	HANDLE GetHandle() const { return m_fd; }

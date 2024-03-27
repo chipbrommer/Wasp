@@ -17,7 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 ImuManager::ImuManager(LogClient& logger) : m_imuOption(ImuOptions::Unknown), m_name("IMU MGR"),
-    m_configured(false), m_logger(logger), m_port(""), m_baudrate(0)
+    m_configured(false), m_logger(logger)
 {
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
@@ -43,15 +43,13 @@ bool ImuManager::Configure(const ImuOptions option, const std::string port, cons
 
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configuring for " + ImuOptionsMap.at(option));
     m_imuOption = option;
-    m_port = port;
-    m_baudrate = baudrate;
 
     // Create the proper IMU
     switch (option)
     {
     case ImuOptions::IL_Kernel210:
     case ImuOptions::IL_Kernel110:
-        m_imu = std::make_unique<InertialLabs>();
+        m_imu = std::make_unique<InertialLabs>(m_logger, port, baudrate);
         break;
     case ImuOptions::Unknown:
         // Intentionally do nothing... 
@@ -73,4 +71,14 @@ void ImuManager::Start()
 void ImuManager::Stop()
 {
     // Stop the IMU
+}
+
+int ImuManager::CheckForData()
+{
+    return m_imu->ProcessData();
+}
+
+int ImuManager::Send(const std::byte& data, const size_t length)
+{
+    return m_commPort.Write(data, length);
 }
