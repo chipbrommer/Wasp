@@ -14,7 +14,9 @@
 #include <unordered_map>                    // unordered map
 //
 #include "../utilities/log_client.h"        // logger
+#include "../files/constants.h"             // Auto discovery timeout 
 #include "ublox.h"                          // ublox gps
+#include "novatel.h"                        // novatel gps
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -26,6 +28,7 @@ public:
     {
         Unknown,
         Ublox,
+        Novatel,
     };
 
     /// @brief Default constructor
@@ -44,6 +47,8 @@ public:
     /// @return - true if successful, false if already configured and connection is opened. 
     bool Configure(const GpsOptions option, const std::string port, const SerialClient::BaudRate baudrate);
 
+    bool AutoConfigure();
+
     /// @brief Start the connection to the GPS
     void Start();
 
@@ -58,10 +63,11 @@ private:
     std::unordered_map<GpsOptions, std::string> GpsOptionsMap
     {
         {GpsOptions::Unknown,   "Unknown"},
-        {GpsOptions::Ublox,     "Ublox"}
+        {GpsOptions::Ublox,     "Ublox"},
+        {GpsOptions::Novatel,   "Novatel"},
     };
 
-    GpsOptions m_gpsOption;                 /// Desired GPS unit
+    GpsOptions m_currentGpsType;            /// Current GPS type 
     std::string m_name;                     /// Name for logging
     bool m_configured;                      /// Flag for if the class is configured
     LogClient& m_logger;                    /// Logger

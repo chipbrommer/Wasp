@@ -44,7 +44,8 @@ add_executable (Wasp
     "gps/gps_manager.h" 
     "gps/gps_manager.cpp" 
     "gps/gps_type.h" 
-)
+    "gps/novatel.h" 
+    "gps/novatel.cpp" "files/constants.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)

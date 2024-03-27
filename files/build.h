@@ -22,14 +22,14 @@ struct Build : JsonType
 {
     std::string imuSerialNumber = "";
     std::string gpsSerialNumber = "";
-    std::string osVersion       = "";
+    //std::string osVersion       = "";
 
     /// @brief map for json item to variables
     std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> jsonMapping
     {
         {"imuSerialNumber", [this](const nlohmann::json& j) { j.at("imuSerialNumber").get_to(imuSerialNumber);  }},
         {"gpsSerialNumber", [this](const nlohmann::json& j) { j.at("gpsSerialNumber").get_to(gpsSerialNumber);  }},
-        {"osVersion",       [this](const nlohmann::json& j) { j.at("osVersion").get_to(osVersion);              }}
+        //{"osVersion",       [this](const nlohmann::json& j) { j.at("osVersion").get_to(osVersion);              }}
     };
 
     /// @brief Mandatory function for serializing settings to json
@@ -45,8 +45,8 @@ struct Build : JsonType
     {
         return nlohmann::json{
             {"imuSerialNumber", imuSerialNumber},
-            {"gpsSerialNumber", gpsSerialNumber},
-            {"osVersion",       osVersion}
+            {"gpsSerialNumber", gpsSerialNumber}
+            //{"osVersion",       osVersion}
         };
     }
        
