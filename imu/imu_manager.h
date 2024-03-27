@@ -33,7 +33,7 @@ public:
     ImuManager(LogClient& logger);
 
     /// @brief Full constructor
-    ImuManager(LogClient& logger, const ImuOptions option, const std::string port, const double baudrate);
+    ImuManager(LogClient& logger, const ImuOptions option, const std::string port, const SerialClient::BaudRate baudrate);
 
     /// @brief Default deconstructor
     ~ImuManager();
@@ -43,7 +43,7 @@ public:
     /// @param port - in - port to connect to for communications
     /// @param baudrate - in - baudrate for the connection
     /// @return - true if successful, false if already configured and connection is opened. 
-    bool Configure(const ImuOptions option, const std::string port, const double baudrate);
+    bool Configure(const ImuOptions option, const std::string port, const SerialClient::BaudRate baudrate);
 
     /// @brief Start the connection to the IMU
     void Start();

@@ -32,7 +32,7 @@ public:
     GpsManager(LogClient& logger);
 
     /// @brief Full constructor
-    GpsManager(LogClient& logger, const GpsOptions option, const std::string port, const double baudrate);
+    GpsManager(LogClient& logger, const GpsOptions option, const std::string port, const SerialClient::BaudRate baudrate);
 
     /// @brief Default deconstructor
     ~GpsManager();
@@ -42,7 +42,7 @@ public:
     /// @param port - in - port to connect to for communications
     /// @param baudrate - in - baudrate for the connection
     /// @return - true if successful, false if already configured and connection is opened. 
-    bool Configure(const GpsOptions option, const std::string port, const double baudrate);
+    bool Configure(const GpsOptions option, const std::string port, const SerialClient::BaudRate baudrate);
 
     /// @brief Start the connection to the GPS
     void Start();
@@ -66,7 +66,7 @@ private:
     bool m_configured;                      /// Flag for if the class is configured
     LogClient& m_logger;                    /// Logger
     std::string m_port;                     /// Holds the port
-    double m_baudrate;                      /// Holds the baudrate
+    SerialClient::BaudRate m_baudrate;      /// Holds the baudrate
     std::unique_ptr<GpsType> m_gps;         /// Holds a pointer to the utilizes GPS type.  
     SerialClient m_commPort;                /// Holds connection to serial port
 };

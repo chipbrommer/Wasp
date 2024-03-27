@@ -14,9 +14,9 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-void Ublox::ProcessData(std::byte* data)
+int Ublox::ProcessData()
 {
-
+    return -1;
 }
 
 void Ublox::UpdateCommonData()

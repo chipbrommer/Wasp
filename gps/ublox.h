@@ -31,13 +31,14 @@ class Ublox : public GpsType
 public:
 
     /// @brief 
-    Ublox(LogClient& logger) : GpsType("UBLOX", logger) {}
+    Ublox(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) : 
+        GpsType("UBLOX", logger, path, baudrate) {}
 
     /// @brief 
     ~Ublox() {}
 
     /// @brief 
-    void ProcessData(std::byte* data) override;
+    int ProcessData() override;
 
 protected:
 

@@ -23,9 +23,9 @@ struct Configuration : JsonType
 {
     // Ports
     std::string imuPort     = "";
-    int imuBaudRate         = 115200;
+    SerialClient::BaudRate imuBaudRate  = SerialClient::BaudRate::BAUDRATE_115200;
     std::string gpsPort     = "";
-    int gpsBaudRate         = 921600;
+    SerialClient::BaudRate gpsBaudRate  = SerialClient::BaudRate::BAUDRATE_921600;
 
     // PWMs / Fins
     std::string fin1Path    = "";

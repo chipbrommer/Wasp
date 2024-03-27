@@ -31,7 +31,7 @@ class InertialLabs : public ImuType
 public:
 
     /// @brief 
-    InertialLabs(LogClient& logger, const std::string path, const double baudrate) : 
+    InertialLabs(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) : 
         ImuType("ILABS", logger, path, baudrate) {}
 
     /// @brief 

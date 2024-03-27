@@ -39,9 +39,13 @@ public:
 
     /// @brief 
     /// @param name 
-    ImuType(const std::string& name, LogClient& logger, const std::string path, const double baudrate) : 
+    /// @param logger 
+    /// @param path 
+    /// @param baudrate 
+    ImuType(const std::string& name, LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) : 
         m_name(name), m_logger(logger), m_path(path), m_baudrate(baudrate)
     {
+        m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE);
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
     }
 
@@ -74,17 +78,17 @@ protected:
     /// @brief 
     virtual void UpdateCommonData() = 0;
 
-    std::string         m_name              = "";           /// name of the unit
-    ImuData             m_commonData        = {};           /// Holds common data 
-    LogClient&          m_logger;
-    std::string         m_path              = "";           /// Holds the path to desired serial port
-    double              m_baudrate          = 0;            /// Holds the baudrate
-    SerialClient        m_comms;                            /// Holds the serial client
+    std::string             m_name              = "";           /// name of the unit
+    ImuData                 m_commonData        = {};           /// Holds common data 
+    LogClient&              m_logger;
+    std::string             m_path              = "";           /// Holds the path to desired serial port
+    SerialClient::BaudRate  m_baudrate          = SerialClient::BaudRate::BAUDRATE_INVALID;     /// Holds the baudrate
+    SerialClient            m_comms;                            /// Holds the serial client
 
-    long                m_txCount           = 0;            /// transmit count
-    long                m_txErrorCount      = 0;            /// transmit error count
-    long                m_rxCount           = 0;            /// receive count
-    long                m_rxErrorCount      = 0;            /// receive error count
+    long                    m_txCount           = 0;            /// transmit count
+    long                    m_txErrorCount      = 0;            /// transmit error count
+    long                    m_rxCount           = 0;            /// receive count
+    long                    m_rxErrorCount      = 0;            /// receive error count
 
 private:
 

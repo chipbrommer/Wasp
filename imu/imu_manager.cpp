@@ -22,7 +22,7 @@ ImuManager::ImuManager(LogClient& logger) : m_imuOption(ImuOptions::Unknown), m_
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
 
-ImuManager::ImuManager(LogClient& logger, const ImuOptions option, const std::string port, const double baudrate) :
+ImuManager::ImuManager(LogClient& logger, const ImuOptions option, const std::string port, const SerialClient::BaudRate baudrate) :
     ImuManager(logger)
 {
     Configure(option, port, baudrate);
@@ -33,7 +33,7 @@ ImuManager::~ImuManager()
     Stop();
 }
 
-bool ImuManager::Configure(const ImuOptions option, const std::string port, const double baudrate)
+bool ImuManager::Configure(const ImuOptions option, const std::string port, const SerialClient::BaudRate baudrate)
 {
     
     if (m_configured)

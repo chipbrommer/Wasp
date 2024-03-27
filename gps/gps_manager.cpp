@@ -15,12 +15,12 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 GpsManager::GpsManager(LogClient& logger) : m_gpsOption(GpsOptions::Unknown), m_name("GPS MGR"),
-    m_configured(false), m_logger(logger), m_port(""), m_baudrate(0) 
+    m_configured(false), m_logger(logger), m_port(""), m_baudrate(SerialClient::BaudRate::BAUDRATE_INVALID)
 {
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
 
-GpsManager::GpsManager(LogClient& logger, const GpsOptions option, const std::string port, const double baudrate) :
+GpsManager::GpsManager(LogClient& logger, const GpsOptions option, const std::string port, const SerialClient::BaudRate baudrate) :
     GpsManager(logger)
 {
     Configure(option, port, baudrate);
@@ -31,7 +31,7 @@ GpsManager::~GpsManager()
     Stop();
 }
 
-bool GpsManager::Configure(const GpsOptions option, const std::string port, const double baudrate)
+bool GpsManager::Configure(const GpsOptions option, const std::string port, const SerialClient::BaudRate baudrate)
 {
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configuring for " + GpsOptionsMap.at(option));
     m_gpsOption = option;
@@ -41,7 +41,7 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
     switch (option)
     {
     case GpsOptions::Ublox:
-        m_gps = std::make_unique<Ublox>(m_logger);
+        m_gps = std::make_unique<Ublox>(m_logger, port, baudrate);
         break;
     case GpsOptions::Unknown:
         // Intentionally do nothing... 
