@@ -47,19 +47,12 @@ public:
     GpsType(const std::string& name, LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
         m_name(name), m_logger(logger), m_path(path), m_baudrate(baudrate)
     {
-        m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE);
-        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
-    }
+        // Attempt to auto discover if we received auto
+        if (m_baudrate != SerialClient::BaudRate::BAUDRATE_AUTO && m_baudrate != SerialClient::BaudRate::BAUDRATE_INVALID)
+        {
+            m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE);
+        }
 
-    /// @brief 
-    /// @param name 
-    /// @param logger 
-    /// @param path 
-    /// @param baudrate 
-    GpsType(const std::string& name, LogClient& logger, const std::string path) :
-        m_name(name), m_logger(logger), m_path(path)
-    {
-        m_baudrate = AutoDiscoverBaudRate();
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
     }
     
@@ -72,16 +65,18 @@ public:
 
     SerialClient::BaudRate AutoDiscoverBaudRate()
     {
+        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery enabled.");
+
         // Iterate over the baud rate map
         for (const auto& [baudRateEnum, baudRateValue] : m_GpsCommonBaudRateMap)
         {
             m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Trying baud rate: " + std::to_string(baudRateValue));
 
             // Try to open the port with the current baud rate
-            if (m_comms.Reconfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE) < 0)
+            if (!m_comms.Reconfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE))
             {
-                m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Baud rate discovered: " + std::to_string(baudRateValue));
-                return baudRateEnum; // Baud rate discovered, return
+                m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery failed to reconfigure port.");
+                return SerialClient::BaudRate::BAUDRATE_INVALID;
             }
 
             // Wait for set timeout length to attempt to get data
@@ -95,6 +90,7 @@ public:
                 if (m_commonData.rxCount > 0)
                 {
                     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Baudrate successful for " + std::to_string(baudRateValue));
+                    m_baudrate = baudRateEnum;
                     return baudRateEnum;
                 }
 

@@ -29,9 +29,9 @@ int SerialClient::OpenConfigure(const std::string port, const BaudRate baud, con
     return 0;
 }
 
-int SerialClient::Reconfigure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity, const bool Blocking)
+bool SerialClient::Reconfigure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity, const bool Blocking)
 {
-    return 0;
+    return true;
 }
 
 bool SerialClient::Flush() 

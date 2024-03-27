@@ -39,6 +39,9 @@ public:
     /// @brief Main entry point to start Wasp
     void Execute();
 
+    /// @brief Graceful closing procedure
+    void Close();
+
 protected:
 
 private:

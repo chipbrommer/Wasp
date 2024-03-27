@@ -45,6 +45,7 @@ public:
 		BAUDRATE_460800,
 		BAUDRATE_921600,
 		BAUDRATE_CUSTOM,
+		BAUDRATE_AUTO,
 		BAUDRATE_INVALID,
 	};
 
@@ -77,7 +78,7 @@ public:
 	int Open();
 	int OpenConfigure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity,
 		const bool Blocking = false);
-	int Reconfigure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity,
+	bool Reconfigure(const std::string port, const BaudRate baud, const ByteSize bytes, const Parity parity,
 		const bool Blocking = false);
 	bool Flush();
 	bool FlushInputBuffer();

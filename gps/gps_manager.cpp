@@ -33,6 +33,8 @@ GpsManager::~GpsManager()
 
 bool GpsManager::Configure(const GpsOptions option, const std::string port, const SerialClient::BaudRate baudrate)
 {
+    bool rtn = false;
+
     // If the requested option is the same as the current option, return true
     if (m_gps && option == m_currentGpsType)
     {
@@ -59,11 +61,24 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
         m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Unsupported GPS option selected.");
         m_currentGpsType = GpsOptions::Unknown;
         m_gps = nullptr;
-        return false;
     };
 
-    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured");
-    return true;
+    if (baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
+    {
+        SerialClient::BaudRate baud = m_gps->AutoDiscoverBaudRate();
+
+        // if return was invalid, we failed to create connection and initialize. 
+        if (baud != SerialClient::BaudRate::BAUDRATE_INVALID) rtn = true;
+    }
+    else
+    {
+        // If the baudrate isnt invalid, it indicates a successful connection
+        if (m_gps->GetBaudRate() != SerialClient::BaudRate::BAUDRATE_INVALID) rtn = true;
+    }
+
+    if (rtn) { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured"); }
+    else { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Failed to configure"); }
+    return rtn;
 }
 
 bool GpsManager::AutoConfigure()

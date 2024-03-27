@@ -38,7 +38,7 @@ bool ImuManager::Configure(const ImuOptions option, const std::string port, cons
     
     if (m_configured)
     {
-        return false;
+        return true;
     }
 
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configuring for " + ImuOptionsMap.at(option));
