@@ -45,7 +45,15 @@ add_executable (Wasp
     "gps/gps_manager.cpp" 
     "gps/gps_type.h" 
     "gps/novatel.h" 
-    "gps/novatel.cpp" "files/constants.h")
+    "gps/novatel.cpp" 
+    "files/constants.h" 
+    "utilities/cot_utility.h" 
+    "utilities/cot_utility.cpp"  
+    "utilities/cot_info.h"
+    "external/pugixml/pugiconfig.hpp"
+    "external/pugixml/pugixml.cpp"
+    "external/pugixml/pugixml.hpp"
+)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)
