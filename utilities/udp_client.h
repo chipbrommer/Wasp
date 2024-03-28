@@ -290,7 +290,7 @@ private:
 	/// <summary>Validates an IP address is IPv4 or IPv6</summary>
 	/// <param name="ip"> -[in]- IP Address to be validated</param>
 	/// <returns>1 if valid ipv4, 2 if valid ipv6, else -1 on fail</returns>
-	int8_t ValidateIP(const std::string& ip);
+	int ValidateIP(const std::string& ip);
 
 	/// <summary>Validates a port number is between 0-65535</summary>
 	/// <param name="port"> -[in]- Port number to be validated</param>

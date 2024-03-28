@@ -941,7 +941,7 @@ std::string UDP_Client::GetLastError()
 	return UdpClientErrorMap[mLastError];
 }
 
-int8_t UDP_Client::ValidateIP(const std::string& ip)
+int UDP_Client::ValidateIP(const std::string& ip)
 {
 	sockaddr_in sa4 = {};
 	sockaddr_in6 sa6 = {};

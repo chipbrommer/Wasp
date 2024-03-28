@@ -5,16 +5,16 @@
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 //
 //  Include files:
 //          name                        reason included
 //          --------------------        ---------------------------------------
-#include <iostream>                     // out stream friend functions
-#include <iomanip>                      // For manipulating output with setw
+#include <iostream>                     // ostream
+#include <iomanip>                      // setw
 #include <unordered_map>                // maps
 //
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
 namespace Root
 {
@@ -509,7 +509,7 @@ public:
     }
 };
 
-/// @brief Define a COT Message subschema class for Uid data 
+/// @brief A COT Message subschema class for Uid data 
 class Uid
 {
 public:
@@ -550,7 +550,7 @@ public:
     }
 };
 
-/// @brief Define a COT Message subschema class for PrecisionLocation data 
+/// @brief A COT Message subschema class for PrecisionLocation data 
 class PrecisionLocation
 {
 public:
@@ -595,7 +595,7 @@ public:
     }
 };
 
-/// @brief Define a COT Message subschema class for Group data 
+/// @brief A COT Message subschema class for Group data 
 class Group
 {
 public:
@@ -640,7 +640,7 @@ public:
     }
 };
 
-/// @brief Define a COT Message subschema class for Status data 
+/// @brief A COT Message subschema class for Status data 
 class Status
 {
 public:
@@ -681,7 +681,7 @@ public:
     }
 };
 
-/// @brief Define a COT Message subschema class for Track data 
+/// @brief A COT Message subschema class for Track data 
 class Track
 {
 public:
@@ -726,7 +726,7 @@ public:
     }
 };
 
-/// @brief Define a COT Message subschema class for Detail data 
+/// @brief A COT Message subschema class for Detail data 
 class Detail
 {
 public:
@@ -819,7 +819,7 @@ public:
     }
 };
 
-/// @brief Define a Root COT Message schema class for entire message data. 
+/// @brief A Root COT Message schema class for entire message data. 
 class COTSchema
 {
 public:

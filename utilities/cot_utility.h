@@ -5,19 +5,19 @@
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 //
 //  Include files:
-//          name                        reason included
-//          --------------------        ---------------------------------------
-#include <iostream>                     // out stream friend functions
-#include <iomanip>                      // For manipulating output with setw
-#include <unordered_map>                // maps
+//          name                            reason included
+//          --------------------            ------------------------------------
+#include <iostream>                         // ostream
+#include <iomanip>                          // setw
+#include <unordered_map>                    // maps
 //
-#include "cot_info.h"                   // schemas
+#include "cot_info.h"                       // schemas
 #include "../external/pugixml/pugixml.hpp"  // XML
 // 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
 
 class COT_Utility
