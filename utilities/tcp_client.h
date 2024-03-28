@@ -17,14 +17,13 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-typedef int SOCKET
+typedef int SOCKET;
 constexpr int INVALID_SOCKET = -1;
 #endif
 #include <cstdint>					// Standard integer types
 #include <map>						// Error enum to strings.
 #include <string>					// Strings
 #include <regex>					// Regular expression for ip validation
-#include <string>                   // strings
 //
 #include "log_client.h"             // Log Client
 // 
