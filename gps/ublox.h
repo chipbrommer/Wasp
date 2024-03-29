@@ -31,8 +31,7 @@ class Ublox : public GpsType
 public:
 
     /// @brief 
-    Ublox(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) : 
-        GpsType("UBLOX", logger, path, baudrate) {}
+    Ublox(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate);
 
     /// @brief 
     ~Ublox() {}

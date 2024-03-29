@@ -14,6 +14,12 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
+Ublox::Ublox(LogClient & logger, const std::string path, const SerialClient::BaudRate baudrate) :
+    GpsType("UBLOX", logger, path, baudrate) 
+{
+
+}
+
 int Ublox::ProcessData()
 {
     return -1;
