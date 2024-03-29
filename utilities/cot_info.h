@@ -151,57 +151,62 @@ namespace Location
     };
 };
 
-namespace HowEntry
+namespace How
 {
-    enum class Type : int
+
+    namespace Entry
     {
-        h,
-        m,
-        Error
+        enum class Type : int
+        {
+            h,
+            m,
+            Error
+        };
+
+        static const std::unordered_map<Type, std::string> TypeToString
+        {
+            {Type::h, "Human"},
+            {Type::m, "Machine"},
+            {Type::Error, "Error"}
+        };
     };
 
-    static const std::unordered_map<Type, std::string> TypeToString
+    /// @brief Data section of the 'how' data
+    namespace Data
     {
-        {Type::h, "Human"},
-        {Type::m, "Machine"},
-        {Type::Error, "Error"}
-    };
-};
+        enum class Type : int
+        {
+            e,
+            cal,
+            t,
+            paste,
+            i,
+            g,
+            m,
+            s,
+            f,
+            con,
+            pred,
+            r,
+            Error
+        };
 
-namespace HowData 
-{
-    enum class Type : int
-    {
-        e,
-        cal,
-        t,
-        paste,
-        i,
-        g,
-        m,
-        s,
-        f,
-        con,
-        pred,
-        r,
-        Error
-    };
-
-    static const std::unordered_map<Type, std::string> TypeToString
-    {
-        {Type::e, "Estimated"},
-        {Type::cal, "Calculated"},
-        {Type::t, "Transcribed"},
-        {Type::paste, "Cut and Paste"},
-        {Type::i, "Mensurated"},
-        {Type::g, "Derived From GPS"},
-        {Type::m, "Magnetic"},
-        {Type::s, "Simulated"},
-        {Type::f, "Fused"},
-        {Type::con, "Configured"},
-        {Type::pred, "Predicted"},
-        {Type::r, "Relayed"},
-        {Type::Error, "Error"}
+        static const std::unordered_map<Type, std::string> TypeToString
+        {
+            {Type::e, "Estimated"},
+            {Type::cal, "Calculated"},
+            {Type::t, "Transcribed"},
+            {Type::paste, "Cut and Paste"},
+            {Type::i, "Mensurated"},
+            {Type::g, "Derived From GPS"},
+            {Type::m, "Magnetic"},
+            {Type::s, "Simulated"},
+            {Type::f, "Fused"},
+            {Type::con, "Configured"},
+            {Type::pred, "Predicted"},
+            {Type::r, "Relayed"},
+            {Type::Error, "Error"}
+        };
     };
 };
 
@@ -336,8 +341,8 @@ public:
     DateTime            start;             /// Starting time when an event should be considered valid
     DateTime            stale;             /// Ending time when an event  should no longer be considered valid
     std::string         how;               /// Gives a hint about how the coordinates were generated
-    HowEntry::Type      howEntry;          /// Grab how the entry point was created from how string.
-    HowData::Type       howData;           /// Grab the data for the entry type from how string. 
+    How::Entry::Type    howEntry;          /// Grab how the entry point was created from how string.
+    How::Data::Type     howData;           /// Grab the data for the entry type from how string. 
 
     /// @brief Constructor - Initializes Everything
     Event(const double          version = 0,
@@ -349,8 +354,8 @@ public:
         const DateTime          start = DateTime(),
         const DateTime          stale = DateTime(),
         const std::string       how = "",
-        const HowEntry::Type    howEntry = HowEntry::Type::Error,
-        const HowData::Type     howData = HowData::Type::Error) :
+        const How::Entry::Type    howEntry = How::Entry::Type::Error,
+        const How::Data::Type     howData = How::Data::Type::Error) :
         version(version), type(type), indicator(indicator), location(location),
         uid(uid), time(time), start(start), stale(stale), how(how),
         howEntry(howEntry), howData(howData)
@@ -399,8 +404,8 @@ public:
             << "\tStart:           " << event.start << "\n"
             << "\tStale:           " << event.stale << "\n"
             << "\tHow:             " << event.how << "\n"
-            << "\tHow Entry:       " << static_cast<int>(event.howEntry) << " - " << HowEntry::TypeToString.at(event.howEntry) << "\n"
-            << "\tHow Data:        " << static_cast<int>(event.howData) << " - " << HowData::TypeToString.at(event.howData) << "\n"
+            << "\tHow Entry:       " << static_cast<int>(event.howEntry) << " - " << How::Entry::TypeToString.at(event.howEntry) << "\n"
+            << "\tHow Data:        " << static_cast<int>(event.howData) << " - " << How::Data::TypeToString.at(event.howData) << "\n"
             << "\n";
 
         return os;

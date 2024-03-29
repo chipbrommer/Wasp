@@ -34,7 +34,7 @@ bool COT_Utility::VerifyXML(std::string& buffer)
     return true;
 }
 
-std::string COT_Utility::GenerateXMLCOTMessage(COTSchema& cot, std::string callsign) 
+std::string COT_Utility::GenerateXMLCOTMessage(COTSchema& cot) 
 {
     std::stringstream msg;
 
@@ -51,9 +51,9 @@ std::string COT_Utility::GenerateXMLCOTMessage(COTSchema& cot, std::string calls
     // Detail section
     msg << "<detail>";
 
-    if (!callsign.empty())
+    if (!cot.detail.contact.callsign.empty())
     {
-        msg << "<contact callsign=\"" << callsign << "\" endpoint=\"\" xmppUsername=\"\"/>";
+        msg << "<contact callsign=\"" << cot.detail.contact.callsign << "\" endpoint=\"" << cot.detail.contact.endpoint << "\" xmppUsername=\"" << cot.detail.contact.xmppUsername << "\"/>";
     }
 
     msg << "<uid Droid=\"" << cot.detail.uid.droid << "\"/>";
@@ -62,7 +62,118 @@ std::string COT_Utility::GenerateXMLCOTMessage(COTSchema& cot, std::string calls
     msg << "<track course=\"" << cot.detail.track.course << "\" speed=\"" << cot.detail.track.speed << "\"/>"; // corrected line
     msg << "</detail></event>";
 
+    // Create XML document to load in the msg for propper xml formating 
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(msg.str().c_str());
+
+    if (result)
+    {
+        std::stringstream newMsg;
+        doc.save(newMsg);
+        return newMsg.str();
+    }
+
+    // else just send unformatted string
     return msg.str();
+}
+
+bool COT_Utility::UpdateReceivedCOTMessage(std::string& receivedMessage, COTSchema& cot, std::string& modifiedMessage, bool acknowledgment)
+{
+    // Create XML document to load in the receivedMessage
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(receivedMessage.c_str());
+
+    if (result) 
+    {
+        // Modified flag
+        bool modified = false;
+
+        // Find the 'point' node
+        pugi::xml_node pointNode = doc.select_node("//point").node();
+
+        // If we found point...
+        if (pointNode) 
+        {
+            // Set the new latitude value
+            pointNode.attribute("lat").set_value(cot.point.latitude);
+            modified = true;
+        }
+
+        // Find the 'status' node
+        pugi::xml_node statusNode = doc.select_node("//status").node();
+        
+        if (statusNode)
+        {
+            // Check if acknowledgment flag is true and acknowledgment attribute doesn't exist
+            if (acknowledgment && !statusNode.attribute("acknowledgment"))
+            {
+                // Add acknowledgment attribute with value "ack"
+                statusNode.append_attribute("acknowledgment").set_value("ack");
+                modified = true;
+            }
+        }
+
+        // If modified, save the modified XML string
+        if (modified)
+        {
+            std::stringstream modifiedXmlStream;
+            doc.save(modifiedXmlStream);
+            modifiedMessage = modifiedXmlStream.str();
+            return true;
+        }
+
+        // No modification made
+        return false;
+    }
+    else 
+    {
+        std::cerr << "Failed to parse XML: " << result.description() << std::endl;
+        return false;
+    }
+}
+
+bool COT_Utility::AcknowledgeReceivedCOTMessage(std::string& receivedMessage, std::string& responseMessage)
+{
+    // Create XML document to load in the receivedMessage
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_string(receivedMessage.c_str());
+
+    if (result)
+    {
+        // Modified flag
+        bool modified = false;
+
+        // Find the 'status' node
+        pugi::xml_node statusNode = doc.select_node("//status").node();
+
+        if (statusNode)
+        {
+            // Check if acknowledgment attribute doesn't exist
+            if (!statusNode.attribute("acknowledgment"))
+            {
+                // Add acknowledgment attribute with value "ack"
+                statusNode.append_attribute("acknowledgment").set_value("ack");
+                modified = true;
+            }
+        }
+
+        // If modified, save the modified XML string
+        if (modified)
+        {
+            std::stringstream modifiedXmlStream;
+            doc.save(modifiedXmlStream);
+            responseMessage = modifiedXmlStream.str();
+            return true;
+        }
+
+        // No modification made
+        return false;
+    }
+    else
+    {
+        std::cerr << "Failed to parse XML: " << result.description() << std::endl;
+        return false;
+    }
 }
 
 int COT_Utility::ParseCOT(std::string& buffer, COTSchema& cot)
@@ -215,14 +326,14 @@ int COT_Utility::ParseCOT(std::string& buffer, COTSchema& cot)
     return pointsSize;
 }
 
-int COT_Utility::ParseCOT(const uint8_t* buffer, COTSchema& cot)
+int COT_Utility::ParseCOT(const char* buffer, COTSchema& cot)
 {
-    std::string str = (char*)buffer;
+    std::string str = buffer;
     int num = ParseCOT(str, cot);
     return num;
 }
 
-COTSchema COT_Utility::ParseBufferToCOT(const uint8_t* buffer)
+COTSchema COT_Utility::ParseBufferToCOT(const char* buffer)
 {
     COTSchema cot;
     ParseCOT(buffer, cot);
@@ -265,7 +376,7 @@ bool COT_Utility::ParseTypeAttribute(std::string& type, Point::Type& ind, Locati
     return true;
 }
 
-bool COT_Utility::ParseHowAttribute(std::string& type, HowEntry::Type& how, HowData::Type& data)
+bool COT_Utility::ParseHowAttribute(std::string& type, How::Entry::Type& how, How::Data::Type& data)
 {
     // Read the data from the file as String Vector
     std::vector<std::string> values;
@@ -443,37 +554,37 @@ Location::Type COT_Utility::LocationTypeCharToEnum(std::string& loc)
     else return Location::Type::Error;
 }
 
-HowEntry::Type COT_Utility::HowEntryTypeCharToEnum(std::string& entry)
+How::Entry::Type COT_Utility::HowEntryTypeCharToEnum(std::string& entry)
 {
-         if (entry == "h")   return HowEntry::Type::h;
-    else if (entry == "m")   return HowEntry::Type::m;
-    else return HowEntry::Type::Error;
+         if (entry == "h")   return How::Entry::Type::h;
+    else if (entry == "m")   return How::Entry::Type::m;
+    else return How::Entry::Type::Error;
 }
 
-HowData::Type COT_Utility::HowDataTypeCharToEnum(std::string& data, HowEntry::Type entry)
+How::Data::Type COT_Utility::HowDataTypeCharToEnum(std::string& data, How::Entry::Type entry)
 {
-    if (entry == HowEntry::Type::h)
+    if (entry == How::Entry::Type::h)
     {
-             if (data == "e")   return HowData::Type::e;
-        else if (data == "c")   return HowData::Type::cal;
-        else if (data == "t")   return HowData::Type::t;
-        else if (data == "p")   return HowData::Type::paste;
-        else return HowData::Type::Error;
+             if (data == "e")   return How::Data::Type::e;
+        else if (data == "c")   return How::Data::Type::cal;
+        else if (data == "t")   return How::Data::Type::t;
+        else if (data == "p")   return How::Data::Type::paste;
+        else return How::Data::Type::Error;
     }
-    else if (entry == HowEntry::Type::m)
+    else if (entry == How::Entry::Type::m)
     {
-             if (data == "i")   return HowData::Type::i;
-        else if (data == "g")   return HowData::Type::g;
-        else if (data == "m")   return HowData::Type::m;
-        else if (data == "s")   return HowData::Type::s;
-        else if (data == "f")   return HowData::Type::f;
-        else if (data == "c")   return HowData::Type::con;
-        else if (data == "p")   return HowData::Type::pred;
-        else if (data == "r")   return HowData::Type::r;
-        else return HowData::Type::Error;
+             if (data == "i")   return How::Data::Type::i;
+        else if (data == "g")   return How::Data::Type::g;
+        else if (data == "m")   return How::Data::Type::m;
+        else if (data == "s")   return How::Data::Type::s;
+        else if (data == "f")   return How::Data::Type::f;
+        else if (data == "c")   return How::Data::Type::con;
+        else if (data == "p")   return How::Data::Type::pred;
+        else if (data == "r")   return How::Data::Type::r;
+        else return How::Data::Type::Error;
     }
     else
     {
-        return HowData::Type::Error;
+        return How::Data::Type::Error;
     }
 }
