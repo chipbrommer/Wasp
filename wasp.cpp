@@ -16,7 +16,7 @@
 Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation, const std::string& configLocation) :
     m_settings(settingsLocation), m_build(buildLocation), m_config(configLocation),
     m_name("WASP"), m_logger(), m_signalManger(m_logger), m_imuManager(m_logger),
-    m_gpsManager(m_logger)
+    m_gpsManager(m_logger), m_webServer(m_logger)
 {
     // Load the configs and catch any failures
     if (!m_settings.Load())
@@ -81,6 +81,9 @@ void Wasp::Close()
 {
     m_signalManger.Stop();
     if (m_signalThread.joinable()) m_signalThread.join();
+
+    m_webServer.Stop();
+    if (m_webThread.joinable()) m_webThread.join();
 
     // Close the logger last but wait until all logs have been written
     m_logger.Stop(true);

@@ -49,23 +49,23 @@ public:
 	/// @brief Configure the client
 	/// @param address - [in] - Address of the server
 	/// @param port - [in] - Port of the server
-	/// @return 0 if successful, -1 if fails. Call Serial::GetLastError to find out more.
+	/// @return 0 if successful, -1 if fails.
 	int Configure(const std::string address, const uint16_t port);
 
 	/// @brief Connect to TCP server at the set address and port
-	/// @return 0 if successful, -1 if fails. Call Serial::GetLastError to find out more.
+	/// @return 0 if successful, -1 if fails. 
 	int Connect();
 
 	/// @brief Send data to a server
 	/// @param buffer - [in] - Buffer to be sent
 	/// @param size - [in] - Size to be sent
-	/// @return 0+ if successful (number bytes sent), -1 if fails. Call TCP_Client::GetLastError to find out more.
+	/// @return 0+ if successful (number bytes sent), -1 if fails.
 	int Send(const char* buffer, const size_t size);
 
 	/// @brief Receive data from a server
 	/// @param buffer - [out] - Buffer to place received data into
 	/// @param maxSize - [in] - Maximum number of bytes to be read
-	/// @return 0+ if successful (number bytes received), -1 if fails. Call TCP_Client::GetLastError to find out more.
+	/// @return 0+ if successful (number bytes received), -1 if fails.
 	int Receive(void* buffer, const size_t maxSize);
 
 	/// @brief Closes a socket

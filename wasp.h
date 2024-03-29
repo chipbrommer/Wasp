@@ -22,6 +22,7 @@
 #include "imu/imu_manager.h"                // imu manager
 #include "gps/gps_manager.h"                // gps manager
 #include "utilities/cot_utility.h"          // cot messaging
+#include "utilities/web_server.h"           // web server
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -57,6 +58,7 @@ private:
     SignalManager                   m_signalManger;         /// Manager for PWMs and GPIOs
     GpsManager                      m_gpsManager;           /// Manager for GPS units
     ImuManager                      m_imuManager;           /// Manager for IMU units
+    WebServer                       m_webServer;            /// Web server interface
 
     // Utilities
     COT_Utility                     m_cot;                  /// Utility to generate and handle CoT stuff. 
@@ -64,5 +66,6 @@ private:
     // Threads
     std::thread                     m_signalThread;         /// Thread for Signal manager
     std::thread                     m_loggingThread;        /// Thread for logging
+    std::thread                     m_webThread;            /// Thread for web interface
     std::thread                     m_ProcessingThread;     /// Main thread for program processing
 };

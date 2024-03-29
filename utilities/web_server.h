@@ -21,8 +21,8 @@ class WebServer
 {
 public:
 
-    WebServer(LogClient logger, const int port = 8080, const std::string directory = ".") :
-        m_name("WEB SERVER"), m_server(nullptr), m_logger(logger), 
+    WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".") :
+        m_name("WEB SVR"), m_server(nullptr), m_logger(logger), 
         m_port(port), m_directory(directory), m_running(false) {}
     
     ~WebServer() { Stop(); }
