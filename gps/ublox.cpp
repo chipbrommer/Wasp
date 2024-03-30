@@ -12,19 +12,186 @@
 //          ------------------              ------------------------
 #include <array>							// array
 //
-#include    "ublox.h"                       // Header
+#include "ublox.h"							// Header
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
 UbloxGps::UbloxGps(LogClient & logger, const std::string path, const SerialClient::BaudRate baudrate) :
     GpsType("UBLOX", logger, path, baudrate) 
 {
-
+	// Initialzie the Ublox receiver
+	Initialize();
 }
 
 int UbloxGps::ProcessData()
 {
-    return -1;
+	static unsigned int bytesInBuffer = 0;
+	static bool first = true;
+	int bytesRead = 0;
+	int bytesAvail = 0;
+
+	// Buffers 
+	static uint8_t inBuffer[BUFFER_SIZE] = {};
+	static uint8_t msgBuffer[BUFFER_SIZE] = {};
+
+	// dump existing data
+	if (first)
+	{
+		first = false;
+		m_comms.Flush();
+		bytesInBuffer = 0;
+	}
+
+	// if here and buffer is full for some odd reason, as a precaution lets clear the buffer and stream before proceeding
+	if (bytesInBuffer >= BUFFER_SIZE)
+	{
+		memset(inBuffer, 0, sizeof(inBuffer));
+		m_comms.Flush();
+		bytesInBuffer = 0;
+	}
+
+	// check how many bytes are available - if none, or if no data available in buffer 
+	// then continue to next iteration of loop
+	bytesAvail = (BUFFER_SIZE - bytesInBuffer);
+
+	// read bytes from port into buffer - only read in the max amount
+	bytesRead = m_comms.Read(&inBuffer[bytesInBuffer], bytesAvail);
+
+	// update bytes in bufer
+	if (bytesRead > 0)
+	{
+		bytesInBuffer += bytesRead;
+	}
+	else
+	{
+		return 0;
+	}
+
+	// do we have at least 2 bytes in buffer (size of sync bytes)
+	while (bytesInBuffer >= Ublox::NUM_SYNC_BYTES)
+	{
+		bool ubxFound = false;
+		bool nmeaFound = false;
+		unsigned int nmeaMsgLength = 0;
+		unsigned int fullMsgLength = 0;
+		unsigned int index = 0;
+		unsigned int index2 = 0;
+
+		// find the start of message
+		for (index = 0; index <= (bytesInBuffer - Ublox::NUM_SYNC_BYTES); index++)
+		{
+			// look for the ubx sync characters
+			if ((inBuffer[index + 0] == reinterpret_cast<uint8_t>(Ublox::UBX::Header::SyncChar1)) &&
+				(inBuffer[index + 1] == reinterpret_cast<uint8_t>(Ublox::UBX::Header::SyncChar2)))
+			{
+				ubxFound = true;
+				break;
+			}
+
+			// look for the nmea sync character
+			else if (inBuffer[index + 0] == Ublox::NMEA::syncChar)
+			{
+				// if its an nmea message, we have to find the tail manually. these are variable length.
+				for (index2 = index; index2 < (bytesInBuffer - 2); index2++)
+				{
+					if (inBuffer[index2 + 0] == Ublox::NMEA::endCheck1 &&
+						inBuffer[index2 + 1] == Ublox::NMEA::endCheck2)
+					{
+						nmeaMsgLength = index2 - index;
+						nmeaFound = true;
+						m_data.NmeaRxCount++;
+						break;
+					}
+				}
+
+				// leave the for loop if its found. 
+				if (nmeaFound) break;
+			}
+		}
+
+		// move start of message to front of buffer
+		if (index > 0)
+		{
+			memmove(&inBuffer, &inBuffer[index], (bytesInBuffer - index));
+			bytesInBuffer -= index;
+		}
+
+		// if we didnt find a start of message, try again next time
+		if (ubxFound == false && nmeaFound == false)
+		{
+			return 0;
+		}
+
+		// did we find a UBX message ? 
+		if (ubxFound == true)
+		{
+			// 8 bytes = (sync1, sync2, class id, msg id, length(2 bytes), checksum A, checksum B)
+			fullMsgLength = CalculatePayloadLength(inBuffer[4], inBuffer[5]) + 8;
+
+			// do we have enough bytes for the message?
+			// if not, continue to top of loop and collect more data
+			if (bytesInBuffer < fullMsgLength)
+			{
+				return 0;
+			}
+
+			// attempt to validate the ubx checksum
+			if (ValidateUbxChecksum(inBuffer, fullMsgLength) == 0)
+			{
+				// checksum fail, dump the sync bytes and continue searching
+				m_data.ChecksumFailCount++;
+				memmove(&inBuffer[0], &inBuffer[Ublox::NUM_SYNC_BYTES], (bytesInBuffer - Ublox::NUM_SYNC_BYTES));
+				bytesInBuffer -= Ublox::NUM_SYNC_BYTES;
+				continue;
+			}
+
+			// consume the ubx message
+			if (bytesInBuffer >= fullMsgLength)
+			{
+				// clear the msg buffer 
+				memset(msgBuffer, 0, sizeof(msgBuffer));
+				// copy the mem to msg buffer
+				memcpy(&msgBuffer[0], &inBuffer[0], fullMsgLength);
+				// move the data in the buffer up.
+				memmove(&inBuffer, &inBuffer[fullMsgLength], bytesInBuffer - fullMsgLength);
+				// update Bytes in buffer
+				bytesInBuffer -= fullMsgLength;
+			}
+
+			// handle the ubx message 
+			HandleUbxMessage(msgBuffer);
+			m_data.UbxRxCount++;
+		}
+		// did we find an nmea message ? 
+		else if (nmeaFound == true)
+		{
+			if (nmeaMsgLength > sizeof(msgBuffer))
+			{
+				// Message is too large for msgBuffer; dump the sync byte and continue searching
+				m_data.ChecksumFailCount++;
+				memmove(&inBuffer[0], &inBuffer[1], (bytesInBuffer - 1));
+				bytesInBuffer -= 1;
+				continue;
+			}
+
+			// clear the msg buffer 
+			memset(msgBuffer, 0, sizeof(msgBuffer));
+			// copy the mem to msg buffer
+			memcpy(&msgBuffer[0], &inBuffer[0], nmeaMsgLength);
+			// move the data in the buffer up.
+			// nmeaMsgLength does not include the ending "\n\r", so +2 for those characters that follow an NMEA message
+			memmove(&inBuffer, &inBuffer[nmeaMsgLength + 2], bytesInBuffer - (nmeaMsgLength + 2));
+			// update Bytes in buffer
+			bytesInBuffer -= (nmeaMsgLength + 2);
+
+			// For NMEA we are only incrementing the counts for no. 
+			// @note - if desire to handle nmea in future - use this "ublox_handleNmeaMessage((char*)msgBuffer);"
+			// after count incrementation. 
+			m_data.NmeaRxCount++;
+		}
+	}
+
+	return 0;
 }
 
 int	UbloxGps::RestartDevice(Ublox::START_TYPE start, Ublox::RESET_TYPE reset)
@@ -388,7 +555,7 @@ void UbloxGps::Initialize()
 {
 	m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initializing.");
 
-	// flush any old data sitting on serial port
+	// Flush any old data sitting on serial port
 	m_comms.Flush();
 
 	// Next configure the device for no NMEA messages - UBX messages instead

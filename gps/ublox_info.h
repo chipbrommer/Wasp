@@ -21,6 +21,9 @@ namespace Ublox
     /// @brief constant for the size of additional version information
     constexpr int EXTENDED_VERSION_DATA_SIZE = 30;
 
+    /// @brief Number of sync bytes in ubx messages
+    constexpr int NUM_SYNC_BYTES = 2;
+
     /// @brief enum for GNSS fix values. 
     enum class GNSS_FIX_TYPE
     {

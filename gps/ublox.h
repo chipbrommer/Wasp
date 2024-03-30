@@ -15,7 +15,7 @@
 //
 #include "gps_type.h"                       // base class
 #include "ublox_info.h"                     // gps info
-#include "../utilities/conversions.h"		// conversions
+#include "../utilities/constants.h"			// conversions
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -120,7 +120,8 @@ struct UbloxData
 	long UbxTimeUtcCount	= 0;
 	long UbxPvtCount		= 0;
 	long UbxGpsTimeCount	= 0;
-	long NmeaRxCount = 0;
+	long NmeaRxCount		= 0;
+	long ChecksumFailCount	= 0;
 };
 
 /// @brief 

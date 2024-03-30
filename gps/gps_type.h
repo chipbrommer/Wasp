@@ -52,6 +52,10 @@ public:
         {
             m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE);
         }
+        else if (m_baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
+        {
+            AutoDiscoverBaudRate();
+        }
 
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
     }
@@ -63,7 +67,7 @@ public:
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Uninitialized.");
     }
 
-    SerialClient::BaudRate AutoDiscoverBaudRate()
+    bool AutoDiscoverBaudRate()
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery enabled.");
 
@@ -73,10 +77,10 @@ public:
             m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Trying baud rate: " + std::to_string(baudRateValue));
 
             // Try to open the port with the current baud rate
-            if (!m_comms.Reconfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE))
+            if (!m_comms.OpenConfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE))
             {
-                m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery failed to reconfigure port.");
-                return SerialClient::BaudRate::BAUDRATE_INVALID;
+                m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery failed to configure port.");
+                return false;
             }
 
             // Wait for set timeout length to attempt to get data
@@ -91,7 +95,7 @@ public:
                 {
                     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Baudrate successful for " + std::to_string(baudRateValue));
                     m_baudrate = baudRateEnum;
-                    return baudRateEnum;
+                    return true;
                 }
 
                 // Sleep for a short duration before processing data again
@@ -100,7 +104,7 @@ public:
         }
 
         m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Failed to auto-discover baud rate.");
-        return SerialClient::BaudRate::BAUDRATE_INVALID; // Failed to discover baud rate
+        return false; // Failed to discover baud rate
     }
 
     /// @brief 
@@ -144,5 +148,4 @@ protected:
     std::string             m_path              = "";           /// Holds the path to desired serial port
     SerialClient::BaudRate  m_baudrate          = SerialClient::BaudRate::BAUDRATE_INVALID;     /// Holds the baudrate
     SerialClient            m_comms;                            /// Holds the serial client
-
 };

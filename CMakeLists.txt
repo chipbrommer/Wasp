@@ -54,7 +54,7 @@ add_executable (Wasp
     "external/pugixml/pugiconfig.hpp"
     "external/pugixml/pugixml.cpp"
     "external/pugixml/pugixml.hpp"
-    "utilities/conversions.h")
+    "utilities/constants.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)
