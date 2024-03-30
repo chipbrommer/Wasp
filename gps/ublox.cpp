@@ -782,7 +782,7 @@ int UbloxGps::HexToInt(char* c)
 
 uint16_t UbloxGps::CalculatePayloadLength(uint8_t uint1, uint8_t uint2)
 {
-	return (uint16_t)(256U * uint2 + uint1);
+	return static_cast<uint16_t>(256U * uint2 + uint1);
 }
 
 template <typename T>
@@ -881,32 +881,32 @@ void UbloxGps::GetUbxChecksums(uint8_t* buffer, int& checkSumA, int& checkSumB)
 
 bool UbloxGps::ValidateNmeaChecksum(char* buffer)
 {
-	char* checksum_str;						// char array to hold the check sum
-	int checksum;							// holds the int version of the checksum
-	unsigned char calculated_checksum = 0;	// holds the calculated checksum
+	char* checksum_str = nullptr; // pointer to hold the checksum position
+	unsigned char calculated_checksum = 0; // holds the calculated checksum
 
-	// Checksum is postcede by *
-	checksum_str = strchr(buffer, '*');
-	if (checksum_str != NULL)
+	// Find the checksum delimiter '*'
+	checksum_str = std::strchr(buffer, '*');
+	if (checksum_str != nullptr)
 	{
-		// Remove checksum from string
-		*checksum_str = '\0';
+		*checksum_str = '\0'; // Null-terminate the string at the checksum delimiter
 
-		// Calculate checksum, starting after $ (i = 1)
-		for (unsigned int i = 1; i < strlen(buffer); i++)
+		// Calculate the checksum, starting after the '$' character (i = 1)
+		for (size_t i = 1; buffer[i] != '\0'; ++i)
 		{
-			calculated_checksum = calculated_checksum ^ buffer[i];
+			calculated_checksum ^= buffer[i];
 		}
-		checksum = HexToInt((char*)checksum_str + 1);
 
-		// if cheksum is good, return success
+		// Convert the checksum string to an integer
+		int checksum = std::stoi(checksum_str + 1, nullptr, 16);
+
+		// Compare calculated checksum with the provided checksum
 		if (checksum == calculated_checksum)
 		{
-			return true;
+			return true; // Checksum is valid
 		}
 	}
-	// else checksum is bad, missing, or the nmea message is null
-	return false;
+
+	return false; // Checksum is invalid or missing
 }
 
 void UbloxGps::HandleNmeaMessage(char* buffer)
@@ -1290,19 +1290,19 @@ void UbloxGps::SetLastTextTransmission(int msgNum, std::string text)
 int UbloxGps::ParseNmeaMessage(char* buffer, char** fields, size_t max_fields)
 {
 	// iterator for size of inbound buffer
-	int i = 0;
+	size_t i = 0;
 	fields[i++] = buffer;
 
-	// Iterate through the string and change each comma into a null to terminate the C string. 
+	// Iterate through the string and change each comma into a null to terminate the C string.
 	// Then store the address of the next location into an array so we can later reference to the start of each field.
-	while ((i < max_fields) && NULL != (buffer = strchr(buffer, ',')))
+	while ((i < max_fields) && (buffer = std::strchr(buffer, ',')) != nullptr)
 	{
 		*buffer = '\0';
 		fields[i++] = ++buffer;
 	}
 
 	// return
-	return --i;
+	return i;
 }
 
 void UbloxGps::ParseMonitorVersionData(uint8_t* buffer)
@@ -1317,7 +1317,7 @@ void UbloxGps::ParseMonitorVersionData(uint8_t* buffer)
 void UbloxGps::ParseNavSatelliteData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.satelliteData, buffer + 6, sizeof(m_data.satelliteData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.satelliteData), reinterpret_cast<uint8_t*>(&m_data.satelliteData));
 
 	// verify message version so we can parse correctly
 	if (m_data.satelliteData.version == Ublox::UBX::NAV::SAT::messageVersion)
@@ -1332,8 +1332,8 @@ void UbloxGps::ParseNavSatelliteData(uint8_t* buffer)
 			satNum = 12 * i;
 
 			// Create a temp satellite and grab its data from the buffer
-			Ublox::UBX::NAV::SAT::Satellite temp;
-			memcpy(&temp, &buffer[14 + satNum], sizeof(temp));
+			Ublox::UBX::NAV::SAT::Satellite temp{};
+			std::copy(&buffer[14 + satNum], &buffer[14 + satNum] + sizeof(temp), reinterpret_cast<uint8_t*>(&temp));
 
 			// Handle scaling
 			temp.prResidual = static_cast<uint16_t>(temp.prResidual * 0.1);
@@ -1350,7 +1350,7 @@ void UbloxGps::ParseNavSatelliteData(uint8_t* buffer)
 void UbloxGps::ParseNavPositionVelocityTimeData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.pvtData, buffer + 6, sizeof(m_data.pvtData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.pvtData), reinterpret_cast<uint8_t*>(&m_data.pvtData));
 
 	// Increment message count
 	m_data.UbxPvtCount++;
@@ -1358,7 +1358,8 @@ void UbloxGps::ParseNavPositionVelocityTimeData(uint8_t* buffer)
 
 void UbloxGps::ParseNavStatusData(uint8_t* buffer)
 {
-	memcpy(&m_data.navigationStatusData, buffer + 6, sizeof(m_data.navigationStatusData));
+	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.navigationStatusData), reinterpret_cast<uint8_t*>(&m_data.navigationStatusData));
 
 	// Increment message count
 	m_data.UbxNavStatusCount++;
@@ -1369,7 +1370,7 @@ void UbloxGps::ParseNavStatusData(uint8_t* buffer)
 void UbloxGps::ParseNavPositionEcefData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.positionEcefData, buffer + 6, sizeof(m_data.positionEcefData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.positionEcefData), reinterpret_cast<uint8_t*>(&m_data.positionEcefData));
 
 	// Increment message count
 	m_data.UbxPosEcefCount++;
@@ -1380,7 +1381,7 @@ void UbloxGps::ParseNavPositionEcefData(uint8_t* buffer)
 void UbloxGps::ParseNavPositionLlhData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.positionLlhData, buffer + 6, sizeof(m_data.positionLlhData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.positionLlhData), reinterpret_cast<uint8_t*>(&m_data.positionLlhData));
 
 	// Increment message count
 	m_data.UbxPosLlhCount++;
@@ -1398,7 +1399,7 @@ void UbloxGps::ParseNavPositionLlhData(uint8_t* buffer)
 void UbloxGps::ParseNavVelocityEcefData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.velocityEcefData, buffer + 6, sizeof(m_data.velocityEcefData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.velocityEcefData), reinterpret_cast<uint8_t*>(&m_data.velocityEcefData));
 
 	// Increment message count
 	m_data.UbxVelEcefCount++;
@@ -1410,7 +1411,7 @@ void UbloxGps::ParseNavVelocityEcefData(uint8_t* buffer)
 void UbloxGps::ParseNavVelocityNedData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.velocityNedData, buffer + 6, sizeof(m_data.velocityNedData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.velocityNedData), reinterpret_cast<uint8_t*>(&m_data.velocityNedData));
 
 	// Increment message count
 	m_data.UbxVelNedCount++;
@@ -1429,7 +1430,7 @@ void UbloxGps::ParseNavVelocityNedData(uint8_t* buffer)
 void UbloxGps::ParseNavTimeUtcData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.timeUtcData, buffer + 6, sizeof(m_data.timeUtcData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.timeUtcData), reinterpret_cast<uint8_t*>(&m_data.timeUtcData));
 
 	// Increment message count
 	m_data.UbxTimeUtcCount++;
@@ -1448,7 +1449,7 @@ void UbloxGps::ParseNavTimeUtcData(uint8_t* buffer)
 void UbloxGps::ParseNavTimeGPSData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.gpsTime, buffer + 6, sizeof(m_data.gpsTime));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.gpsTime), reinterpret_cast<uint8_t*>(&m_data.gpsTime));
 
 	// Increment message count
 	m_data.UbxGpsTimeCount++;
@@ -1460,7 +1461,7 @@ void UbloxGps::ParseNavTimeGPSData(uint8_t* buffer)
 void UbloxGps::ParseNavDopData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.dopData, buffer + 6, sizeof(m_data.dopData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.dopData), reinterpret_cast<uint8_t*>(&m_data.dopData));
 
 	// Increment message count
 	m_data.UbxDopCount++;
@@ -1472,7 +1473,7 @@ void UbloxGps::ParseNavDopData(uint8_t* buffer)
 void UbloxGps::ParseNavCovData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.navCovarianceData, buffer + 6, sizeof(m_data.navCovarianceData));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.navCovarianceData), reinterpret_cast<uint8_t*>(&m_data.navCovarianceData));
 
 	// Increment message count
 	m_data.UbxNavCovCount++;
