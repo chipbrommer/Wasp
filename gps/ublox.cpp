@@ -42,22 +42,22 @@ int UbloxGps::ProcessData()
 		bytesInBuffer = 0;
 	}
 
-	// if here and buffer is full for some odd reason, as a precaution lets clear the buffer and stream before proceeding
+	// if here and buffer is full for some odd reason, as a precaution let's clear the buffer and stream before proceeding
 	if (bytesInBuffer >= BUFFER_SIZE)
 	{
-		memset(inBuffer, 0, sizeof(inBuffer));
+		std::fill(std::begin(inBuffer), std::end(inBuffer), 0);
 		m_comms.Flush();
 		bytesInBuffer = 0;
 	}
 
 	// check how many bytes are available - if none, or if no data available in buffer 
-	// then continue to next iteration of loop
+	// then continue to the next iteration of the loop
 	bytesAvail = (BUFFER_SIZE - bytesInBuffer);
 
 	// read bytes from port into buffer - only read in the max amount
-	bytesRead = m_comms.Read(&inBuffer[bytesInBuffer], bytesAvail);
+	bytesRead = m_comms.Read(reinterpret_cast<std::byte*>(&inBuffer[bytesInBuffer]), bytesAvail);
 
-	// update bytes in bufer
+	// update bytes in buffer
 	if (bytesRead > 0)
 	{
 		bytesInBuffer += bytesRead;
@@ -74,15 +74,15 @@ int UbloxGps::ProcessData()
 		bool nmeaFound = false;
 		unsigned int nmeaMsgLength = 0;
 		unsigned int fullMsgLength = 0;
-		unsigned int index = 0;
-		unsigned int index2 = 0;
+		size_t index = 0;
+		size_t index2 = 0;
 
-		// find the start of message
+		// find the start of the message
 		for (index = 0; index <= (bytesInBuffer - Ublox::NUM_SYNC_BYTES); index++)
 		{
 			// look for the ubx sync characters
-			if ((inBuffer[index + 0] == reinterpret_cast<uint8_t>(Ublox::UBX::Header::SyncChar1)) &&
-				(inBuffer[index + 1] == reinterpret_cast<uint8_t>(Ublox::UBX::Header::SyncChar2)))
+			if ((inBuffer[index + 0] == static_cast<uint8_t>(Ublox::UBX::Header::SyncChar1)) &&
+				(inBuffer[index + 1] == static_cast<uint8_t>(Ublox::UBX::Header::SyncChar2)))
 			{
 				ubxFound = true;
 				break;
@@ -91,7 +91,7 @@ int UbloxGps::ProcessData()
 			// look for the nmea sync character
 			else if (inBuffer[index + 0] == Ublox::NMEA::syncChar)
 			{
-				// if its an nmea message, we have to find the tail manually. these are variable length.
+				// if it's an nmea message, we have to find the tail manually. These are variable length.
 				for (index2 = index; index2 < (bytesInBuffer - 2); index2++)
 				{
 					if (inBuffer[index2 + 0] == Ublox::NMEA::endCheck1 &&
@@ -104,88 +104,88 @@ int UbloxGps::ProcessData()
 					}
 				}
 
-				// leave the for loop if its found. 
+				// leave the for loop if it's found. 
 				if (nmeaFound) break;
 			}
 		}
 
-		// move start of message to front of buffer
+		// move start of message to the front of the buffer
 		if (index > 0)
 		{
-			memmove(&inBuffer, &inBuffer[index], (bytesInBuffer - index));
+			std::memmove(&inBuffer[0], &inBuffer[index], (bytesInBuffer - index));
 			bytesInBuffer -= index;
 		}
 
-		// if we didnt find a start of message, try again next time
-		if (ubxFound == false && nmeaFound == false)
+		// if we didn't find a start of message, try again next time
+		if (!ubxFound && !nmeaFound)
 		{
 			return 0;
 		}
 
 		// did we find a UBX message ? 
-		if (ubxFound == true)
+		if (ubxFound)
 		{
 			// 8 bytes = (sync1, sync2, class id, msg id, length(2 bytes), checksum A, checksum B)
 			fullMsgLength = CalculatePayloadLength(inBuffer[4], inBuffer[5]) + 8;
 
 			// do we have enough bytes for the message?
-			// if not, continue to top of loop and collect more data
+			// if not, continue to the top of the loop and collect more data
 			if (bytesInBuffer < fullMsgLength)
 			{
 				return 0;
 			}
 
-			// attempt to validate the ubx checksum
+			// attempt to validate the UBX checksum
 			if (ValidateUbxChecksum(inBuffer, fullMsgLength) == 0)
 			{
 				// checksum fail, dump the sync bytes and continue searching
 				m_data.ChecksumFailCount++;
-				memmove(&inBuffer[0], &inBuffer[Ublox::NUM_SYNC_BYTES], (bytesInBuffer - Ublox::NUM_SYNC_BYTES));
+				std::memmove(&inBuffer[0], &inBuffer[Ublox::NUM_SYNC_BYTES], (bytesInBuffer - Ublox::NUM_SYNC_BYTES));
 				bytesInBuffer -= Ublox::NUM_SYNC_BYTES;
 				continue;
 			}
 
-			// consume the ubx message
+			// consume the UBX message
 			if (bytesInBuffer >= fullMsgLength)
 			{
 				// clear the msg buffer 
-				memset(msgBuffer, 0, sizeof(msgBuffer));
-				// copy the mem to msg buffer
-				memcpy(&msgBuffer[0], &inBuffer[0], fullMsgLength);
+				std::fill(std::begin(msgBuffer), std::end(msgBuffer), 0);
+				// copy the memory to msg buffer
+				std::copy(&inBuffer[0], &inBuffer[fullMsgLength], &msgBuffer[0]);
 				// move the data in the buffer up.
-				memmove(&inBuffer, &inBuffer[fullMsgLength], bytesInBuffer - fullMsgLength);
+				std::memmove(&inBuffer[0], &inBuffer[fullMsgLength], bytesInBuffer - fullMsgLength);
 				// update Bytes in buffer
 				bytesInBuffer -= fullMsgLength;
 			}
 
-			// handle the ubx message 
+			// handle the UBX message 
 			HandleUbxMessage(msgBuffer);
 			m_data.UbxRxCount++;
 		}
-		// did we find an nmea message ? 
-		else if (nmeaFound == true)
+		// did we find an NMEA message ? 
+		else if (nmeaFound)
 		{
 			if (nmeaMsgLength > sizeof(msgBuffer))
 			{
 				// Message is too large for msgBuffer; dump the sync byte and continue searching
 				m_data.ChecksumFailCount++;
-				memmove(&inBuffer[0], &inBuffer[1], (bytesInBuffer - 1));
+				std::memmove(&inBuffer[0], &inBuffer[1], (bytesInBuffer - 1));
 				bytesInBuffer -= 1;
 				continue;
 			}
 
 			// clear the msg buffer 
-			memset(msgBuffer, 0, sizeof(msgBuffer));
-			// copy the mem to msg buffer
-			memcpy(&msgBuffer[0], &inBuffer[0], nmeaMsgLength);
+			std::fill(std::begin(msgBuffer), std::end(msgBuffer), 0);
+			// copy the memory to msg buffer
+			std::copy(&inBuffer[0], &inBuffer[nmeaMsgLength], &msgBuffer[0]);
 			// move the data in the buffer up.
 			// nmeaMsgLength does not include the ending "\n\r", so +2 for those characters that follow an NMEA message
-			memmove(&inBuffer, &inBuffer[nmeaMsgLength + 2], bytesInBuffer - (nmeaMsgLength + 2));
+			std::memmove(&inBuffer[0], &inBuffer[nmeaMsgLength + 2], bytesInBuffer - (nmeaMsgLength + 2));
 			// update Bytes in buffer
 			bytesInBuffer -= (nmeaMsgLength + 2);
 
-			// For NMEA we are only incrementing the counts for no. 
-			// @note - if desire to handle nmea in future - use this "ublox_handleNmeaMessage((char*)msgBuffer);"
+			// For NMEA we are only incrementing the counts for now. 
+			// @note - if desire to handle NMEA in future - use this "HandleNmeaMessage(msgBuffer);"
 			// after count incrementation. 
 			m_data.NmeaRxCount++;
 		}
@@ -578,17 +578,17 @@ int UbloxGps::Configure()
 	// Clear the data storages and request an immediate cold start
 	if (RestartDevice(Ublox::START_TYPE::COLD, Ublox::RESET_TYPE::HW_RESET_IMMEDIATE) < 0)
 	{
-		std::cout << "restart Error: Cold start request failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Cold start request failed");
 		return -1;
 	}
 
 	// wait some time for the unit to accept clear command and process
-	std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
 	// turn off NMEA GNGLL - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxGLL::messageId, false, false) < 0)
 	{
-		std::cout << "configureDevice Error: Turning off GNGLL failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning off GNGLL failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -596,7 +596,7 @@ int UbloxGps::Configure()
 	// turn off NMEA GBGSV, GAGSV, GLGSV, GPGSV - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxGSV::messageId, false, false) < 0)
 	{
-		std::cout << "configureDevice Error: Turning off GxGSV failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning off GxGSV failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -604,7 +604,7 @@ int UbloxGps::Configure()
 	// turn off NMEA GNGST - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxGST::messageId, false, false) < 0)
 	{
-		std::cout << "configureDevice Error: Turning off GNGST failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning off GNGST failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -612,7 +612,7 @@ int UbloxGps::Configure()
 	// turn off NMEA GNGSA - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxGSA::messageId, false, false) < 0)
 	{
-		std::cout << "configureDevice Error: Turning off GNGSA failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning off GNGSA failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -620,14 +620,14 @@ int UbloxGps::Configure()
 	// turn off NMEA GNGGA - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxGGA::messageId, false, false) < 0)
 	{
-		std::cout << "configureDevice Error: Turning off GNGGA failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning off GNGGA failed");
 		return -1;
 	}
 
 	// turn off NMEA GNVTG - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxVTG::messageId, false, false) < 0)
 	{
-		std::cout << "configureDevice Error: Turning off GNVTG failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning off GNVTG failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -635,7 +635,7 @@ int UbloxGps::Configure()
 	// turn off NMEA GNRMC - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxRMC::messageId, false, false) < 0)
 	{
-		std::cout << "configureDevice Error: Turning off GNRMC failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning off GNRMC failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -643,7 +643,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV DOP - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::DOP::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-DOP failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-DOP failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -651,7 +651,7 @@ int UbloxGps::Configure()
 	// set ratefor UBX NAV DOP - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::DOP::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-DOP failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-DOP failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -659,7 +659,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV COV - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::COV::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-COV failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-COV failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -667,7 +667,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV COV - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::COV::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-COV failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-COV failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -675,7 +675,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV PVT - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::PVT::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-PVT failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-PVT failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -683,7 +683,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV PVT - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::PVT::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-PVT failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-PVT failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -691,7 +691,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV POSECEF - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::POSECEF::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-POSECEF failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-POSECEF failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -699,7 +699,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV POSECEF - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::POSECEF::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-POSECEF failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-POSECEF failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -707,7 +707,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV POSLLH - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::POSLLH::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-POSLLH failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-POSLLH failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -715,7 +715,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV POSLLH - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::POSLLH::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-POSLLH failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-POSLLH failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -723,7 +723,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV VELECEF - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::VELECEF::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-VELECEF failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-VELECEF failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -731,7 +731,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV VELECEF - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::VELECEF::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-VELECEF failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-VELECEF failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -739,7 +739,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV VELNED - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::VELNED::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-VELNED failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-VELNED failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -747,7 +747,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV VELNED - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::VELNED::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-VELNED failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-VELNED failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -755,7 +755,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV TIMEUTC - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::TIMEUTC::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-TIMEUTC failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-TIMEUTC failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -763,7 +763,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV TIMEUTC - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::TIMEUTC::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-TIMEUTC failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-TIMEUTC failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -771,7 +771,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV SAT - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::SAT::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-SAT failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-SAT failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -779,7 +779,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV SAT - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::SAT::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-SAT failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-SAT failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -787,7 +787,7 @@ int UbloxGps::Configure()
 	// turn on UBX NAV TIMEGPS - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::TIMEGPS::messageId, m_commsOnUart, m_commsOnUsb) < 0)
 	{
-		std::cout << "configureDevice Error: Turning on UBX-NAV-TIMEGPS failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Turning on UBX-NAV-TIMEGPS failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -795,7 +795,7 @@ int UbloxGps::Configure()
 	// set rate for UBX NAV TIMEGPS - return -1 on error
 	if (ConfigureMessageRate(Ublox::UBX::NAV::classId, Ublox::UBX::NAV::TIMEGPS::messageId, static_cast<uint8_t>(desiredMessageRate)) < 0)
 	{
-		std::cout << "messageRate Error: Setting UBX-NAV-TIMEGPS failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Setting UBX-NAV-TIMEGPS failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -803,7 +803,7 @@ int UbloxGps::Configure()
 	// set dynamic model
 	if (ConfigureDynamics(Ublox::DYNAMICS::AIRBORNE_LESS_THAN_1G))
 	{
-		std::cout << "configureDynamics Error: Set Dynamics Model failed\n";
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Set Dynamics Model failed");
 		return -1;
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(1));

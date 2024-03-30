@@ -27,7 +27,7 @@ bool COT_Utility::VerifyXML(std::string& buffer)
 
     if (!result)
     {
-        std::cout << "ERROR: " << result.description() << "\n";
+        std::cout << "[COT UTIL] - ERROR - " << result.description() << "\n";
         return false;
     }
 

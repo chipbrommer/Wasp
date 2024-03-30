@@ -65,10 +65,7 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
 
     if (baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
     {
-        SerialClient::BaudRate baud = m_gps->AutoDiscoverBaudRate();
-
-        // if return was invalid, we failed to create connection and initialize. 
-        if (baud != SerialClient::BaudRate::BAUDRATE_INVALID) rtn = true;
+        rtn = m_gps->AutoDiscoverBaudRate();
     }
     else
     {
