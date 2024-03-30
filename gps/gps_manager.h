@@ -67,12 +67,12 @@ private:
         {GpsOptions::Novatel,   "Novatel"},
     };
 
-    GpsOptions m_currentGpsType;            /// Current GPS type 
-    std::string m_name;                     /// Name for logging
-    bool m_configured;                      /// Flag for if the class is configured
-    LogClient& m_logger;                    /// Logger
-    std::string m_port;                     /// Holds the port
-    SerialClient::BaudRate m_baudrate;      /// Holds the baudrate
-    std::unique_ptr<GpsType> m_gps;         /// Holds a pointer to the utilizes GPS type.  
-    SerialClient m_commPort;                /// Holds connection to serial port
+    GpsOptions                  m_currentGpsType;   /// Current GPS type 
+    std::string                 m_name;             /// Name for logging
+    bool                        m_configured;       /// Flag for if the class is configured
+    LogClient&                  m_logger;           /// Logger
+    std::string                 m_port;             /// Holds the port
+    SerialClient::BaudRate      m_baudrate;         /// Holds the baudrate
+    std::unique_ptr<GpsType>    m_gps;              /// Holds a pointer to the utilizes GPS type.  
+    SerialClient                m_commPort;         /// Holds connection to serial port
 };

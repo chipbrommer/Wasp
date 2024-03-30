@@ -106,20 +106,21 @@ struct UbloxData
 	Ublox::UBX::NAV::TIMEGPS::Message				gpsTime = {};
 	std::vector<Ublox::UBX::NAV::SAT::Satellite>	satellites;
 	std::vector<Ublox::UBX::NAV::ORB::Satellite>	orbits;
-	long RxCount			= 0;
-	long NMEACount			= 0;
-	long MonVerCount		= 0;
-	long NavCovCount		= 0;
-	long DopCount			= 0;
-	long SatDataCount		= 0;
-	long NavStatusCount		= 0;
-	long PosEcefCount		= 0;
-	long PosLlhCount		= 0;
-	long VelEcefCount		= 0;
-	long VelNedCount		= 0;
-	long TimeUtcCount		= 0;
-	long PvtCount			= 0;
-	long GpsTimeCount		= 0;
+
+	long UbxRxCount			= 0;
+	long UbxMonVerCount		= 0;
+	long UbxNavCovCount		= 0;
+	long UbxDopCount		= 0;
+	long UbxSatDataCount	= 0;
+	long UbxNavStatusCount	= 0;
+	long UbxPosEcefCount	= 0;
+	long UbxPosLlhCount		= 0;
+	long UbxVelEcefCount	= 0;
+	long UbxVelNedCount		= 0;
+	long UbxTimeUtcCount	= 0;
+	long UbxPvtCount		= 0;
+	long UbxGpsTimeCount	= 0;
+	long NmeaRxCount = 0;
 };
 
 /// @brief 
@@ -266,7 +267,7 @@ private:
 	/// @param fields - [out] - Char array to store the parsed message cuts into
 	/// @param max_fields - [in] - maximum number of fields we can parse into.
 	/// @return The number of fields parsed into
-	int ParseNmeaMessage(char* buffer, char** fields, int max_fields);
+	int ParseNmeaMessage(char* buffer, char** fields, size_t max_fields);
 
 	/// @brief Parses a UBX::MON::VER message to the appropriate variables.
 	/// @param buffer - [in] - buffer to be parsed. 
@@ -323,7 +324,7 @@ private:
 	/// @param elevation - [in] - elevation in degrees
 	/// @param azimuth - [in] - azimuth in degrees
 	/// @param signalStrength - [in] - signal strength of the satellite connection
-	void UpdateSatelliteData(int gnssId, char* id, char* elevation, char* azimuth, char* signalStrength);
+	void UpdateSatelliteData(const int gnssId, const char* id, const char* elevation, const char* azimuth, const char* signalStrength);
 
 	/// @brief Updates the data within the satellite list for NMEA messages. If sat.id is not found it adds new sat to list, else it updates the values.
 	/// @param sat - [in] - Satellite instance to add or update
@@ -333,88 +334,88 @@ private:
 	/// @brief Updates the list of Navigation Satellites, id's
 	/// @param id - [in] - ID of the satellite. 
 	/// @param satelliteNumber - [in] - array element (satellite number) to set the ID for.
-	void UpdateIdOfActiveNavigationSatellites(int id, int satelliteNumber);
+	void UpdateIdOfActiveNavigationSatellites(const int id, const int satelliteNumber);
 
 	/// @brief Updates the list of Navigation Satellites, ranges
 	/// @param range - [in] - range of the satellite
 	/// @param satelliteNumber - [in] - array element (satellite number) to set the range for.
-	void UpdateRangeOfActiveNavigationSatellites(double range, int satelliteNumber);
+	void UpdateRangeOfActiveNavigationSatellites(const double range, const int satelliteNumber);
 
 	/// @brief Decode the signal ID 
 	/// @param gnssId - [in] - GNSS Id 
 	/// @param signalId - [in] - Signal ID
 	/// @return string containing the satellite signal ID
-	std::string DecodeSignalId(int gnssId, char* signalId);
+	std::string DecodeSignalId(const int gnssId, const char* signalId);
 
 	/// @brief Converts the status indicator into its readable type Ex: 'A' = "Data Valid"
 	/// @param status - [in] - indicator to be decoded
 	/// @return string of the decoded indicator
-	std::string DecodeDataStatus(char* status);
+	std::string DecodeDataStatus(const char* status);
 
 	/// @brief Decode the posMode data into a string 
 	/// @param posMode - [in] - data code for the position mode
 	/// @return - string containing the decoded value/meaning
-	std::string DecodePosMode(char* posMode);
+	std::string DecodePosMode(const char* posMode);
 
 	/// @brief Decode the navMode data into a string 
 	/// @param navMode - [in] - data code for the navigation mode
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeNavMode(char* navMode);
+	std::string DecodeNavMode(const char* navMode);
 
 	/// @brief Decode the txt data type into a string 
 	/// @param msgType - [in] - data code for the text message type
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeTxtMsgType(char* msgType);
+	std::string DecodeTxtMsgType(const char* msgType);
 
 	/// @brief Decode the quality data type into a string
 	/// @param quality - [in] - data code for the gps fix quality 
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeQuality(char* quality);
+	std::string DecodeQuality(const char* quality);
 
 	/// @brief Decode the operation mode into a sting
 	/// @param opMode - [in] - data code for the gps operation mode
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeOpMode(char* opMode);
+	std::string DecodeOpMode(const char* opMode);
 
 	/// @brief Decode the GNSS ID into a string for the type of satellite.
 	/// @param gnssId - [in] - data code of the satellite to be decoded. 
 	/// @return - string containing the type of satellite.
-	std::string DecodeGnssId(char* gnssId);
+	std::string DecodeGnssId(const char* gnssId);
 
 	/// @brief Decode the satellite quality into a string
 	/// @param quality - [in] - int value of the quality to be decoded
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeSatelliteQuality(int quality);
+	std::string DecodeSatelliteQuality(const int quality);
 
 	/// @brief Decode the satellite health into a string
 	/// @param health - [in] - int value of the health to be decoded
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeSatelliteSignalHealth(int health);
+	std::string DecodeSatelliteSignalHealth(const int health);
 
 	/// @brief Decode the satellite orbit source into a string
 	/// @param source - [in] - int value of the orbit source
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeSatelliteOrbitSource(int source);
+	std::string DecodeSatelliteOrbitSource(const int source);
 
 	/// @brief Decode the navigation power state into a string
 	/// @param state - [in] - int value of the power state
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeNavStatusPowerSaveState(uint8_t state);
+	std::string DecodeNavStatusPowerSaveState(const uint8_t state);
 
 	/// @brief Decode the navigation power state into a string
 	/// @param state - [in] - int value of the power state
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeNavPvtPowerSaveState(uint8_t state);
+	std::string DecodeNavPvtPowerSaveState(const uint8_t state);
 
 	/// @brief Decode the navigation power state into a string
 	/// @param state - [in] - int value of the power state
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeNavPvtCarrierPhaseRangeSolution(uint8_t status);
+	std::string DecodeNavPvtCarrierPhaseRangeSolution(const uint8_t status);
 
 	/// @brief Decode the UTC Standard Identifier into a string
 	/// @param time - [in] - int value of the utc standard identifier
 	/// @return - string containing the decoded value/meaning
-	std::string DecodeNavTimeUtcStandardIdentifier(uint8_t time);
+	std::string DecodeNavTimeUtcStandardIdentifier(const uint8_t time);
 
     /// @brief Updates the common data structure
     void UpdateCommonData() override;

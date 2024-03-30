@@ -956,8 +956,8 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 			field[3][0] == 0 ? m_data.nmeaData.gpsFixData.latitudeDirection = '0' : m_data.nmeaData.gpsFixData.latitudeDirection = field[3][0];
 			m_data.nmeaData.gpsFixData.longitudeInDegrees = atof(field[4]);					// longitudeInDeg in degrees
 			field[5][0] == 0 ? m_data.nmeaData.gpsFixData.longitudeDirection = '0' : m_data.nmeaData.gpsFixData.longitudeDirection = field[5][0];
-			m_data.nmeaData.gpsFixData.positionFixQuality = atoi(field[6]);					// position fix quality
-			m_data.nmeaData.gpsFixData.numberSatellitesUsed = atoi(field[7]);					// num of sats used 0-12
+			m_data.nmeaData.gpsFixData.positionFixQuality = std::stoi(field[6]);					// position fix quality
+			m_data.nmeaData.gpsFixData.numberSatellitesUsed = std::stoi(field[7]);					// num of sats used 0-12
 			m_data.nmeaData.gpsFixData.horizontalDOP = atof(field[8]);							// HDOP
 			m_data.nmeaData.gpsFixData.altitudeASLinMeters = atof(field[9]);					// alt above sea level
 			m_data.nmeaData.gpsFixData.geoidSeperationInMeters = atof(field[11]);				// difference between ellipsoid and mean sea level
@@ -985,7 +985,7 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 			field[3][0] == 0 ? m_data.nmeaData.gnssFixData.latitudeDirection = '0' : m_data.nmeaData.gnssFixData.latitudeDirection = field[3][0];
 			m_data.nmeaData.gnssFixData.longitudeInDegrees = atof(field[4]);					// longitudeInDeg in degrees
 			field[5][0] == 0 ? m_data.nmeaData.gnssFixData.longitudeDirection = '0' : m_data.nmeaData.gnssFixData.longitudeDirection = field[5][0];
-			m_data.nmeaData.gnssFixData.numberSatellitesUsed = atoi(field[7]);					// num of sats used 0-12
+			m_data.nmeaData.gnssFixData.numberSatellitesUsed = std::stoi(field[7]);					// num of sats used 0-12
 			m_data.nmeaData.gnssFixData.horizontalDOP = atof(field[8]);						// HDOP
 			m_data.nmeaData.gnssFixData.altitudeASLinMeters = atof(field[9]);					// alt above sea level
 			m_data.nmeaData.gnssFixData.geoidSeperationInMeters = atof(field[10]);				// difference between ellipsoid and mean sea level
@@ -1016,7 +1016,7 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 			// store
 			for (int i = 0; i < maxSatellitesUsed; i++)
 			{
-				UpdateIdOfActiveNavigationSatellites(atoi(field[3 + i]), i);
+				UpdateIdOfActiveNavigationSatellites(std::stoi(field[3 + i]), i);
 
 			}
 			m_data.nmeaData.positionDOP = (uint16_t)atof(field[8]);							// Position dilution of precision
@@ -1040,9 +1040,9 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 		else if (subMessageType == "GSV")
 		{
 			// if first message in series, reset print variable and set num sats in view
-			if (atoi(field[2]) == 1)
+			if (std::stoi(field[2]) == 1)
 			{
-				numberSatellitesInView = atoi(field[3]);
+				numberSatellitesInView = std::stoi(field[3]);
 				numberSatellitesPrinted = 0;
 			}
 
@@ -1072,7 +1072,7 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 			field[6][0] == 0 ? m_data.nmeaData.longitudeDirection = m_data.nmeaData.longitudeDirection : m_data.nmeaData.longitudeDirection = field[6][0];
 			m_data.nmeaData.speedOverGroundInKnots = atof(field[7]);
 			m_data.nmeaData.courseOverGroundInDegrees = atof(field[8]);
-			m_data.nmeaData.utcDate = atoi(field[9]);
+			m_data.nmeaData.utcDate = std::stoi(field[9]);
 			m_data.nmeaData.magneticVariationInDegrees = atof(field[10]);
 			field[11][0] == 0 ? m_data.nmeaData.magneticVariationDirection = m_data.nmeaData.magneticVariationDirection : m_data.nmeaData.magneticVariationDirection = field[11][0];
 			field[12][0] == 0 ? m_data.nmeaData.positionModeGps = m_data.nmeaData.positionModeGps : m_data.nmeaData.positionModeGps = field[12][0];
@@ -1083,7 +1083,7 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 		{
 			// store
 			m_data.nmeaData.lastTextTransmissionType = DecodeTxtMsgType(field[3]);
-			SetLastTextTransmission(atoi(field[2]), field[4]);
+			SetLastTextTransmission(std::stoi(field[2]), field[4]);
 		}
 		// DUAL GROUND/WATER DISTANCE
 		else if (subMessageType == "VLW")
@@ -1109,9 +1109,9 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 		{
 			// store
 			m_data.nmeaData.utcTime = atof(field[1]);
-			m_data.nmeaData.utcDate = atoi(field[2]);
-			m_data.nmeaData.localTimeZoneHours = atoi(field[5]);
-			m_data.nmeaData.localTimeZoneMinutes = atoi(field[6]);
+			m_data.nmeaData.utcDate = std::stoi(field[2]);
+			m_data.nmeaData.localTimeZoneHours = std::stoi(field[5]);
+			m_data.nmeaData.localTimeZoneMinutes = std::stoi(field[6]);
 		}
 		else
 		{
@@ -1133,9 +1133,9 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 		else if (subMessageType == "GSV")
 		{
 			// if first message in series, reset print variable and set num sats in view
-			if (atoi(field[2]) == 1)
+			if (std::stoi(field[2]) == 1)
 			{
-				numberSatellitesInView = atoi(field[3]);
+				numberSatellitesInView = std::stoi(field[3]);
 				numberSatellitesPrinted = 0;
 			}
 
@@ -1173,9 +1173,9 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 		else if (subMessageType == "GSV")
 		{
 			// if first message in series, reset print variable and set num sats in view
-			if (atoi(field[2]) == 1)
+			if (std::stoi(field[2]) == 1)
 			{
-				numberSatellitesInView = atoi(field[3]);
+				numberSatellitesInView = std::stoi(field[3]);
 				numberSatellitesPrinted = 0;
 			}
 
@@ -1213,9 +1213,9 @@ void UbloxGps::HandleNmeaMessage(char* buffer)
 		else if (subMessageType == "GSV")
 		{
 			// if first message in series, reset print variable and set num sats in view
-			if (atoi(field[2]) == 1)
+			if (std::stoi(field[2]) == 1)
 			{
-				numberSatellitesInView = atoi(field[3]);
+				numberSatellitesInView = std::stoi(field[3]);
 				numberSatellitesPrinted = 0;
 			}
 
@@ -1264,7 +1264,7 @@ int UbloxGps::GetNmeaMsgSignalId(std::string buffer)
 		}
 
 		// return the char converted to an int. 
-		return atoi(&buffer[temp - 1]);
+		return std::stoi(&buffer[temp - 1]);
 	}
 }
 
@@ -1287,7 +1287,7 @@ void UbloxGps::SetLastTextTransmission(int msgNum, std::string text)
 
 // Parsers
 
-int UbloxGps::ParseNmeaMessage(char* buffer, char** fields, int max_fields)
+int UbloxGps::ParseNmeaMessage(char* buffer, char** fields, size_t max_fields)
 {
 	// iterator for size of inbound buffer
 	int i = 0;
@@ -1308,10 +1308,10 @@ int UbloxGps::ParseNmeaMessage(char* buffer, char** fields, int max_fields)
 void UbloxGps::ParseMonitorVersionData(uint8_t* buffer)
 {
 	// Start at Buffer+6 (sync bytes, ids, payload length are in first 6 bytes)
-	memcpy(&m_data.monitorVersion, buffer + 6, sizeof(m_data.monitorVersion));
+	std::copy(buffer + 6, buffer + 6 + sizeof(m_data.monitorVersion), reinterpret_cast<uint8_t*>(&m_data.monitorVersion));
 
 	// Increment message count
-	m_data.MonVerCount++;
+	m_data.UbxMonVerCount++;
 }
 
 void UbloxGps::ParseNavSatelliteData(uint8_t* buffer)
@@ -1336,7 +1336,7 @@ void UbloxGps::ParseNavSatelliteData(uint8_t* buffer)
 			memcpy(&temp, &buffer[14 + satNum], sizeof(temp));
 
 			// Handle scaling
-			temp.prResidual *= 0.1;
+			temp.prResidual = static_cast<uint16_t>(temp.prResidual * 0.1);
 
 			// push to the vector
 			m_data.satellites.push_back(temp);
@@ -1344,7 +1344,7 @@ void UbloxGps::ParseNavSatelliteData(uint8_t* buffer)
 	}
 
 	// Increment message count
-	m_data.SatDataCount++;
+	m_data.UbxSatDataCount++;
 }
 
 void UbloxGps::ParseNavPositionVelocityTimeData(uint8_t* buffer)
@@ -1353,7 +1353,7 @@ void UbloxGps::ParseNavPositionVelocityTimeData(uint8_t* buffer)
 	memcpy(&m_data.pvtData, buffer + 6, sizeof(m_data.pvtData));
 
 	// Increment message count
-	m_data.PvtCount++;
+	m_data.UbxPvtCount++;
 }
 
 void UbloxGps::ParseNavStatusData(uint8_t* buffer)
@@ -1361,7 +1361,7 @@ void UbloxGps::ParseNavStatusData(uint8_t* buffer)
 	memcpy(&m_data.navigationStatusData, buffer + 6, sizeof(m_data.navigationStatusData));
 
 	// Increment message count
-	m_data.NavStatusCount++;
+	m_data.UbxNavStatusCount++;
 
 	m_data.pvtData.gpsTowInMs = m_data.navigationStatusData.gpsTowInMs;
 }
@@ -1372,7 +1372,7 @@ void UbloxGps::ParseNavPositionEcefData(uint8_t* buffer)
 	memcpy(&m_data.positionEcefData, buffer + 6, sizeof(m_data.positionEcefData));
 
 	// Increment message count
-	m_data.PosEcefCount++;
+	m_data.UbxPosEcefCount++;
 
 	m_data.pvtData.gpsTowInMs = m_data.positionEcefData.gpsTowInMs;
 }
@@ -1383,7 +1383,7 @@ void UbloxGps::ParseNavPositionLlhData(uint8_t* buffer)
 	memcpy(&m_data.positionLlhData, buffer + 6, sizeof(m_data.positionLlhData));
 
 	// Increment message count
-	m_data.PosLlhCount++;
+	m_data.UbxPosLlhCount++;
 
 	m_data.pvtData.gpsTowInMs = m_data.positionLlhData.gpsTowInMs;
 	m_data.pvtData.latitudeInDeg = m_data.positionLlhData.latitude;
@@ -1401,7 +1401,7 @@ void UbloxGps::ParseNavVelocityEcefData(uint8_t* buffer)
 	memcpy(&m_data.velocityEcefData, buffer + 6, sizeof(m_data.velocityEcefData));
 
 	// Increment message count
-	m_data.VelEcefCount++;
+	m_data.UbxVelEcefCount++;
 
 	// Update the PVT structure also as its main source of data to pull from. 
 	m_data.pvtData.gpsTowInMs = m_data.velocityEcefData.gpsTowInMs;
@@ -1413,7 +1413,7 @@ void UbloxGps::ParseNavVelocityNedData(uint8_t* buffer)
 	memcpy(&m_data.velocityNedData, buffer + 6, sizeof(m_data.velocityNedData));
 
 	// Increment message count
-	m_data.VelNedCount++;
+	m_data.UbxVelNedCount++;
 
 	// Update the PVT structure also as its main source of data to pull from. 
 	m_data.pvtData.gpsTowInMs = m_data.velocityNedData.gpsTowInMs;
@@ -1432,7 +1432,7 @@ void UbloxGps::ParseNavTimeUtcData(uint8_t* buffer)
 	memcpy(&m_data.timeUtcData, buffer + 6, sizeof(m_data.timeUtcData));
 
 	// Increment message count
-	m_data.TimeUtcCount++;
+	m_data.UbxTimeUtcCount++;
 
 	// Update the PVT structure also as its main source of data to pull from. 
 	m_data.pvtData.gpsTowInMs = m_data.timeUtcData.gpsTowInMs;
@@ -1451,7 +1451,7 @@ void UbloxGps::ParseNavTimeGPSData(uint8_t* buffer)
 	memcpy(&m_data.gpsTime, buffer + 6, sizeof(m_data.gpsTime));
 
 	// Increment message count
-	m_data.GpsTimeCount++;
+	m_data.UbxGpsTimeCount++;
 
 	// Update the PVT structure also as its main source of data to pull from. 
 	m_data.pvtData.gpsTowInMs = m_data.gpsTime.gpsTowInMs;
@@ -1463,7 +1463,7 @@ void UbloxGps::ParseNavDopData(uint8_t* buffer)
 	memcpy(&m_data.dopData, buffer + 6, sizeof(m_data.dopData));
 
 	// Increment message count
-	m_data.DopCount++;
+	m_data.UbxDopCount++;
 
 	// Update the PVT structure also as its main source of data to pull from. 
 	m_data.pvtData.gpsTowInMs = m_data.dopData.gpsTowInMs;
@@ -1475,19 +1475,19 @@ void UbloxGps::ParseNavCovData(uint8_t* buffer)
 	memcpy(&m_data.navCovarianceData, buffer + 6, sizeof(m_data.navCovarianceData));
 
 	// Increment message count
-	m_data.NavCovCount++;
+	m_data.UbxNavCovCount++;
 }
 
 // Updaters
 
-void UbloxGps::UpdateSatelliteData(int gnssId, char* id, char* elevation, char* azimuth, char* signalStrength)
+void UbloxGps::UpdateSatelliteData(const int gnssId, const char* id, const char* elevation, const char* azimuth, const char* signalStrength)
 {
 	// create a temp satellite instance and set the data to it. 
 	Ublox::NMEA::Satellite temp;
-	temp.numberID = atoi(id);
-	temp.elevationInDegrees = atoi(elevation);
-	temp.azimuthInDegrees = atoi(azimuth);
-	temp.signalStrength = atoi(signalStrength);
+	temp.numberID = std::stoi(id);
+	temp.elevationInDegrees = std::stoi(elevation);
+	temp.azimuthInDegrees = std::stoi(azimuth);
+	temp.signalStrength = std::stoi(signalStrength);
 
 	// if signal strength is 0 = not tracking. else = tracking
 	signalStrength == "\0" ? temp.tracking = false : temp.tracking = true;
@@ -1496,25 +1496,17 @@ void UbloxGps::UpdateSatelliteData(int gnssId, char* id, char* elevation, char* 
 	switch (gnssId)
 	{
 	case 1:
-	{
 		UbloxGps::UpdateSatelliteVector(temp, m_data.nmeaData.gpsSatellites);
 		break;
-	}
 	case 2:
-	{
 		UbloxGps::UpdateSatelliteVector(temp, m_data.nmeaData.glonassSatellites);
 		break;
-	}
 	case 3:
-	{
 		UbloxGps::UpdateSatelliteVector(temp, m_data.nmeaData.galileoSatellites);
 		break;
-	}
 	case 4:
-	{
 		UbloxGps::UpdateSatelliteVector(temp, m_data.nmeaData.beidouSatellites);
 		break;
-	}
 	}
 }
 
@@ -1555,18 +1547,18 @@ void UbloxGps::UpdateRangeOfActiveNavigationSatellites(double range, int satelli
 
 void UbloxGps::UpdateCommonData()
 {
-
+	m_commonData.rxCount = m_data.UbxRxCount + m_data.NmeaRxCount;
 }
 
 // Decoders
 
-std::string UbloxGps::DecodeSignalId(int gnssId, char* signalId)
+std::string UbloxGps::DecodeSignalId(const int gnssId, const char* signalId)
 {
 	// store conversion for return
 	std::string type;
 
 	// catch empty string = QZSS
-	if (gnssId == 0 && strlen(signalId) == 0)
+	if (gnssId == 0 && std::string(signalId).length() == 0)
 	{
 		type = "QZSS";
 	}
@@ -1576,41 +1568,34 @@ std::string UbloxGps::DecodeSignalId(int gnssId, char* signalId)
 		switch (gnssId)
 		{
 		case 1:
-		{
-			switch (atoi(signalId))
+			switch (std::stoi(signalId))
 			{
 			case 1: type = "GPS L1C/A"; break;
 			case 5: type = "GPS L2 CM"; break;
 			case 6: type = "GPS L2 CL "; break;
 			}
 			break;
-		}
 		case 2:
-		{
-			switch (atoi(signalId))
+			switch (std::stoi(signalId))
 			{
 			case 1: type = "GLONASS L1 OF*"; break;
 			case 3: type = "GLONASS L2 OF"; break;
 			}
 			break;
-		}
 		case 3:
-		{
-			switch (atoi(signalId))
+			switch (std::stoi(signalId))
 			{
 			case 2: type = "Galileo E5"; break;
 			case 7: type = "Galileo E1"; break;
 			}
-		}
+			break;
 		case 4:
-		{
-			switch (atoi(signalId))
+			switch (std::stoi(signalId))
 			{
 			case 1: type = "BeiDou B1I"; break;
 			case 3: type = "BeiDou B2I"; break;
 			}
 			break;
-		}
 		default: type = "Unknown";
 		}
 	}
@@ -1619,75 +1604,51 @@ std::string UbloxGps::DecodeSignalId(int gnssId, char* signalId)
 	return type;
 }
 
-std::string UbloxGps::DecodeDataStatus(char* status)
+std::string UbloxGps::DecodeDataStatus(const char* status)
 {
 	// holds decoded meaning
 	std::string type;
 
+	// Convert status to a string for comparison
+	std::string mode(status != nullptr ? status : "");
+
 	// find the chars appropriate meaning.
-	if (strcmp(status, "V") == 0)
-	{
-		type = "Data Invalid";
-	}
-	else if (strcmp(status, "A") == 0)
-	{
-		type = "Data Valid";
-	}
-	else if (status == NULL)
-	{
-		type = "Error";
-	}
+	if (status == "V") { type = "Data Invalid"; }
+	else if (status == "A") { type = "Data Valid"; }
+	else { type = "Error"; }
 
 	// return string of decoded type
 	return type;
 }
 
-std::string UbloxGps::DecodePosMode(char* posMode)
+std::string UbloxGps::DecodePosMode(const char* posMode) 
 {
-	// holds decoded meaning
+	// Holds decoded meaning
 	std::string type;
 
-	// find the chars appropriate meaning.
-	if (strcmp(posMode, "N") == 0)
-	{
-		type = "No Fix";
-	}
-	else if (strcmp(posMode, "E") == 0)
-	{
-		type = "Estimated/Dead Reckoning Fix";
-	}
-	else if (strcmp(posMode, "A") == 0)
-	{
-		type = "Autonomous GNSS Fix";
-	}
-	else if (strcmp(posMode, "D") == 0)
-	{
-		type = "Differential GNSS Fix";
-	}
-	else if (strcmp(posMode, "F") == 0)
-	{
-		type = "RTK Float";
-	}
-	else if (strcmp(posMode, "R") == 0)
-	{
-		type = "RTK Fixed";
-	}
-	else if (posMode == NULL)
-	{
-		type = "Error";
-	}
+	// Convert posMode to a string for comparison
+	std::string mode(posMode != nullptr ? posMode : "");
 
-	// return string of decoded type
+	// Find the chars' appropriate meaning
+	if (mode == "N") { type = "No Fix"; }
+	else if (mode == "E") { type = "Estimated/Dead Reckoning Fix"; }
+	else if (mode == "A") { type = "Autonomous GNSS Fix"; }
+	else if (mode == "D") { type = "Differential GNSS Fix"; }
+	else if (mode == "F") { type = "RTK Float"; }
+	else if (mode == "R") { type = "RTK Fixed"; }
+	else { type = "Error"; }
+
+	// Return string of decoded type
 	return type;
 }
 
-std::string UbloxGps::DecodeNavMode(char* navMode)
+std::string UbloxGps::DecodeNavMode(const char* navMode)
 {
 	// holds decoded meaning
 	std::string type;
 
 	// convert the char to int and find its appropriate meaning.
-	switch (atoi(navMode))
+	switch (std::stoi(navMode))
 	{
 	case 1: type = "No Fix"; break;
 	case 2: type = "2D Fix"; break;
@@ -1699,13 +1660,13 @@ std::string UbloxGps::DecodeNavMode(char* navMode)
 	return type;
 }
 
-std::string UbloxGps::DecodeTxtMsgType(char* msgType)
+std::string UbloxGps::DecodeTxtMsgType(const char* msgType)
 {
 	// holds decoded meaning
 	std::string type;
 
 	// convert the char to int and find its appropriate meaning.
-	switch (atoi(msgType))
+	switch (std::stoi(msgType))
 	{
 	case 00: type = "Error"; break;
 	case 01: type = "Warning"; break;
@@ -1718,13 +1679,13 @@ std::string UbloxGps::DecodeTxtMsgType(char* msgType)
 	return type;
 }
 
-std::string UbloxGps::DecodeQuality(char* quality)
+std::string UbloxGps::DecodeQuality(const char* quality)
 {
 	// holds decoded meaning
 	std::string type;
 
 	// convert the char to int and find its appropriate meaning.
-	switch (atoi(quality))
+	switch (std::stoi(quality))
 	{
 	case 0: type = "No Fix"; break;
 	case 1: type = "Autonomous GNSS Fix"; break;
@@ -1739,43 +1700,37 @@ std::string UbloxGps::DecodeQuality(char* quality)
 	return type;
 }
 
-std::string UbloxGps::DecodeOpMode(char* opMode)
+std::string UbloxGps::DecodeOpMode(const char* opMode) 
 {
-	// holds decoded mode
+	// Holds decoded mode
 	std::string mode;
 
-	// Decode the opMode
-	if (strcmp(opMode, "M") == 0)
-	{
-		mode = "Manual Mode";
-	}
-	else if (strcmp(opMode, "A") == 0)
-	{
-		mode = "Automatic Mode";
-	}
-	else if (opMode == NULL)
-	{
-		mode = "Error";
-	}
+	// Convert opMode to a string for comparison
+	std::string modeStr(opMode != nullptr ? opMode : "");
 
-	// turn string
+	// Decode the opMode
+	if (modeStr == "M") { mode = "Manual Mode"; }
+	else if (modeStr == "A") { mode = "Automatic Mode"; }
+	else { mode = "Error"; }
+
+	// Return string
 	return mode;
 }
 
-std::string UbloxGps::DecodeGnssId(char* gnssId)
+std::string UbloxGps::DecodeGnssId(const char* gnssId)
 {
 	// store conversion for return
 	std::string type;
 
 	// catch empty string = QZSS
-	if (strlen(gnssId) == 0)
+	if (std::string(gnssId).length() == 0)
 	{
 		type = "QZSS";
 	}
 	// else convert to appropriate type
 	else
 	{
-		switch (atoi(gnssId))
+		switch (std::stoi(gnssId))
 		{
 		case 1: type = "GPS"; break;
 		case 2: type = "GLONASS"; break;
@@ -1789,7 +1744,7 @@ std::string UbloxGps::DecodeGnssId(char* gnssId)
 	return type;
 }
 
-std::string UbloxGps::DecodeSatelliteQuality(int quality)
+std::string UbloxGps::DecodeSatelliteQuality(const int quality)
 {
 	// holds decoded meaning
 	std::string type;
@@ -1812,7 +1767,7 @@ std::string UbloxGps::DecodeSatelliteQuality(int quality)
 	return type;
 }
 
-std::string UbloxGps::DecodeSatelliteSignalHealth(int health)
+std::string UbloxGps::DecodeSatelliteSignalHealth(const int health)
 {
 	// holds decoded meaning
 	std::string type;
@@ -1830,7 +1785,7 @@ std::string UbloxGps::DecodeSatelliteSignalHealth(int health)
 	return type;
 }
 
-std::string UbloxGps::DecodeSatelliteOrbitSource(int source)
+std::string UbloxGps::DecodeSatelliteOrbitSource(const int source)
 {
 	// holds decoded meaning
 	std::string type;
@@ -1853,7 +1808,7 @@ std::string UbloxGps::DecodeSatelliteOrbitSource(int source)
 	return type;
 }
 
-std::string UbloxGps::DecodeNavStatusPowerSaveState(uint8_t state)
+std::string UbloxGps::DecodeNavStatusPowerSaveState(const uint8_t state)
 {
 	// holds decoded meaning
 	std::string type;
@@ -1872,7 +1827,7 @@ std::string UbloxGps::DecodeNavStatusPowerSaveState(uint8_t state)
 	return type;
 }
 
-std::string UbloxGps::DecodeNavPvtPowerSaveState(uint8_t state)
+std::string UbloxGps::DecodeNavPvtPowerSaveState(const uint8_t state)
 {
 	// holds decoded meaning
 	std::string type;
@@ -1893,7 +1848,7 @@ std::string UbloxGps::DecodeNavPvtPowerSaveState(uint8_t state)
 	return type;
 }
 
-std::string UbloxGps::DecodeNavPvtCarrierPhaseRangeSolution(uint8_t status)
+std::string UbloxGps::DecodeNavPvtCarrierPhaseRangeSolution(const uint8_t status)
 {
 	// holds decoded meaning
 	std::string type;
@@ -1911,7 +1866,7 @@ std::string UbloxGps::DecodeNavPvtCarrierPhaseRangeSolution(uint8_t status)
 	return type;
 }
 
-std::string UbloxGps::DecodeNavTimeUtcStandardIdentifier(uint8_t time)
+std::string UbloxGps::DecodeNavTimeUtcStandardIdentifier(const uint8_t time)
 {
 	// holds decoded meaning
 	std::string type;
