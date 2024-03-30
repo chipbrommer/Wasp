@@ -78,7 +78,7 @@ int ImuManager::CheckForData()
     return m_imu->ProcessData();
 }
 
-int ImuManager::Send(const std::byte& data, const size_t length)
+int ImuManager::Send(const std::byte* data, const size_t length)
 {
     return m_commPort.Write(data, length);
 }

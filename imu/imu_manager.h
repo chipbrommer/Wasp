@@ -59,7 +59,7 @@ public:
     /// @param data - in - reference to the data to be sent
     /// @param length - in - number of bytes to send
     /// @return -1 on error, else number of bytes sent
-    int Send(const std::byte& data, const size_t length);
+    int Send(const std::byte* data, const size_t length);
 
 protected:
 

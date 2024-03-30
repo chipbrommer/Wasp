@@ -64,7 +64,7 @@ public:
     /// @param data - in - data to be sent
     /// @param size - in - size of data to be sent
     /// @return -1 on error, else number of bytes sent
-    int Send(const std::byte& data, const size_t size)
+    int Send(const std::byte* data, const size_t size)
     {
         if (!m_comms.IsOpen()) return -1;
         return m_comms.Write(data, size);

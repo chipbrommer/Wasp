@@ -21,6 +21,7 @@ add_executable (Wasp
     "wasp.cpp"
     "gps/ublox.h" 
     "gps/ublox.cpp" 
+    "gps/ublox_info.h"
     "imu/inertial_labs.h" 
     "imu/inertial_labs.cpp" 
     "utilities/serial_client.cpp" 
@@ -53,7 +54,7 @@ add_executable (Wasp
     "external/pugixml/pugiconfig.hpp"
     "external/pugixml/pugixml.cpp"
     "external/pugixml/pugixml.hpp"
-)
+    "utilities/conversions.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)

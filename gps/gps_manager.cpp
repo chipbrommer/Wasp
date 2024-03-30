@@ -50,7 +50,7 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
     switch (option)
     {
     case GpsOptions::Ublox:
-        m_gps = std::make_unique<Ublox>(m_logger, port, baudrate);
+        m_gps = std::make_unique<UbloxGps>(m_logger, port, baudrate);
         break;
     case GpsOptions::Novatel:
         m_gps = std::make_unique<Novatel>(m_logger, port, baudrate);
@@ -124,7 +124,6 @@ bool GpsManager::AutoConfigure()
     m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Auto-configuration failed. Unable to establish communication with any GPS option.");
     return false;
 }
-
 
 void GpsManager::Start()
 {

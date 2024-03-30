@@ -74,7 +74,7 @@ int SerialClient::Read(std::byte* buffer, size_t size)
     return 0;
 }
 
-int SerialClient::Write(const std::byte& buffer, size_t size)
+int SerialClient::Write(const std::byte* buffer, size_t size)
 {
     return 0;
 }
