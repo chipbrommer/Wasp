@@ -29,6 +29,7 @@ public:
         Unknown,
         Ublox,
         Novatel,
+        Atacnav,
     };
 
     /// @brief Default constructor
@@ -78,6 +79,7 @@ private:
         {GpsOptions::Unknown,   "Unknown"},
         {GpsOptions::Ublox,     "Ublox"},
         {GpsOptions::Novatel,   "Novatel"},
+        {GpsOptions::Atacnav,   "Atacnav"},
     };
 
     GpsOptions                  m_currentGpsType;   /// Current GPS type 

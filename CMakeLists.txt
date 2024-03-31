@@ -54,7 +54,7 @@ add_executable (Wasp
     "external/pugixml/pugiconfig.hpp"
     "external/pugixml/pugixml.cpp"
     "external/pugixml/pugixml.hpp"
-    "utilities/constants.h")
+    "utilities/constants.h" "gps/atacnav.h" "gps/atacnav.cpp" "gps/atacnav_info.h")
 
 # Create a test files directory for ease of access 
 set(TEST_FILES_DIR "${CMAKE_SOURCE_DIR}/test_files")

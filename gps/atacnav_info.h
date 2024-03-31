@@ -1,7 +1,7 @@
-
+#pragma once
 /////////////////////////////////////////////////////////////////////////////////
-// @file            novatel.cpp
-// @brief           Implementation for the novatel GPS class
+// @file            atacnav_info.h
+// @brief           Definitions and structures for Atacnav modules
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -10,21 +10,13 @@
 // Includes:
 //          name                            reason included
 //          ------------------              ------------------------
-#include    "novatel.h"                     // Header
+#include <string>                           // strings
+#include <cstdint>                          // std ints
+#include <unordered_map>                    // map
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-int Novatel::ProcessData()
-{
-    return -1;
-}
-
-GpsData Novatel::GetCommonData()
-{
-    return m_commonData;
-}
-
-void Novatel::UpdateCommonData()
+namespace Atacnav
 {
 
 }

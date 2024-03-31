@@ -1,7 +1,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////
-// @file            novatel.cpp
-// @brief           Implementation for the novatel GPS class
+// @file            atacnav.cpp
+// @brief           Implementation for the atacnav GPS class
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -10,21 +10,21 @@
 // Includes:
 //          name                            reason included
 //          ------------------              ------------------------
-#include    "novatel.h"                     // Header
+#include    "atacnav.h"                     // Header
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-int Novatel::ProcessData()
+int AtacnavGps::ProcessData()
 {
     return -1;
 }
 
-GpsData Novatel::GetCommonData()
+GpsData AtacnavGps::GetCommonData()
 {
     return m_commonData;
 }
 
-void Novatel::UpdateCommonData()
+void AtacnavGps::UpdateCommonData()
 {
 
 }

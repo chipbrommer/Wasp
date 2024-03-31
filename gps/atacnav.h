@@ -1,7 +1,7 @@
 #pragma once
 /////////////////////////////////////////////////////////////////////////////////
-// @file            novatel.h
-// @brief           A class for communicating with Novatel GPS modules
+// @file            atacnav.h
+// @brief           A class for communicating with ATACNAV GPS modules
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -17,7 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 /// @brief 
-struct NovatelData
+struct AtacnavData
 {
     double roll;
     double pitch;
@@ -26,16 +26,16 @@ struct NovatelData
 };
 
 /// @brief 
-class Novatel : public GpsType
+class AtacnavGps : public GpsType
 {
 public:
 
     /// @brief 
-    Novatel(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
+    AtacnavGps(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
         GpsType("UBLOX", logger, path, baudrate) {}
 
     /// @brief 
-    ~Novatel() {}
+    ~AtacnavGps() {}
 
     /// @brief 
     int ProcessData() override;
@@ -51,5 +51,5 @@ private:
     /// @brief 
     void UpdateCommonData() override;
 
-    NovatelData m_data = {};              /// Data storage
+    AtacnavData m_data = {};              /// Data storage
 };
