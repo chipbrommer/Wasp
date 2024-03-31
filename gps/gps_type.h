@@ -46,9 +46,7 @@ public:
     /// @param baudrate 
     GpsType(const std::string& name, LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
         m_name(name), m_logger(logger), m_path(path), m_baudrate(baudrate)
-    {
-
-    }
+    {}
     
     /// @brief Default base deconstructor
     virtual ~GpsType() 
@@ -69,8 +67,6 @@ public:
         // Iterate over the baud rate map
         for (const auto& [baudRateEnum, baudRateValue] : m_GpsCommonBaudRateMap)
         {
-            m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Trying baud rate: " + std::to_string(baudRateValue));
-
             if (baudRateEnum != m_comms.GetBaudRate())
             {
                 // Try to open the port with the current baud rate
@@ -81,12 +77,27 @@ public:
                 }
             }
 
+            m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Trying baud rate: " + std::to_string(baudRateValue));
+
             // Wait for set timeout length to attempt to get data
             auto startTime = std::chrono::steady_clock::now();
             while (std::chrono::steady_clock::now() - startTime < std::chrono::seconds(AUTO_DISCOVERY_TIMEOUT_SECS))
             {
-                // Attempt to get and process data
-                //ProcessData();
+                try 
+                {
+                    // Attempt to get and process data
+                    ProcessData();
+                }
+                catch (const std::exception& e) 
+                {
+                    // Catch any standard exception and print out the exception information
+                    std::cerr << "Caught exception: " << e.what() << std::endl;
+                }
+                catch (...) 
+                {
+                    // Catch any other exception types
+                    std::cerr << "Caught unknown exception" << std::endl;
+                }
 
                 // Check if data is received
                 if (m_commonData.rxCount > 0)
@@ -115,7 +126,7 @@ public:
 
     /// @brief Get a copy of the common GPS daa
     /// @return GpsData copy
-    GpsData GetCommonData() const { return m_commonData; }
+    virtual GpsData GetCommonData() = 0;
 
     /// @brief Check if the GPS unit was initialized correctly 
     /// @returntrue for successfully initalized, else false 
@@ -142,4 +153,5 @@ protected:
     SerialClient::BaudRate  m_baudrate          = SerialClient::BaudRate::BAUDRATE_INVALID;     /// Holds the baudrate
     SerialClient            m_comms;                            /// Holds the serial client
     bool                    m_initialized       = false;        /// Bool to hold if the gps unit is initialized correctly
+    std::mutex              m_commonDataMutex   = {};           /// Safety for common data
 };

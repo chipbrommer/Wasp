@@ -139,7 +139,7 @@ int UbloxGps::ProcessData()
 		// if we didn't find a start of message, try again next time
 		if (!ubxFound && !nmeaFound)
 		{
-			return 0;
+			break;
 		}
 
 		// did we find a UBX message ? 
@@ -213,7 +213,11 @@ int UbloxGps::ProcessData()
 		}
 	}
 
-	if (newData) return 1;
+	if (newData)
+	{	
+		UpdateCommonData();
+		return 1;
+	}
 	else return 0;
 }
 
@@ -256,6 +260,12 @@ int	UbloxGps::RestartDevice(Ublox::START_TYPE start, Ublox::RESET_TYPE reset)
 
 	// return success
 	return rtn;
+}
+
+GpsData UbloxGps::GetCommonData()
+{
+	std::scoped_lock lock(m_commonDataMutex);
+	return m_commonData;
 }
 
 int UbloxGps::ConfigureMessageDataStream(uint8_t classId, uint8_t messageId, bool uart1, bool usb)
@@ -598,15 +608,15 @@ int UbloxGps::Configure()
 	else if (m_data.SoftwareVersion == Ublox::SW_VERSION::EXT_CORE_4_04) desiredMessageRate = Ublox::MESSAGE_OUTPUT_RATE::FIVE;
 	else if (m_data.SoftwareVersion == Ublox::SW_VERSION::EXT_CORE_3_01) desiredMessageRate = Ublox::MESSAGE_OUTPUT_RATE::ONE;
 
-	// Clear the data storages and request an immediate cold start
-	if (RestartDevice(Ublox::START_TYPE::COLD, Ublox::RESET_TYPE::HW_RESET_IMMEDIATE) < 0)
-	{
-		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Cold start request failed");
-		return -1;
-	}
+	//// Clear the data storages and request an immediate cold start
+	//if (RestartDevice(Ublox::START_TYPE::COLD, Ublox::RESET_TYPE::HW_RESET_IMMEDIATE) < 0)
+	//{
+	//	m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Cold start request failed");
+	//	return -1;
+	//}
 
-	// wait some time for the unit to accept clear command and process
-	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+	//// wait some time for the unit to accept clear command and process
+	//std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
 	// turn off NMEA GNGLL - return -1 on error
 	if (ConfigureMessageDataStream(Ublox::NMEA::classId, Ublox::NMEA::GxGLL::messageId, false, false) < 0)
@@ -1738,6 +1748,7 @@ void UbloxGps::UpdateRangeOfActiveNavigationSatellites(double range, int satelli
 
 void UbloxGps::UpdateCommonData()
 {
+	std::scoped_lock lock(m_commonDataMutex);
 	m_commonData.rxCount = m_data.UbxRxCount + m_data.NmeaRxCount;
 }
 

@@ -144,6 +144,8 @@ public:
 	/// @return -1 on error, 0+ on success
 	int	RestartDevice(Ublox::START_TYPE start, Ublox::RESET_TYPE reset);
 
+	GpsData GetCommonData();
+
 protected:
 
 private:

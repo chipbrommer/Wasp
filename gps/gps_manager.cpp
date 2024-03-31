@@ -144,3 +144,8 @@ void GpsManager::Stop()
 {
     m_run = false;
 }
+
+GpsData GpsManager::GetCommonData()
+{
+    return m_gps->GetCommonData();
+}

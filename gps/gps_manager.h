@@ -59,6 +59,9 @@ public:
     /// @brief Stop the main working loop if it was started
     void Stop();
 
+    // Accessible variables
+    GpsData GetCommonData();
+
 protected:
 
 private:

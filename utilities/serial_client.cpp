@@ -166,7 +166,7 @@ int SerialClient::Read(std::byte* buffer, size_t size)
     // Read data from the buffer 
 #ifdef WIN32
     DWORD numRead = 0;
-    rtn = ReadFile(m_fd, &buffer, static_cast<DWORD>(size), &numRead, NULL);
+    rtn = ReadFile(m_fd, buffer, static_cast<DWORD>(size), &numRead, NULL);
 
     // ReadFile returns 0 on fail, adjust to -1; else set to number successfully written.
     if (rtn == 0)
@@ -175,7 +175,7 @@ int SerialClient::Read(std::byte* buffer, size_t size)
     }
     else
     {
-        rtn = numRead;
+        rtn = static_cast<int>(numRead);
     }
 #elif defined __linux__
     rtn = read(m_fd, buffer, size);
@@ -213,8 +213,9 @@ int SerialClient::Write(const std::byte* buffer, size_t size)
 #endif
 
     // Check if send was successful
-    if (rtn < 0)
+    if (rtn < 0 || rtn != numOut)
     {
+        // Sending failed or we did not send the full data
         return -1;
     }
 

@@ -58,7 +58,7 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     }
 
     // Configure the GPS
-    if (!m_gpsManager.Configure(m_config.data.gpsUnit, m_config.data.gpsPort, SerialClient::BaudRate::BAUDRATE_AUTO))
+    if (!m_gpsManager.Configure(m_config.data.gpsUnit, m_config.data.gpsPort, m_config.data.gpsBaudRate))
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "GPS Manager failed to configure, exiting.");
         m_initialized = false;
@@ -81,6 +81,9 @@ void Wasp::Execute()
     {
         // Check for GPS updates
         if (m_gpsManager.Read() < 0) break;
+
+        GpsData data = m_gpsManager.GetCommonData();
+        std::cout << "Rx Count: " + std::to_string(data.rxCount) + '\n';
 
         // Sleep a little
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
