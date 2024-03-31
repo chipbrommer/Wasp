@@ -47,7 +47,13 @@ public:
     /// @return - true if successful, false if already configured and connection is opened. 
     bool Configure(const GpsOptions option, const std::string port, const SerialClient::BaudRate baudrate);
 
+    /// @brief Ability for manager to auto detect the GPS unit and the GPS units baudrate
+    /// @return true if successful connected to a gps unit, else false
     bool AutoConfigure();
+
+    /// @brief Check if initialization sequence for the manager is complete
+    /// @return true if complete, else false
+    bool IsInitializationComplete();
 
     /// @brief Start the connection to the GPS and poll it for data in an endless loop
     void Start();
@@ -83,4 +89,5 @@ private:
     std::unique_ptr<GpsType>    m_gps;              /// Holds a pointer to the utilizes GPS type.  
     SerialClient                m_commPort;         /// Holds connection to serial port
     std::atomic_bool            m_run;              /// Holds an bool to kill the main loop
+    std::atomic_bool            m_initComplete;     /// Holds flag indicating if initialization is complete.
 };

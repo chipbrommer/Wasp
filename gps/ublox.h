@@ -107,6 +107,8 @@ struct UbloxData
 	std::vector<Ublox::UBX::NAV::SAT::Satellite>	satellites;
 	std::vector<Ublox::UBX::NAV::ORB::Satellite>	orbits;
 
+	long UbxAckCount		= 0;
+	long UbxNackCount		= 0;
 	long UbxRxCount			= 0;
 	long UbxMonVerCount		= 0;
 	long UbxNavCovCount		= 0;

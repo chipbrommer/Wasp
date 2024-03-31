@@ -152,7 +152,7 @@ int UbloxGps::ProcessData()
 			// if not, continue to the top of the loop and collect more data
 			if (bytesInBuffer < fullMsgLength)
 			{
-				return 0;
+				break;
 			}
 
 			// attempt to validate the UBX checksum
@@ -860,11 +860,13 @@ void UbloxGps::HandleUbxMessage(uint8_t* buffer)
 		// Check for ACK message
 		if (msgId == Ublox::UBX::ACK::ACK::messageId)
 		{
+			m_data.UbxAckCount++;
 			return;
 		}
 		// Check for NACK massage
 		else if (msgId == Ublox::UBX::ACK::NACK::messageId)
 		{
+			m_data.UbxNackCount++;
 			return;
 		}
 	}

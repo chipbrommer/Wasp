@@ -82,9 +82,6 @@ void Wasp::Execute()
         // Check for GPS updates
         if (m_gpsManager.Read() < 0) break;
 
-        GpsData data = m_gpsManager.GetCommonData();
-        std::cout << "Rx Count: " + std::to_string(data.rxCount) + '\n';
-
         // Sleep a little
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }

@@ -10,7 +10,7 @@
     "finMaxDegrees": 25.0,
     "finMinDegrees": -25.0,
     "gpsBaudRate": 15,
-    "gpsPort": "",
+    "gpsPort": "COM5",
     "gpsUnit": 1,
     "imuBaudRate": 18,
     "imuPort": "",

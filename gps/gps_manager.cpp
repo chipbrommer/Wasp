@@ -15,7 +15,8 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 GpsManager::GpsManager(LogClient& logger) : m_currentGpsType(GpsOptions::Unknown), m_name("GPS MGR"),
-    m_configured(false), m_logger(logger), m_port(""), m_baudrate(SerialClient::BaudRate::BAUDRATE_INVALID), m_run(false)
+    m_configured(false), m_logger(logger), m_port(""), m_baudrate(SerialClient::BaudRate::BAUDRATE_INVALID), 
+    m_run(false), m_initComplete(false)
 {
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
@@ -48,7 +49,11 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
     m_baudrate = baudrate;
 
     // prevent an empty string port
-    if (m_port.empty()) return false;
+    if (m_port.empty())
+    {
+        m_logger.AddLog(m_name, LogClient::LogLevel::Error, "GPS Port is empty in Configure()");
+        return false;
+    }
 
     // Validate the serial port
     std::string portUpdate = ValidateSerialPort(port);
@@ -71,6 +76,7 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
 
     // Make sure the gps unit is initialized
     rtn = m_gps->Initialized();
+    m_initComplete = true;
 
     if (rtn) { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured"); }
     else { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Failed to configure"); }
@@ -119,6 +125,11 @@ bool GpsManager::AutoConfigure()
     // If no GPS option succeeded in receiving data
     m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Auto-configuration failed. Unable to establish communication with any GPS option.");
     return false;
+}
+
+bool GpsManager::IsInitializationComplete()
+{
+    return m_initComplete;
 }
 
 void GpsManager::Start()
