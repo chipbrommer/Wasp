@@ -3,10 +3,16 @@
 
 int main()
 {
+	// Grab the test files directory
+	std::string testFilesDir(TEST_FILES_DIR);
+
+	// Create Wasp instance
 	Wasp wasp( 
-		"C:/Users/cbrommer/Desktop/wasp/settings.json", 
-		"C:/Users/cbrommer/Desktop/wasp/build.json",
-		"C:/Users/cbrommer/Desktop/wasp/config.json");
+		testFilesDir + "/settings.json", 
+		testFilesDir + "/build.json",
+		testFilesDir + "/config.json");
+
+	// Start Wasp
 	wasp.Execute();
 
 	return 0;

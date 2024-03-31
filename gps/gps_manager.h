@@ -49,10 +49,14 @@ public:
 
     bool AutoConfigure();
 
-    /// @brief Start the connection to the GPS
+    /// @brief Start the connection to the GPS and poll it for data in an endless loop
     void Start();
 
-    /// @brief Stop the main working loop
+    /// @brief Read for new data from the configured GPS unit. 
+    /// @return -1 on error, 0 on nothing read, 1 if data was processed. 
+    int Read();
+
+    /// @brief Stop the main working loop if it was started
     void Stop();
 
 protected:
@@ -75,4 +79,5 @@ private:
     SerialClient::BaudRate      m_baudrate;         /// Holds the baudrate
     std::unique_ptr<GpsType>    m_gps;              /// Holds a pointer to the utilizes GPS type.  
     SerialClient                m_commPort;         /// Holds connection to serial port
+    std::atomic_bool            m_run;              /// Holds an bool to kill the main loop
 };

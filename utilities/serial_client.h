@@ -112,7 +112,7 @@ public:
 	/// @return true if successful, false if fails
 	bool Open();
 
-	/// @brief 
+	/// @brief Attempt to configure the port and open it
 	/// @param port - [in] - Port to connect on.
 	/// @param baud - [in] - Baudrate for the port.
 	/// @param bytes - [in] - BytesSize for the port.
@@ -120,8 +120,8 @@ public:
 	/// @param stopbits - [in] - Stopbits for the port.
 	/// @param blocking - [in/opt] - Configure the port to be a blocking port
 	/// @param customBaud - [in/opt] - Custom baud only useful if using BAUDRATE_CUSTOM for baud
-	/// @return 0 if successful, -1 if fails
-	int OpenConfigure(const std::string port, const BaudRate baud, const ByteSize bytesize, const Parity parity,
+	/// @return true if successful, false if fails
+	bool OpenConfigure(const std::string port, const BaudRate baud, const ByteSize bytesize, const Parity parity,
 		const StopBits stopbits, const bool blocking = false, const int customBaud = -1);
 	
 	/// @brief Reconfigure a port after it has been opened.
@@ -132,20 +132,20 @@ public:
 	/// @param stopbits - [in] - Stopbits for the port.
 	/// @param blocking - [in/opt] - Configure the port to be a blocking port
 	/// @param customBaud - [in/opt] - Custom baud only useful if using BAUDRATE_CUSTOM for baud
-	/// @return 0 if successful, -1 if fails
+	/// @return true if successful, false if fails
 	bool Reconfigure(const std::string port, const BaudRate baud, const ByteSize bytesize, const Parity parity,
 		const StopBits stopbits, const bool blocking = false, const int customBaud = -1);
 
 	/// @brief Flush the input and output of a serial port
-	/// @return 0 if successful, -1 if fails
+	/// @return true if successful, false if fails
 	bool Flush();
 
 	/// @brief Flush the input of a serial port
-	/// @return 0 if successful, -1 if fails
+	/// @return true if successful, false if fails
 	bool FlushInputBuffer();
 
 	/// @brief Flush the output of a serial port
-	/// @return 0 if successful, -1 if fails
+	/// @return true if successful, false if fails
 	bool FlushOutputBuffer();
 
 	/// @brief Read from serial into the passed in buffer.
@@ -161,8 +161,8 @@ public:
 	int Write(const std::byte* buffer, size_t size);
 
 	/// @brief Closes a serial connection
-	/// @return 0 if successful, -1 if fails
-	int Close();
+	/// @return true if successful, false if fails
+	bool Close();
 
 	/// @brief Get the current port handle
 	/// @return if Linux integer of current port, if windows HANDLE of current handle

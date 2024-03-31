@@ -1,0 +1,12 @@
+{
+    "fileLoggingEnabled": false,
+    "logFilePath": "",
+    "targetAltitudeHAE": 0.0,
+    "targetAltitudeMSL": 0.0,
+    "targetLatitude": 0.0,
+    "targetLongitude": 0.0,
+    "testMode1": false,
+    "tmIpAddress": "224.1.1.1",
+    "tmPort": 5700,
+    "webPort": 8080
+}

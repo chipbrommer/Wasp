@@ -15,17 +15,18 @@ SerialClient::~SerialClient()
 int SerialClient::Configure(const std::string port, const BaudRate baud, const ByteSize bytesize, const Parity parity, 
     const StopBits stopbits, const bool blocking, const int customBaud)
 {
-    if (IsOpen()) return -1;
+    if (IsOpen()) return false;
 
     m_port = port;
     m_baudRate = baud;
     m_byteSize = bytesize;
     m_parity = parity;
+    m_stopbits = stopbits;
     m_blocking = blocking;
 
     if (baud == BaudRate::BAUDRATE_CUSTOM) { m_customBaud = customBaud; }
 
-    return 0;
+    return true;
 }
 
 bool SerialClient::Open()
@@ -97,16 +98,14 @@ bool SerialClient::Open()
     return Reconfigure(m_port, m_baudRate, m_byteSize, m_parity, m_stopbits, m_blocking, m_customBaud);
 }
 
-int SerialClient::OpenConfigure(const std::string port, const BaudRate baud, const ByteSize bytesize, const Parity parity, 
+bool SerialClient::OpenConfigure(const std::string port, const BaudRate baud, const ByteSize bytesize, const Parity parity, 
     const StopBits stopbits, const bool blocking, const int customBaud)
 {
     if (IsOpen()) { return false; }
 
     Configure(port, baud, bytesize, parity, stopbits, blocking, customBaud);
 
-    Open();
-
-    return 0;
+    return Open();
 }
 
 bool SerialClient::Reconfigure(const std::string port, const BaudRate baud, const ByteSize bytesize, const Parity parity, 
@@ -223,15 +222,15 @@ int SerialClient::Write(const std::byte* buffer, size_t size)
     return rtn;
 }
 
-int SerialClient::Close() 
+bool SerialClient::Close() 
 {
 #ifdef _WIN32
-    if (CloseHandle(m_fd) == 0) { return -1; }
+    if (CloseHandle(m_fd) == 0) { return false; }
 #else
-    if (close(m_fd) == -1) { return -1; }
+    if (close(m_fd) == -1) { return false; }
 #endif
     m_fd = INVALID_HANDLE_VALUE;
-    return 0;
+    return true;
 }
 
 int SerialClient::BytesInQueue() 

@@ -56,6 +56,12 @@ add_executable (Wasp
     "external/pugixml/pugixml.hpp"
     "utilities/constants.h")
 
+# Create a test files directory for ease of access 
+set(TEST_FILES_DIR "${CMAKE_SOURCE_DIR}/test_files")
+
+# Pass the TEST_FILES_DIR as a compile definition
+target_compile_definitions(Wasp PRIVATE TEST_FILES_DIR="${TEST_FILES_DIR}")
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)
 endif()

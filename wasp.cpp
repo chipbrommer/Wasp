@@ -53,7 +53,7 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     if(!m_imuManager.Configure(m_config.data.imuUnit, m_config.data.imuPort, m_config.data.imuBaudRate))
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "IMU Manager failed to configure, exiting.");
-        Close();
+        // Close();
     }
 
     // Configure the GPS
@@ -73,7 +73,11 @@ void Wasp::Execute()
 {
     while (true)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        // Check for GPS updates
+        if (m_gpsManager.Read() < 0) break;
+
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 

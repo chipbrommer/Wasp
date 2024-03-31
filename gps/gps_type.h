@@ -47,17 +47,20 @@ public:
     GpsType(const std::string& name, LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
         m_name(name), m_logger(logger), m_path(path), m_baudrate(baudrate)
     {
+        bool success = false;
+
         // Attempt to auto discover if we received auto
         if (m_baudrate != SerialClient::BaudRate::BAUDRATE_AUTO && m_baudrate != SerialClient::BaudRate::BAUDRATE_INVALID)
         {
-            m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE);
+            success = m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE);
         }
         else if (m_baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
         {
-            AutoDiscoverBaudRate();
+            success = AutoDiscoverBaudRate();
         }
 
-        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
+        if(success) m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
+        else m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Initialized Failed");
     }
     
     /// @brief Default base deconstructor

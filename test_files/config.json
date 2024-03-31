@@ -1,0 +1,18 @@
+{
+    "fin1Channel": -1,
+    "fin1Path": "",
+    "fin2Channel": -1,
+    "fin2Path": "",
+    "fin3Channel": -1,
+    "fin3Path": "",
+    "fin4Channel": -1,
+    "fin4Path": "",
+    "finMaxDegrees": 25.0,
+    "finMinDegrees": -25.0,
+    "gpsBaudRate": 22,
+    "gpsPort": "COM5",
+    "gpsUnit": 1,
+    "imuBaudRate": 18,
+    "imuPort": "",
+    "imuUnit": 1
+}

@@ -15,7 +15,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 GpsManager::GpsManager(LogClient& logger) : m_currentGpsType(GpsOptions::Unknown), m_name("GPS MGR"),
-    m_configured(false), m_logger(logger), m_port(""), m_baudrate(SerialClient::BaudRate::BAUDRATE_INVALID)
+    m_configured(false), m_logger(logger), m_port(""), m_baudrate(SerialClient::BaudRate::BAUDRATE_INVALID), m_run(false)
 {
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
@@ -47,13 +47,19 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
     m_port = port;
     m_baudrate = baudrate;
 
+    // prevent an empty string port
+    if (m_port.empty()) return false;
+
+    // Validate the serial port
+    std::string portUpdate = ValidateSerialPort(port);
+
     switch (option)
     {
     case GpsOptions::Ublox:
-        m_gps = std::make_unique<UbloxGps>(m_logger, port, baudrate);
+        m_gps = std::make_unique<UbloxGps>(m_logger, portUpdate, baudrate);
         break;
     case GpsOptions::Novatel:
-        m_gps = std::make_unique<Novatel>(m_logger, port, baudrate);
+        m_gps = std::make_unique<Novatel>(m_logger, portUpdate, baudrate);
         break;
     case GpsOptions::Unknown:
         // Intentional fall through
@@ -63,15 +69,8 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
         m_gps = nullptr;
     };
 
-    if (baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
-    {
-        rtn = m_gps->AutoDiscoverBaudRate();
-    }
-    else
-    {
-        // If the baudrate isnt invalid, it indicates a successful connection
-        if (m_gps->GetBaudRate() != SerialClient::BaudRate::BAUDRATE_INVALID) rtn = true;
-    }
+    // If the baudrate isnt invalid, it indicates a successful connection
+    if (m_gps->GetBaudRate() != SerialClient::BaudRate::BAUDRATE_INVALID) rtn = true;
 
     if (rtn) { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured"); }
     else { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Failed to configure"); }
@@ -124,10 +123,24 @@ bool GpsManager::AutoConfigure()
 
 void GpsManager::Start()
 {
-    // @todo
+    m_run = true;
+
+    while (m_run)
+    {
+        // Look for new data
+        Read();
+
+        // Rest 
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
+
+int GpsManager::Read()
+{
+    return m_gps->ProcessData();
 }
 
 void GpsManager::Stop()
 {
-    // @todo
+    m_run = false;
 }

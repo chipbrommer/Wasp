@@ -15,6 +15,7 @@
 //
 #include "../utilities/log_client.h"        // logger
 #include "inertial_labs.h"                  // inertial labs 
+#include "../utilities/constants.h"         // constants
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -73,10 +74,14 @@ private:
         {ImuOptions::IL_Kernel110,      "Inertial Labs Kernel-110"},
     };
 
-    ImuOptions                  m_imuOption;        /// Desired IMU for usage
+    ImuOptions                  m_currentImuType;   /// Desired IMU for usage
     std::string                 m_name;             /// Name for logging
     bool                        m_configured;       /// Flag for if the class is configured
     LogClient&                  m_logger;           /// Logger
+    std::string                 m_port;             /// Holds the port
+    SerialClient::BaudRate      m_baudrate;         /// Holds the baudrate
     std::unique_ptr<ImuType>    m_imu;              /// Holds a pointer to the utilized IMU type. 
     SerialClient                m_commPort;         /// Holds connection to serial port
+    std::atomic_bool            m_run;              /// Holds an bool to kill the main loop
+
 };

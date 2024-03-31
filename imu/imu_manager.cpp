@@ -16,8 +16,8 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-ImuManager::ImuManager(LogClient& logger) : m_imuOption(ImuOptions::Unknown), m_name("IMU MGR"),
-    m_configured(false), m_logger(logger)
+ImuManager::ImuManager(LogClient& logger) : m_currentImuType(ImuOptions::Unknown), m_name("IMU MGR"),
+    m_configured(false), m_logger(logger), m_port(""), m_baudrate(SerialClient::BaudRate::BAUDRATE_INVALID), m_run(false)
 {
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
@@ -35,21 +35,28 @@ ImuManager::~ImuManager()
 
 bool ImuManager::Configure(const ImuOptions option, const std::string port, const SerialClient::BaudRate baudrate)
 {
-    
     if (m_configured)
     {
         return true;
     }
 
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configuring for " + ImuOptionsMap.at(option));
-    m_imuOption = option;
+    m_currentImuType = option;
+    m_port = port;
+    m_baudrate = baudrate;
+
+    // prevent an empty string port
+    if (m_port.empty()) return false;
+
+    // Validate the serial port
+    std::string portUpdate = ValidateSerialPort(port);
 
     // Create the proper IMU
     switch (option)
     {
     case ImuOptions::IL_Kernel210:
     case ImuOptions::IL_Kernel110:
-        m_imu = std::make_unique<InertialLabs>(m_logger, port, baudrate);
+        m_imu = std::make_unique<InertialLabs>(m_logger, portUpdate, baudrate);
         break;
     case ImuOptions::Unknown:
         // Intentionally do nothing... 

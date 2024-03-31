@@ -29,6 +29,7 @@ int UbloxGps::ProcessData()
 	static bool first = true;
 	int bytesRead = 0;
 	int bytesAvail = 0;
+	bool newData = false;
 
 	// Buffers 
 	static uint8_t inBuffer[BUFFER_SIZE] = {};
@@ -61,6 +62,10 @@ int UbloxGps::ProcessData()
 	if (bytesRead > 0)
 	{
 		bytesInBuffer += bytesRead;
+	}
+	else if (bytesRead < 0)
+	{
+		return -1;
 	}
 	else
 	{
@@ -161,6 +166,7 @@ int UbloxGps::ProcessData()
 			// handle the UBX message 
 			HandleUbxMessage(msgBuffer);
 			m_data.UbxRxCount++;
+			newData = true;
 		}
 		// did we find an NMEA message ? 
 		else if (nmeaFound)
@@ -188,8 +194,10 @@ int UbloxGps::ProcessData()
 			// @note - if desire to handle NMEA in future - use this "HandleNmeaMessage(msgBuffer);"
 			// after count incrementation. 
 			m_data.NmeaRxCount++;
+			newData = true;
 		}
 	}
+
 
 	return 0;
 }
