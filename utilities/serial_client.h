@@ -194,6 +194,10 @@ public:
 	/// @return true if configured to block, else false
 	bool GetBlockingMode();
 
+	/// @brief Get the current baud rate
+	/// @return enum of the current baud rate
+	SerialClient::BaudRate GetBaudRate();
+
 protected:
 
 private:

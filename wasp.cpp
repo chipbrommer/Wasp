@@ -53,6 +53,7 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     if(!m_imuManager.Configure(m_config.data.imuUnit, m_config.data.imuPort, m_config.data.imuBaudRate))
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "IMU Manager failed to configure, exiting.");
+        // m_initialized = false;
         // Close();
     }
 
@@ -60,6 +61,7 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     if (!m_gpsManager.Configure(m_config.data.gpsUnit, m_config.data.gpsPort, SerialClient::BaudRate::BAUDRATE_AUTO))
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "GPS Manager failed to configure, exiting.");
+        m_initialized = false;
         Close();
     }
 }
@@ -71,18 +73,25 @@ Wasp::~Wasp()
 
 void Wasp::Execute()
 {
-    while (true)
+    if (!m_initialized) return;
+
+    m_run = true;
+
+    while (m_run)
     {
         // Check for GPS updates
         if (m_gpsManager.Read() < 0) break;
 
-
+        // Sleep a little
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 
 void Wasp::Close()
 {
+    // Stop the execution loop
+    m_run = false;
+
     m_signalManger.Stop();
     if (m_signalThread.joinable()) m_signalThread.join();
 

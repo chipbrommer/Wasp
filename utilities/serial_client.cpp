@@ -482,6 +482,11 @@ bool SerialClient::SetBaudRate()
     return true;
 }
 
+SerialClient::BaudRate SerialClient::GetBaudRate()
+{
+    return m_baudRate;
+}
+
 bool SerialClient::SetByteSize()
 {
     // if the port has been opened

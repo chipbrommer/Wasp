@@ -19,6 +19,27 @@
 UbloxGps::UbloxGps(LogClient & logger, const std::string path, const SerialClient::BaudRate baudrate) :
     GpsType("UBLOX", logger, path, baudrate) 
 {
+	m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initializing.");
+
+	bool success = false;
+
+	// Attempt to auto discover if we received auto
+	if (m_baudrate != SerialClient::BaudRate::BAUDRATE_AUTO && m_baudrate != SerialClient::BaudRate::BAUDRATE_INVALID)
+	{
+		success = m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE);
+	}
+	else if (m_baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
+	{
+		success = AutoDiscoverBaudRate();
+	}
+
+	if (!success)
+	{
+		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Initialized Failed");
+		m_initialized = false;
+		return;
+	}
+
 	// Initialzie the Ublox receiver
 	Initialize();
 }
@@ -63,14 +84,8 @@ int UbloxGps::ProcessData()
 	{
 		bytesInBuffer += bytesRead;
 	}
-	else if (bytesRead < 0)
-	{
-		return -1;
-	}
-	else
-	{
-		return 0;
-	}
+	else if (bytesRead < 0) return -1;
+	else return 0;
 
 	// do we have at least 2 bytes in buffer (size of sync bytes)
 	while (bytesInBuffer >= Ublox::NUM_SYNC_BYTES)
@@ -198,8 +213,8 @@ int UbloxGps::ProcessData()
 		}
 	}
 
-
-	return 0;
+	if (newData) return 1;
+	else return 0;
 }
 
 int	UbloxGps::RestartDevice(Ublox::START_TYPE start, Ublox::RESET_TYPE reset)
@@ -561,8 +576,6 @@ int UbloxGps::RequestUbxData(uint8_t classId, uint8_t messageId)
 
 void UbloxGps::Initialize()
 {
-	m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initializing.");
-
 	// Flush any old data sitting on serial port
 	m_comms.Flush();
 
@@ -570,9 +583,11 @@ void UbloxGps::Initialize()
 	if (Configure() < 0)
 	{
 		m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Failed to configure.");
+		m_initialized = false;
 		return;
 	}
 
+	m_initialized = true;
 	m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
 }
 

@@ -59,7 +59,7 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
         m_gps = std::make_unique<UbloxGps>(m_logger, portUpdate, baudrate);
         break;
     case GpsOptions::Novatel:
-        m_gps = std::make_unique<Novatel>(m_logger, portUpdate, baudrate);
+        //m_gps = std::make_unique<Novatel>(m_logger, portUpdate, baudrate);
         break;
     case GpsOptions::Unknown:
         // Intentional fall through
@@ -69,8 +69,8 @@ bool GpsManager::Configure(const GpsOptions option, const std::string port, cons
         m_gps = nullptr;
     };
 
-    // If the baudrate isnt invalid, it indicates a successful connection
-    if (m_gps->GetBaudRate() != SerialClient::BaudRate::BAUDRATE_INVALID) rtn = true;
+    // Make sure the gps unit is initialized
+    rtn = m_gps->Initialized();
 
     if (rtn) { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Configured"); }
     else { m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Failed to configure"); }

@@ -47,20 +47,7 @@ public:
     GpsType(const std::string& name, LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
         m_name(name), m_logger(logger), m_path(path), m_baudrate(baudrate)
     {
-        bool success = false;
 
-        // Attempt to auto discover if we received auto
-        if (m_baudrate != SerialClient::BaudRate::BAUDRATE_AUTO && m_baudrate != SerialClient::BaudRate::BAUDRATE_INVALID)
-        {
-            success = m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE);
-        }
-        else if (m_baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
-        {
-            success = AutoDiscoverBaudRate();
-        }
-
-        if(success) m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
-        else m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Initialized Failed");
     }
     
     /// @brief Default base deconstructor
@@ -76,16 +63,22 @@ public:
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery enabled.");
 
+        // Open the port and configure it to 9600 (lowest baud)
+        m_comms.OpenConfigure(m_path, SerialClient::BaudRate::BAUDRATE_9600, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE);
+
         // Iterate over the baud rate map
         for (const auto& [baudRateEnum, baudRateValue] : m_GpsCommonBaudRateMap)
         {
             m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Trying baud rate: " + std::to_string(baudRateValue));
 
-            // Try to open the port with the current baud rate
-            if (!m_comms.OpenConfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE))
+            if (baudRateEnum != m_comms.GetBaudRate())
             {
-                m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery failed to configure port.");
-                return false;
+                // Try to open the port with the current baud rate
+                if (!m_comms.Reconfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE))
+                {
+                    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery failed to configure port.");
+                    return false;
+                }
             }
 
             // Wait for set timeout length to attempt to get data
@@ -93,7 +86,7 @@ public:
             while (std::chrono::steady_clock::now() - startTime < std::chrono::seconds(AUTO_DISCOVERY_TIMEOUT_SECS))
             {
                 // Attempt to get and process data
-                ProcessData();
+                //ProcessData();
 
                 // Check if data is received
                 if (m_commonData.rxCount > 0)
@@ -116,19 +109,24 @@ public:
     /// @return - Configured baudrate, SerialClient::BaudRate::BAUDRATE_INVALID indicates connection not opened. 
     SerialClient::BaudRate GetBaudRate() const { return m_baudrate; }
 
-    /// @brief 
-    /// @return 
+    /// @brief Necessary function to read and process data that all GPS units must use
+    /// @return -1 on fail, else 0+
     virtual int ProcessData() = 0;
 
-    /// @brief 
-    /// @return 
+    /// @brief Get a copy of the common GPS daa
+    /// @return GpsData copy
     GpsData GetCommonData() const { return m_commonData; }
+
+    /// @brief Check if the GPS unit was initialized correctly 
+    /// @returntrue for successfully initalized, else false 
+    bool Initialized() const { return m_initialized; }
 
 protected:
 
-    /// @brief 
+    /// @brief Necessary function to update common data that all GPS units must provide
     virtual void UpdateCommonData() = 0;
 
+    /// @brief mapping for common baud rates. Used in AutoDiscoverBaudRate()
     std::unordered_map<SerialClient::BaudRate, int> m_GpsCommonBaudRateMap = {
             {SerialClient::BaudRate::BAUDRATE_9600, 9600},
             {SerialClient::BaudRate::BAUDRATE_19200, 19200},
@@ -139,8 +137,9 @@ protected:
 
     std::string             m_name              = "";           /// name of the unit
     GpsData                 m_commonData        = {};           /// Holds common data 
-    LogClient&              m_logger;
+    LogClient&              m_logger;                           /// Holds the logger instance
     std::string             m_path              = "";           /// Holds the path to desired serial port
     SerialClient::BaudRate  m_baudrate          = SerialClient::BaudRate::BAUDRATE_INVALID;     /// Holds the baudrate
     SerialClient            m_comms;                            /// Holds the serial client
+    bool                    m_initialized       = false;        /// Bool to hold if the gps unit is initialized correctly
 };
