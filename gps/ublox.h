@@ -129,13 +129,13 @@ class UbloxGps : public GpsType
 {
 public:
 
-    /// @brief 
+    /// @brief Default Constructor
     UbloxGps(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate);
 
-    /// @brief 
+    /// @brief Default Deconstructor
     ~UbloxGps() {}
 
-    /// @brief 
+    /// @brief Read data from the gps unit and process it
     int ProcessData() override;
 
     /// @brief Restarts the Ublox receiver.
@@ -143,6 +143,16 @@ public:
 	/// @param reset - [in] - The desired reset type
 	/// @return -1 on error, 0+ on success
 	int	RestartDevice(Ublox::START_TYPE start, Ublox::RESET_TYPE reset);
+
+protected:
+
+private:
+	/// @brief Initialize the ublox interface
+	void Initialize();
+
+	/// @brief Configure the ublox device
+	/// @return -1 on error, else 0
+	int Configure();
 
 	/// @brief Disables or enables a desired message data stream from the uBlox GPS
 	/// @param classId - [in] - classId of the message we want to enable
@@ -184,16 +194,6 @@ public:
 	//! @param messageId  - [in] - messageId of the message we want to request
 	//! @return -1 on error, else the number of bytes successfully sent. 
 	int RequestUbxData(uint8_t classId, uint8_t messageId);
-
-protected:
-
-private:
-	/// @brief Initialize the ublox interface
-	void Initialize();
-
-	/// @brief Configure the ublox device
-	/// @return -1 on error, else 0
-	int Configure();
 
 	//! @brief Handles a received UBX message and maps the data accordingly
 	//! @param buffer - [in] - buffer containing the received UBX message

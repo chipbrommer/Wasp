@@ -45,7 +45,7 @@ public:
     ImuType(const std::string& name, LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) : 
         m_name(name), m_logger(logger), m_path(path), m_baudrate(baudrate)
     {
-        m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE);
+        m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE);
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
     }
 
@@ -59,16 +59,6 @@ public:
     /// @brief 
     /// @return -1 on error, else number of bytes read and processed
     virtual int ProcessData() = 0;
-
-    /// @brief 
-    /// @param data - in - data to be sent
-    /// @param size - in - size of data to be sent
-    /// @return -1 on error, else number of bytes sent
-    int Send(const std::byte* data, const size_t size)
-    {
-        if (!m_comms.IsOpen()) return -1;
-        return m_comms.Write(data, size);
-    }
 
     /// @brief 
     /// @return 

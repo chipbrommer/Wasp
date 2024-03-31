@@ -97,7 +97,7 @@ int UbloxGps::ProcessData()
 					if (inBuffer[index2 + 0] == Ublox::NMEA::endCheck1 &&
 						inBuffer[index2 + 1] == Ublox::NMEA::endCheck2)
 					{
-						nmeaMsgLength = index2 - index;
+						nmeaMsgLength = static_cast<unsigned int>(index2 - index);
 						nmeaFound = true;
 						m_data.NmeaRxCount++;
 						break;
@@ -113,7 +113,7 @@ int UbloxGps::ProcessData()
 		if (index > 0)
 		{
 			std::memmove(&inBuffer[0], &inBuffer[index], (bytesInBuffer - index));
-			bytesInBuffer -= index;
+			bytesInBuffer -= static_cast<unsigned int>(index);
 		}
 
 		// if we didn't find a start of message, try again next time
@@ -1469,7 +1469,7 @@ int UbloxGps::ParseNmeaMessage(char* buffer, char** fields, size_t max_fields)
 	}
 
 	// return
-	return i;
+	return static_cast<int>(i);
 }
 
 void UbloxGps::ParseMonitorVersionData(uint8_t* buffer)

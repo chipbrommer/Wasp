@@ -50,7 +50,7 @@ public:
         // Attempt to auto discover if we received auto
         if (m_baudrate != SerialClient::BaudRate::BAUDRATE_AUTO && m_baudrate != SerialClient::BaudRate::BAUDRATE_INVALID)
         {
-            m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE);
+            m_comms.OpenConfigure(m_path, m_baudrate, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE);
         }
         else if (m_baudrate == SerialClient::BaudRate::BAUDRATE_AUTO)
         {
@@ -60,13 +60,15 @@ public:
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Initialized.");
     }
     
-    /// @brief 
+    /// @brief Default base deconstructor
     virtual ~GpsType() 
     {
         m_comms.Close();
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Uninitialized.");
     }
 
+    /// @brief Attempts to connect to the GPS unit without a specific baudrate
+    /// @return true if successful connection established, else false
     bool AutoDiscoverBaudRate()
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery enabled.");
@@ -77,7 +79,7 @@ public:
             m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Trying baud rate: " + std::to_string(baudRateValue));
 
             // Try to open the port with the current baud rate
-            if (!m_comms.OpenConfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE))
+            if (!m_comms.OpenConfigure(m_path, baudRateEnum, SerialClient::ByteSize::EIGHT, SerialClient::Parity::NONE, SerialClient::StopBits::ONE))
             {
                 m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Auto baud discovery failed to configure port.");
                 return false;
@@ -107,23 +109,13 @@ public:
         return false; // Failed to discover baud rate
     }
 
-    /// @brief 
+    /// @brief Get the current baudrate
     /// @return - Configured baudrate, SerialClient::BaudRate::BAUDRATE_INVALID indicates connection not opened. 
     SerialClient::BaudRate GetBaudRate() const { return m_baudrate; }
 
     /// @brief 
     /// @return 
     virtual int ProcessData() = 0;
-
-    /// @brief 
-    /// @param data - in - data to be sent
-    /// @param size - in - size of data to be sent
-    /// @return -1 on error, else number of bytes sent
-    int Send(const std::byte* data, const size_t size)
-    {
-        if (!m_comms.IsOpen()) return -1;
-        return m_comms.Write(data, size);
-    }
 
     /// @brief 
     /// @return 
