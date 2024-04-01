@@ -65,11 +65,13 @@ add_executable (Wasp
     "gps/atacnav_info.h"
 )
 
-# Create a test files directory for ease of access 
+# Create a test files directory for ease of access and pass it as a compile definition
 set(TEST_FILES_DIR "${CMAKE_SOURCE_DIR}/test_files")
-
-# Pass the TEST_FILES_DIR as a compile definition
 target_compile_definitions(Wasp PRIVATE TEST_FILES_DIR="${TEST_FILES_DIR}")
+
+# Create a web_files directory for ease of access and pass it as a compile definition
+set(WEB_FILES_DIR "${CMAKE_SOURCE_DIR}/web_files")
+target_compile_definitions(Wasp PRIVATE WEB_FILES_DIR="${WEB_FILES_DIR}")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Wasp PROPERTY CXX_STANDARD 20)

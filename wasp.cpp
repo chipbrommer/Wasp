@@ -16,7 +16,7 @@
 Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation, const std::string& configLocation) :
     m_settings(settingsLocation), m_build(buildLocation), m_config(configLocation),
     m_name("WASP"), m_logger(), m_signalManger(m_logger), m_imuManager(m_logger),
-    m_gpsManager(m_logger), m_webServer(m_logger)
+    m_gpsManager(m_logger), m_webServer(m_logger), m_initialized(false)
 {
     // Load the configs and catch any failures
     if (!m_settings.Load())
@@ -45,7 +45,8 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     // Start the web server
-    m_webServer.Configure(m_settings.data.webPort, ".");
+    std::string dir = WEB_FILES_DIR;
+    m_webServer.Configure(m_settings.data.webPort, dir);
     m_webThread = std::thread([this] { m_webServer.Start(); });
 
     // Initialize the signal manager PWMs
@@ -60,17 +61,19 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     if(!m_imuManager.Configure(m_config.data.imuUnit, m_config.data.imuPort, m_config.data.imuBaudRate))
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "IMU Manager failed to configure, exiting.");
-        // m_initialized = false;
         // Close();
+        //return;
     }
 
     // Configure the GPS
     if (!m_gpsManager.Configure(m_config.data.gpsUnit, m_config.data.gpsPort, m_config.data.gpsBaudRate))
     {
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "GPS Manager failed to configure, exiting.");
-        m_initialized = false;
-        Close();
+        //Close();
+        //return;
     }
+
+    m_initialized = true;
 }
 
 Wasp::~Wasp() 
@@ -87,7 +90,7 @@ void Wasp::Execute()
     while (m_run)
     {
         // Check for GPS updates
-        if (m_gpsManager.Read() < 0) break;
+        //if (m_gpsManager.Read() < 0) break;
 
         // Sleep a little
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
