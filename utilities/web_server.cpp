@@ -1,3 +1,4 @@
+
 /////////////////////////////////////////////////////////////////////////////////
 // @file            web_server.cpp
 // @brief           Implementation for web server
@@ -20,9 +21,15 @@ void WebServer::SetPort(int port)
     m_port = port;
 }
 
-void WebServer::SetDirectory(std::string path)
+void WebServer::SetDirectory(std::string directory)
 {
-    m_directory = path;
+    m_directory = directory;
+}
+
+void WebServer::Configure(int port, std::string directory)
+{
+    m_port = port;
+    m_directory = directory;
 }
 
 void WebServer::Start()
@@ -56,4 +63,24 @@ void WebServer::Stop()
         // Log server stop
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Stopped.");
     }
+}
+
+void WebServer::HandleConfigPage(mg_connection* c)
+{
+
+}
+
+void WebServer::HandleLayoutPage(mg_connection* c, std::string bodyContent)
+{
+
+}
+
+void WebServer::HandleReboot(mg_connection* c)
+{
+
+}
+
+std::string WebServer::Parse(const std::string name, const char* data)
+{
+    return "";
 }

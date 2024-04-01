@@ -22,10 +22,15 @@ class WebServer
 {
 public:
 
+    /// @brief Constructor
+    /// @param logger - instance of LogClient
+    /// @param port - port to serve the server at
+    /// @param directory - directory for the server files
     WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".") :
         m_name("WEB SVR"), m_server(nullptr), m_logger(logger), 
         m_port(port), m_directory(directory), m_running(false) {}
     
+    /// @brief Default deconstructor
     ~WebServer() { Stop(); }
 
     /// @brief Sets the port for 
@@ -34,7 +39,12 @@ public:
 
     /// @brief Sets the target directory for web requests
     /// @param path 
-    void SetDirectory(std::string path);
+    void SetDirectory(std::string directory);
+
+	/// @brief Configure the webserver with a port and a path
+	/// @param port 
+	/// @param path 
+	void Configure(int port, std::string directory);
 
 	/// @brief Starts the web server process. NOTE: This blocks the calling thread
     void Start();
@@ -56,10 +66,6 @@ public:
 	/// @param c - the connection for the page request
 	void HandleReboot(mg_connection* c);
 
-	std::mutex m_connectionLock;
-	std::map<struct mg_connection*, bool> m_connections;
-	std::string m_rootDir;			// the root directory that will be accessed for web files
-
 protected:
 
 private:
@@ -78,4 +84,6 @@ private:
 	const mg_context* m_context				= {};
 	std::string		m_listeningAddress		= "";
 	char			m_buffer[BUFFER_SIZE]	= {};
+	std::mutex m_connectionLock				= {};
+	std::map<struct mg_connection*, bool> m_connections = {};
 };

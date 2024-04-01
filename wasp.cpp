@@ -41,6 +41,10 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     }
     m_loggingThread = std::thread([this] { m_logger.Run(); });
 
+    // Start the web server
+    m_webServer.Configure(m_settings.data.webPort, ".");
+    m_webThread = std::thread([this] { m_webServer.Start(); });
+
     // Initialize the signal manager PWMs
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Starting Signal Manager.");
     m_signalManger.ReadyFin(SignalManager::FIN::ONE,      m_config.data.fin1Path, m_config.data.fin1Channel, m_config.data.finMinDegrees, m_config.data.finMaxDegrees);
