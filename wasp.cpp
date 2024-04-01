@@ -41,6 +41,9 @@ Wasp::Wasp(const std::string& settingsLocation, const std::string& buildLocation
     }
     m_loggingThread = std::thread([this] { m_logger.Run(); });
 
+    // Sleep a little while the logger sets up
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
     // Start the web server
     m_webServer.Configure(m_settings.data.webPort, ".");
     m_webThread = std::thread([this] { m_webServer.Start(); });
@@ -105,4 +108,5 @@ void Wasp::Close()
     // Close the logger last but wait until all logs have been written
     m_logger.Stop(true);
     if (m_loggingThread.joinable()) m_loggingThread.join();
+
 }

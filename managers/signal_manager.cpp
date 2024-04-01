@@ -54,14 +54,12 @@ void SignalManager::Start()
 
 void SignalManager::Stop()
 {
-    if (mRun)
-    {
-        // Create a notice and write it. 
-        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Closing.");
 
-        // Signal the run to stop
-        mRun = false;
-    }
+    // Signal the run to stop
+    mRun = false;
+
+    // Create a notice and write it. 
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Closing.");
 }
 
 bool SignalManager::ReadyFin(const FIN fin, const std::string finPath, const int finChannel,

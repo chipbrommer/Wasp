@@ -28,7 +28,7 @@ public:
     /// @param directory - directory for the server files
     WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".") :
         m_name("WEB SVR"), m_server(nullptr), m_logger(logger), 
-        m_port(port), m_directory(directory), m_running(false) {}
+        m_port(port), m_directory(directory), m_run(false) {}
     
     /// @brief Default deconstructor
     ~WebServer() { Stop(); }
@@ -75,15 +75,15 @@ private:
 	/// @return - the string format of the variable value
 	std::string Parse(const std::string name, const char* data);
 
-    std::string     m_name					= "";
-    CivetServer*    m_server;
-    LogClient&      m_logger;
-    int             m_port					= 0;
-    std::string     m_directory				= "";
-    bool            m_running				= false;
-	const mg_context* m_context				= {};
-	std::string		m_listeningAddress		= "";
-	char			m_buffer[BUFFER_SIZE]	= {};
-	std::mutex m_connectionLock				= {};
+	std::atomic_bool	m_run					= false;
+    std::string			m_name					= "";
+    CivetServer*		m_server;
+    LogClient&			m_logger;
+    int					m_port					= 0;
+    std::string			m_directory				= "";
+	const mg_context*	m_context				= {};
+	std::string			m_listeningAddress		= "";
+	char				m_buffer[BUFFER_SIZE]	= {};
+	std::mutex			m_connectionLock		= {};
 	std::map<struct mg_connection*, bool> m_connections = {};
 };

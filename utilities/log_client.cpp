@@ -90,11 +90,11 @@ void LogClient::Run()
 
 void LogClient::Stop(bool waitForEmptyQueue)
 {
+    // Create a notice and write it. 
+    WriteLog({ 0, LogLevel::Info, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::Info), "Stopping.") });
+
     if (mRun)
     {
-        // Create a notice and write it. 
-        WriteLog({0, LogLevel::Info, CreateLogString(m_name, LogLevelToStringMap.at(LogLevel::Info), "Stopping.")});
-
         if (waitForEmptyQueue)
         {
             while (!mLogQueue.empty())

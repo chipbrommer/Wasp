@@ -41,9 +41,11 @@ void WebServer::Start()
 		0
 	};
 
-    m_running = true;
+    // Set the running flag
+    m_run = true;
 
-    while (m_running)
+    // Enter endless running loop
+    while (m_run)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
@@ -51,14 +53,15 @@ void WebServer::Start()
 
 void WebServer::Stop() 
 {
+    // Reset running flag
+    m_run = false;
+
+    // If server isnt null pointer, delete it. 
     if (m_server != nullptr) 
     {
         // Stop the server
         delete m_server;
         m_server = nullptr;
-
-        // Reset running flag
-        m_running = false;
 
         // Log server stop
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Stopped.");
