@@ -12,7 +12,7 @@
 //          ------------------      ------------------------
 #include <string>                   // strings
 //
-#include "../external/civetweb/CivetServer.h"   // Civet header
+#include "../external/civetweb/civetweb.h"   // Civet header
 #include "log_client.h"             // Log Client
 #include "constants.h"				// Buffer size
 //
@@ -26,24 +26,22 @@ public:
     /// @param logger - instance of LogClient
     /// @param port - port to serve the server at
     /// @param directory - directory for the server files
-    WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".") :
-        m_name("WEB SVR"), m_server(nullptr), m_logger(logger), 
-        m_port(port), m_directory(directory), m_run(false) {}
+	WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".");
     
     /// @brief Default deconstructor
-    ~WebServer() { Stop(); }
+	~WebServer();
 
     /// @brief Sets the port for 
-    /// @param port 
-    void SetPort(int port);
+    /// @param port - [in] - Port to server the server on
+    void SetServerPort(int port);
 
     /// @brief Sets the target directory for web requests
-    /// @param path 
-    void SetDirectory(std::string directory);
+    /// @param path - [in] - path for the webserver files
+    void SetServerDirectory(std::string directory);
 
 	/// @brief Configure the webserver with a port and a path
-	/// @param port 
-	/// @param path 
+	/// @param port - [in] - Port to server the server on
+	/// @param path - [in] - path for the webserver files
 	void Configure(int port, std::string directory);
 
 	/// @brief Starts the web server process. NOTE: This blocks the calling thread
@@ -75,15 +73,17 @@ private:
 	/// @return - the string format of the variable value
 	std::string Parse(const std::string name, const char* data);
 
+
 	std::atomic_bool	m_run					= false;
     std::string			m_name					= "";
-    CivetServer*		m_server;
     LogClient&			m_logger;
     int					m_port					= 0;
     std::string			m_directory				= "";
-	const mg_context*	m_context				= {};
+	mg_context*			m_context				= {};
 	std::string			m_listeningAddress		= "";
 	char				m_buffer[BUFFER_SIZE]	= {};
-	std::mutex			m_connectionLock		= {};
-	std::map<struct mg_connection*, bool> m_connections = {};
+
+	// Items for websocket
+	std::mutex								m_connectionLock	= {};
+	std::map<struct mg_connection*, bool>	m_connections		= {};
 };

@@ -11,6 +11,9 @@ endif()
 
 project ("Wasp")
 
+# CivetWeb needs this flag to use OpenSSL
+add_definitions(-DOPENSSL_API_1_1)
+
 # Add source to this project's executable.
 add_executable (Wasp 
     "main.cpp" 
@@ -54,7 +57,13 @@ add_executable (Wasp
     "external/pugixml/pugiconfig.hpp"
     "external/pugixml/pugixml.cpp"
     "external/pugixml/pugixml.hpp"
-    "utilities/constants.h" "gps/atacnav.h" "gps/atacnav.cpp" "gps/atacnav_info.h")
+    "external/civetweb/civetweb.c"
+    "external/civetweb/civetweb.h"
+    "utilities/constants.h" 
+    "gps/atacnav.h" 
+    "gps/atacnav.cpp" 
+    "gps/atacnav_info.h"
+)
 
 # Create a test files directory for ease of access 
 set(TEST_FILES_DIR "${CMAKE_SOURCE_DIR}/test_files")
