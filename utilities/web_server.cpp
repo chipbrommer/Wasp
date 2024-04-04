@@ -50,8 +50,9 @@ void WebServer::Configure(int port, std::string directory)
 void WebServer::Start()
 {
 	// Configure civetweb options
+    std::string port = std::to_string(m_port);
 	const char* options[] = {
-		"listening_ports", std::to_string(m_port).c_str(),
+		"listening_ports", port.c_str(),
         "request_timeout_ms", "10000",
 		"document_root", m_directory.c_str(),
 		0
@@ -66,13 +67,13 @@ void WebServer::Start()
     };
 
     // Log server stop
-    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Started");
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Started on " + port);
 
     // Start the web server
     m_context = mg_start(&callbacks, 0, options);
 
     // Setup the request handler for any directory 
-    mg_set_request_handler(m_context, "/$|/config$|/config.html$", [](struct mg_connection* c, void* cbdata) 
+    mg_set_request_handler(m_context, "/$|/index$|/index.html$", [](struct mg_connection* c, void* cbdata) 
     {
         static_cast<WebServer*>(cbdata)->HandleConfigPage(c);
         return 0;
