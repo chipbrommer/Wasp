@@ -15,30 +15,18 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 const std::string configPage = R"(
-	<style type="text/css">
-		a:hover {
-			text-decoration: underline;
-		} 
-
-		a {
-			text-decoration: none;
-			color: aqua;
-		}
-
-		hr {
-		  display: block;
-		  margin-top: 0.5em;
-		  margin-bottom: 0.5em;
-		  margin-left: auto;
-		  margin-right: auto;
-		  border-style: inset;
-		  border-width: 1px;
-		}
-	</style>
 	<table style="font-size: 14px;">
 		<tr>
-			<td valign="top" style="width: 130px; padding: 25px; border-right: 1px solid #32CD32;">
+			<td valign="top" style="width: 130px; padding: 25px; border-right: 1px solid #FFFFFF;">
 				<div style="height: 25px; line-height: 25px;"><a href="/config?type=system">System</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=mounting">Mounting</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=gigdata">GIG Datalink</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=network">Network</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=message">Message</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=cas">CAS</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=target">Target</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=launchParams">Launch Params</a></div>
+				<div style="height: 25px; line-height: 25px;"><a href="/config?type=testModes">Test Modes</a></div>
 			</td>
 			<td valign="top" style="padding: 25px;">
 				<form method="post">
