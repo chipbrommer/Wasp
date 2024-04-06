@@ -69,7 +69,7 @@ private:
     std::thread                     m_webThread;            /// Thread for web interface
     std::thread                     m_ProcessingThread;     /// Main thread for program processing
 
-    /// Flags
+    // Flags
     std::atomic_bool                m_run;                  /// Flag indicating we are good to run. 
     bool                            m_initialized;          /// Flag indicating initialization successful
 };

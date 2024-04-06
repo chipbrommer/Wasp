@@ -12,6 +12,10 @@
 //          --------------------        ---------------------------------------
 #include <string>                       // strings
 //
+#ifdef WIN32
+#define NOMINMAX                        // This is needed to prevent windows from 
+                                        // causing a conflict with std::min & std::max
+#endif
 /////////////////////////////////////////////////////////////////////////////////
 
 constexpr int cm_to_mm = 10;

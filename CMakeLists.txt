@@ -72,7 +72,6 @@ add_executable (Wasp
     "gps/gps_type.h" 
     "gps/novatel.h" 
     "gps/novatel.cpp" 
-     
     "utilities/cot_utility.h" 
     "utilities/cot_utility.cpp"  
     "utilities/cot_info.h"
@@ -81,8 +80,8 @@ add_executable (Wasp
     "external/pugixml/pugixml.hpp"
     "external/civetweb/civetweb.c"
     "external/civetweb/civetweb.h"
-    #"external/inja/inja.hpp"
-    #"external/inja/utils.hpp"
+    "external/inja/inja.hpp"
+    "external/inja/utils.hpp"
     "utilities/constants.h" 
     "gps/atacnav.h" 
     "gps/atacnav.cpp" 
