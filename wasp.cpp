@@ -90,7 +90,7 @@ void Wasp::Execute()
     while (m_run)
     {
         // Check for GPS updates
-        //if (m_gpsManager.Read() < 0) break;
+        if (m_gpsManager.Read() < 0) break;
 
         // Sleep a little
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

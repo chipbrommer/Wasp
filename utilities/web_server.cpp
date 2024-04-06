@@ -22,9 +22,9 @@ WebServer::WebServer(LogClient& logger, const int port, const std::string direct
     mg_init_library(0);
 }
 
-WebServer::~WebServer() 
-{ 
-    Stop(); 
+WebServer::~WebServer()
+{
+    Stop();
 }
 
 void WebServer::SetServerPort(int port)
@@ -45,22 +45,22 @@ void WebServer::Configure(int port, std::string directory)
 
 void WebServer::Start()
 {
-	// Configure civetweb options
+    // Configure civetweb options
     std::string port = std::to_string(m_port);
-	const char* options[] = {
-		"listening_ports", port.c_str(),
+    const char* options[] = {
+        "listening_ports", port.c_str(),
         "request_timeout_ms", "10000",
-		"document_root", m_directory.c_str(),
-		0
-	};
+        "document_root", m_directory.c_str(),
+        0
+    };
 
     // Print any error messages to console
     struct mg_callbacks callbacks = { 0 };
-    callbacks.log_message = [](const struct mg_connection* conn, const char* message) 
-    {
-        std::cerr << message << "\n";
-        return 1;
-    };
+    callbacks.log_message = [](const struct mg_connection* conn, const char* message)
+        {
+            std::cerr << message << "\n";
+            return 1;
+        };
 
     // Log server stop
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Started on " + port);
@@ -68,25 +68,73 @@ void WebServer::Start()
     // Start the web server
     m_context = mg_start(&callbacks, 0, options);
 
+    // Setup the request handler for the reboot call
+    mg_set_request_handler(m_context, "/config$", [](struct mg_connection* c, void* cbdata)
+        {
+            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Config);
+            return 0;
+        }, this);
+
     // Setup the request handler for any directory 
-    mg_set_request_handler(m_context, "/$|/index$|/index.html$", [](struct mg_connection* c, void* cbdata) 
-    {
-        static_cast<WebServer*>(cbdata)->HandleConfigPage(c);
-        return 0;
-    }, this);
+    mg_set_request_handler(m_context, "/$|/index$|/index.html$", [](struct mg_connection* c, void* cbdata)
+        {
+            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Index);
+            return 0;
+        }, this);
 
     // Setup the request handler for the reboot call
-    mg_set_request_handler(m_context, "/reboot$", [](struct mg_connection* c, void* cbdata) 
-    {
-        static_cast<WebServer*>(cbdata)->HandleReboot(c);
-        return 0;
-    }, this);
+    mg_set_request_handler(m_context, "/login$", [](struct mg_connection* c, void* cbdata)
+        {
+            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Login);
+            return 0;
+        }, this);
+
+    // Setup the request handler for the reboot call
+    mg_set_request_handler(m_context, "/reboot$", [](struct mg_connection* c, void* cbdata)
+        {
+            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Reboot);
+            return 0;
+        }, this);
+
+    // Setup the request handler for the login form submission
+    //mg_set_request_handler(m_context, "/login$", [](struct mg_connection* c, void* cbdata)
+    //{
+    //    auto* server = static_cast<WebServer*>(cbdata);
+
+    //    // Retrieve the POST data from the request
+    //    char post_data[1000];
+    //    int post_data_len = mg_read(c, post_data, sizeof(post_data));
+
+    //    // Extract the password parameter from the POST data
+    //    char password[100];
+    //    if (mg_get_http_var(post_data, post_data_len, "password", password, sizeof(password)) > 0) {
+    //        // Check if the password is correct
+    //        if (strcmp(password, "your_password_here") == 0) {
+    //            // Password is correct, display the form page
+    //            server->HandlePage(formPage);
+    //        }
+    //        else {
+    //            // Password is incorrect, display the login page with an error message
+    //            std::string errorMessage = "<p style=\"color: red;\">Incorrect password. Please try again.</p>";
+    //            std::string formattedLoginPage =
+    //                loginPage.replace(loginPage.find("%s"), 2, errorMessage);
+    //            server->HandlePage(formattedLoginPage);
+    //        }
+    //    }
+    //    else {
+    //        // Password parameter not found, display the login page without any error message
+    //        server->HandlePage(loginPage);
+    //    }
+
+    //    return 0;
+    //}, this);
+
 }
 
-void WebServer::Stop() 
+void WebServer::Stop()
 {
     // Stop the web server
-    if (m_context != nullptr) 
+    if (m_context != nullptr)
     {
         mg_stop(m_context);
         m_context = nullptr;
@@ -96,39 +144,123 @@ void WebServer::Stop()
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Stopped");
 }
 
+void WebServer::HandlePage(mg_connection* c, Page page)
+{
+    switch (page)
+    {
+    case Page::Config:
+        HandleLayoutPage(c, configPage);
+        break;
+    case Page::Dev:
+        HandleLayoutPage(c, devPage);
+        break;
+    case Page::Index:
+        HandleLayoutPage(c, indexPage);
+        break;
+    case Page::Login:
+        HandleLayoutPage(c, loginPage);
+        break;
+    case Page::Reboot:
+        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Received reboot request.");
+        HandleLayoutPage(c, rebootPage);
+        break;
+    case Page::Error:
+    default:
+        break;
+    };
+}
+
 void WebServer::HandleConfigPage(mg_connection* c)
 {
-    // HTML content for the configuration page
-    std::string htmlContent = "<h2>Configuration Page</h2>";
-    htmlContent += "<p>Hello World</p>";
+    //   const struct mg_request_info* ri = mg_get_request_info(c);
 
-    // Send Content to the layout
-    HandleLayoutPage(c, htmlContent);
+    //   std::string method = strtok(const_cast<char*>(ri->request_method), " ");
+    //   std::string typeValue = Parse("type", ri->query_string);
+
+       //std::string configContent = "";
+       //bool isSaveSuccessful = false;
+       //bool didSomeNotSave = false;
+       //bool isSaveFailed = false;
+       //if (typeValue != "")
+       //{
+       //	std::string handler = buffer;
+       //	if (handler == "system")			fields = systemFields;
+
+       //	nlohmann::json json = { };
+
+       //	if (method == "GET")
+       //	{
+       //		for (std::shared_ptr<Field> field : fields)
+       //		{
+       //			json[field->name] = { { "isgood", true } };
+       //			field->setjson(json[field->name]["value"]);
+       //		}
+       //	}
+       //	else
+       //	{
+       //		bool didAnySave = false;
+
+       //		char post_data[1024];
+       //		int post_data_len = mg_read(c, post_data, 1024);
+
+       //		for (std::shared_ptr<Field> field : fields)
+       //		{
+       //			std::string value = Parse(field->name, post_data);
+       //			json[field->name] = { { "isgood", field->parseAndValidate(value) } };
+       //			if (json[field->name]["isgood"])
+       //			{
+       //				field->setjson(json[field->name]["value"]);
+       //				didAnySave = true;
+       //			}
+       //			else
+       //			{
+       //				json[field->name]["value"] = value;
+       //				didSomeNotSave = true;
+       //			}
+       //		}
+
+       //		if (saveProgramConfiguration(defaultConfigPath))
+       //		{
+       //			isSaveSuccessful = true;
+
+       //			// update sal code decimal.
+       //			std::istringstream iss(programConfig.salCodeHex);
+       //			iss >> std::hex >> programConfig.salCodeDec;
+       //		}
+
+       //		if (!didAnySave)
+       //			isSaveFailed = true;
+       //	}
+
+       //	if (handler == "system")			configContent = m_environment.render(configPage_systemConfigPage, json);
+    //       
+       //}
+
+       //nlohmann::json json = {
+       //	{ "configContent", configContent },
+       //	{ "isSaveSuccessful", isSaveSuccessful },
+       //	{ "didSomeNotSave", didSomeNotSave },
+       //	{ "isSaveFailed", isSaveFailed }
+       //};
+
+       //std::string bodyContent = m_environment.render(configPage, json);
+       //HandleLayoutPage(c, bodyContent);
 }
 
 void WebServer::HandleLayoutPage(mg_connection* c, std::string bodyContent)
 {
-    // HTML content for the layout page
-    std::string htmlContent = "<html><body>";
-    htmlContent += "<h1>Layout Page</h1>";
-    htmlContent += bodyContent; // Embedding body content
-    htmlContent += "</body></html>";
+    nlohmann::json json = {
+        { "bodyContent", bodyContent },
+        { "version", std::to_string(PROJECT_VERSION_MAJOR) + "." +
+            std::to_string(PROJECT_VERSION_MINOR) + "." +
+            std::to_string(PROJECT_VERSION_PATCH) + " (" +
+            PROJECT_GIT_COMMIT_HASH + ")"
+        }
+    };
+    const std::string wholePage = m_environment.render(layoutPage, json);
 
-    // Send HTTP response with HTML content
-    mg_printf(c, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: %lu\r\n\r\n", htmlContent.size());
-    mg_write(c, htmlContent.c_str(), htmlContent.size());
-}
-
-void WebServer::HandleReboot(mg_connection* c)
-{
-    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Received reboot request.");
-
-    // HTML content for the configuration page
-    std::string htmlContent = "<h2>Reboot Command Received</h2>";
-    htmlContent += "<p>Please wait for reconnection...</p>";
-
-    // Send Content to the layout
-    HandleLayoutPage(c, htmlContent);
+    mg_send_http_ok(c, "text/html", wholePage.size());
+    mg_write(c, wholePage.c_str(), wholePage.size());
 }
 
 std::string WebServer::Parse(const std::string name, const char* data)
@@ -137,7 +269,7 @@ std::string WebServer::Parse(const std::string name, const char* data)
     try
     {
         std::string query_string(data);
-        if (mg_get_var(data, query_string.size(), name.c_str(), m_buffer, BUFFER_SIZE) > 0)
+        if (mg_get_var(data, query_string.size(), name.c_str(), m_buffer, 50) > 0)
         {
             value = std::string(m_buffer);
 

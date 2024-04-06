@@ -17,29 +17,40 @@
 #include "log_client.h"             // Log Client
 #include "constants.h"				// Buffer size
 #include <mutex>
+#include "version.h"				// Generated version file
+#include "../web_pages/web_pages.h"	// web pages
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 class WebServer
 {
 public:
+	enum class Page
+	{
+		Config,
+		Dev,
+		Index,
+		Login,
+		Reboot,
+		Error
+	};
 
-    /// @brief Constructor
-    /// @param logger - instance of LogClient
-    /// @param port - port to serve the server at
-    /// @param directory - directory for the server files
+	/// @brief Constructor
+	/// @param logger - instance of LogClient
+	/// @param port - port to serve the server at
+	/// @param directory - directory for the server files
 	WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".");
-    
-    /// @brief Default deconstructor
+
+	/// @brief Default deconstructor
 	~WebServer();
 
-    /// @brief Sets the port for 
-    /// @param port - [in] - Port to server the server on
-    void SetServerPort(int port);
+	/// @brief Sets the port for 
+	/// @param port - [in] - Port to server the server on
+	void SetServerPort(int port);
 
-    /// @brief Sets the target directory for web requests
-    /// @param path - [in] - path for the webserver files
-    void SetServerDirectory(std::string directory);
+	/// @brief Sets the target directory for web requests
+	/// @param path - [in] - path for the webserver files
+	void SetServerDirectory(std::string directory);
 
 	/// @brief Configure the webserver with a port and a path
 	/// @param port - [in] - Port to server the server on
@@ -47,10 +58,15 @@ public:
 	void Configure(int port, std::string directory);
 
 	/// @brief Starts the web server process. NOTE: This blocks the calling thread
-    void Start();
+	void Start();
 
-    /// @brief Stops the web server process.
-    void Stop();
+	/// @brief Stops the web server process.
+	void Stop();
+
+	/// @brief handles page requests
+	/// @param c - the connection for the page request
+	/// @param page - the specific page to be handled
+	void HandlePage(mg_connection* c, Page page);
 
 	/// @brief handles config page request
 	/// @param c - the connection for the page request
