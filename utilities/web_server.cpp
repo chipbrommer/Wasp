@@ -10,18 +10,14 @@
 // Includes:
 //          name                            reason included
 //          ------------------              ------------------------
-#include <string>                           // strings
-//
 #include "web_server.h"                     // header
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
 WebServer::WebServer(LogClient& logger, const int port, const std::string directory) :
     m_name("WEB SVR"), m_logger(logger),
-    m_port(port), m_directory(directory), m_run(false) 
+    m_port(port), m_directory(directory), m_run(false), m_environment()
 {
-    Configure(port, directory);
-
     // Inititalize libcivetweb
     mg_init_library(0);
 }

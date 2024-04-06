@@ -12,9 +12,11 @@
 //          ------------------      ------------------------
 #include <string>                   // strings
 //
-#include "../external/civetweb/civetweb.h"   // Civet header
+#include "../external/civetweb/civetweb.h"		// Civet header
+#include "../external/inja/inja.hpp"			// inja header
 #include "log_client.h"             // Log Client
 #include "constants.h"				// Buffer size
+#include <mutex>
 //
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -52,7 +54,6 @@ public:
 
 	/// @brief handles config page request
 	/// @param c - the connection for the page request
-	/// @param hm - the page request data
 	void HandleConfigPage(mg_connection* c);
 
 	/// @brief handles the layout page request
@@ -60,9 +61,6 @@ public:
 	/// @param bodyContent - the content to be embedded in the layout page
 	void HandleLayoutPage(mg_connection* c, std::string bodyContent);
 
-	/// @brief handles the reboot action
-	/// @param c - the connection for the page request
-	void HandleReboot(mg_connection* c);
 
 protected:
 
@@ -82,6 +80,7 @@ private:
 	mg_context*			m_context				= {};
 	std::string			m_listeningAddress		= "";
 	char				m_buffer[BUFFER_SIZE]	= {};
+	inja::Environment	m_environment;
 
 	// Items for websocket
 	std::mutex								m_connectionLock	= {};
