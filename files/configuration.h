@@ -1,3 +1,4 @@
+#pragma once
 /////////////////////////////////////////////////////////////////////////////////
 // @file            configuration.h
 // @brief           Structure for the device configuration information

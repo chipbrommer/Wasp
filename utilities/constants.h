@@ -18,6 +18,7 @@ constexpr int cm_to_mm = 10;
 
 constexpr int BUFFER_SIZE       = 1024;
 constexpr int WEB_BUFFER_SIZE   = 50;
+constexpr int AUTO_DISCOVERY_TIMEOUT_SECS = 10;
 
 const std::string IP_PATTERN = "(?!127\\.0\\.0\\.1)(([1-9]|[0-9]{2}|1[0-9]{2}|2[0-4][0-9]|25[0-4])\\.)(([0-9]|[0-9]{2}|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){2}([1-9]|[0-9]{2}|1[0-9]{2}|2[0-4][0-9]|25[0-4])";
 const std::string NETMASK_PATTERN = "(255\\.){3}(0|255)|(255\\.){2}(0\\.){1}0|(255\\.){1}(0\\.){2}0|(0\\.){3}0";

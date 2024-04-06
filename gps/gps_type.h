@@ -14,7 +14,7 @@
 //
 #include "../utilities/serial_client.h"     // serial client
 #include "../utilities/log_client.h"        // log client
-#include "../files/constants.h"             // Auto discovery timeout 
+#include "../utilities/constants.h"         // Auto discovery timeout 
 // 
 /////////////////////////////////////////////////////////////////////////////////
 

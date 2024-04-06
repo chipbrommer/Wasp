@@ -14,7 +14,7 @@
 #include <unordered_map>                    // unordered map
 //
 #include "../utilities/log_client.h"        // logger
-#include "../files/constants.h"             // Auto discovery timeout 
+#include "../utilities/constants.h"         // Auto discovery timeout 
 #include "ublox.h"                          // ublox gps
 #include "novatel.h"                        // novatel gps
 // 
