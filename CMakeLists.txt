@@ -94,7 +94,7 @@ add_executable (Wasp
     "web_pages/dev_page.h" 
     "web_pages/index_page.h"
 
-)
+ "web_pages/error_page.h" "web_pages/update_page.h" "web_pages/data_page.h")
 
 # Include the generated header file directory
 target_include_directories(Wasp PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

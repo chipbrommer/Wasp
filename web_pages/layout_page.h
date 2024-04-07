@@ -22,6 +22,7 @@ const std::string layoutPage = R"(
                 body {
                     margin: 0;
                     padding: 0;
+                    min-width: 600px;
                     font-family: Verdana, Helvetica, Arial, sans-serif;
                     background-color: #1d2335;
                     color: #FFFFFF;
@@ -50,14 +51,23 @@ const std::string layoutPage = R"(
                 #content {
                     padding: 15px;
                     min-height: 400px;
-                    min-width: 800px;
-                    max-width: 1200px;
                     margin: auto;
                     display: flex;
                 }
 
                 #left-column {
-                    width: 15%;
+                    flex: 1;
+                    background-color: #131725;
+                    border-radius: 10px;
+                    padding: 10px;
+                    margin-right: 10px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: top;
+                }
+
+                #left-column {
+                    width: 14%;
                     background-color: #131725;
                     border-radius: 10px;
                     padding: 10px;
@@ -65,7 +75,7 @@ const std::string layoutPage = R"(
                 }
 
                 #right-column {
-                    width: 85%;
+                    width: 86%;
                     background-color: #131725;
                     border-radius: 10px;
                     padding: 10px;
@@ -123,6 +133,7 @@ const std::string layoutPage = R"(
                 </div>
                 <div class="program-name">Wasp-M</div>
                 <div class="reboot">
+                    <input type="button" value="Update" onclick="update();" />
                     <input type="button" value="Reboot" onclick="reboot();" />
                 </div>
             </div>
@@ -134,7 +145,6 @@ const std::string layoutPage = R"(
                               <div style="height: 25px; line-height: 25px;"><a href="/index">Home</a></div>
                               <div style="height: 25px; line-height: 25px;"><a href="/config?type=system">Config</a></div>
                               <div style="height: 25px; line-height: 25px;"><a href="/data">Data</a></div>
-                              <div style="height: 25px; line-height: 25px;"><a href="/update">Update</a></div>
                           </td>
                       </tr>
                   </table>
@@ -146,6 +156,10 @@ const std::string layoutPage = R"(
 			<script>
 				if (window.history.replaceState) {
 					window.history.replaceState(null, null, window.location.href);
+				}
+
+				function update() {
+					location.href = "http://" + window.location.host + "/update";
 				}
 
 				function reboot() {

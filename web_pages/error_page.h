@@ -1,7 +1,7 @@
 #pragma once
 /////////////////////////////////////////////////////////////////////////////////
-// @file            login_page.h
-// @brief           login html content in a std::string
+// @file            error_page.h
+// @brief           404 error html content in a std::string
 // @author          Chip Brommer
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -14,12 +14,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-const std::string loginPage = R"(
-<h2>Login</h2>
-<div id="error-message"></div>
-<form action="/login" method="post">
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" maxlength="49"><br><br>
-    <input type="submit" value="Submit">
-</form>
+const std::string errorPage = R"(
+    <div style="padding: 15px;">
+		<h5>404 Error: Not Found</h5>
+	</div>
 )";

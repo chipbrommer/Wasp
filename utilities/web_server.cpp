@@ -14,9 +14,10 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-WebServer::WebServer(LogClient& logger, const int port, const std::string directory) :
-    m_name("WEB SVR"), m_logger(logger),
-    m_port(port), m_directory(directory), m_run(false), m_environment()
+WebServer::WebServer(LogClient& logger, const int port, const std::string directory, 
+    const int maxThreads) :
+    m_name("WEB SVR"), m_logger(logger), m_port(port), m_directory(directory),
+    m_run(false), m_environment(), m_maxThreads(maxThreads)
 {
     // Inititalize libcivetweb
     mg_init_library(0);
@@ -49,18 +50,24 @@ void WebServer::Start()
     std::string port = std::to_string(m_port);
     const char* options[] = {
         "listening_ports", port.c_str(),
+        "num_threads", "5",
         "request_timeout_ms", "10000",
         "document_root", m_directory.c_str(),
         0
     };
 
+    static const char subprotocol_bin[] = "Company.ProtoName.bin";
+    static const char subprotocol_json[] = "Company.ProtoName.json";
+    static const char* subprotocols[] = { subprotocol_bin, subprotocol_json, NULL };
+    static struct mg_websocket_subprotocols wsprot = { 2, subprotocols };
+
     // Print any error messages to console
     struct mg_callbacks callbacks = { 0 };
     callbacks.log_message = [](const struct mg_connection* conn, const char* message)
-        {
-            std::cerr << message << "\n";
-            return 1;
-        };
+    {
+        std::cerr << message << "\n";
+        return 1;
+    };
 
     // Log server stop
     m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Started on " + port);
@@ -70,65 +77,118 @@ void WebServer::Start()
 
     // Setup the request handler for the reboot call
     mg_set_request_handler(m_context, "/config$", [](struct mg_connection* c, void* cbdata)
-        {
-            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Config);
-            return 0;
-        }, this);
+    {
+        static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Config);
+        return 1;
+    }, this);
+
+    // Setup the request handler for the reboot call
+    mg_set_request_handler(m_context, "/data$", [](struct mg_connection* c, void* cbdata)
+    {
+        static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Data);
+        return 1;
+    }, this);
 
     // Setup the request handler for any directory 
     mg_set_request_handler(m_context, "/$|/index$|/index.html$", [](struct mg_connection* c, void* cbdata)
-        {
-            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Index);
-            return 0;
-        }, this);
+    {
+        static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Index);
+        return 1;
+    }, this);
 
-    // Setup the request handler for the reboot call
+    // Setup the request handler for the login page
     mg_set_request_handler(m_context, "/login$", [](struct mg_connection* c, void* cbdata)
+    {
+        // Extract the POST data from the request
+        char post_data[WEB_BUFFER_SIZE];
+        int post_data_len = mg_read(c, post_data, sizeof(post_data));
+
+        // Ensure that the data is null-terminated
+        post_data[post_data_len] = '\0';
+
+        // Parse the POST data to get the password
+        char password[WEB_BUFFER_SIZE];
+        if (mg_get_var(post_data, post_data_len, "password", password, sizeof(password)) > 0)
         {
-            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Login);
-            return 0;
-        }, this);
+            // Check the password
+            if (strcmp(password, "password") == 0)
+            {
+                // Password is correct, redirect to dev page
+                static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Dev);
+                return 1;
+            }
+            else
+            {
+                // Password is incorrect, display an error message on the login page
+                std::string errorMessage = "<p style=\"color:red;\">Incorrect password. Please try again.</p>";
+                std::string loginPageWithError = loginPage;
+                size_t pos = loginPageWithError.find("</form>");
+                if (pos != std::string::npos) {
+                    loginPageWithError.insert(pos, errorMessage);
+                }
+
+                static_cast<WebServer*>(cbdata)->HandleLayoutPage(c, loginPageWithError);
+                return 1;
+            }
+        }
+
+        // No password provided, this will just show the login page
+        static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Login);
+        return 1; // Indicate that the request has been handled
+    }, this);
 
     // Setup the request handler for the reboot call
     mg_set_request_handler(m_context, "/reboot$", [](struct mg_connection* c, void* cbdata)
+    {
+        static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Reboot);
+        return 1;
+    }, this);
+
+    // Setup the request handler for the reboot call
+    mg_set_request_handler(m_context, "/update$", [](struct mg_connection* c, void* cbdata)
         {
-            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Reboot);
-            return 0;
+            static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Update);
+            return 1;
         }, this);
 
-    // Setup the request handler for the login form submission
-    //mg_set_request_handler(m_context, "/login$", [](struct mg_connection* c, void* cbdata)
-    //{
-    //    auto* server = static_cast<WebServer*>(cbdata);
+    // Setup a default handler for any unmatched requests
+    mg_set_request_handler(m_context, "/*", [](struct mg_connection* c, void* cbdata)
+    {
+        static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Error);
+        return 1;
+    }, this);
 
-    //    // Retrieve the POST data from the request
-    //    char post_data[1000];
-    //    int post_data_len = mg_read(c, post_data, sizeof(post_data));
+    // Start the websocket
+    //mg_set_websocket_handler_with_subprotocols(m_context,
+    //    "/websocket",
+    //    &wsprot,
+    //    ws_connect_handler,
+    //    ws_ready_handler,
+    //    ws_data_handler,
+    //    ws_close_handler,
+    //    user_data);
+}
 
-    //    // Extract the password parameter from the POST data
-    //    char password[100];
-    //    if (mg_get_http_var(post_data, post_data_len, "password", password, sizeof(password)) > 0) {
-    //        // Check if the password is correct
-    //        if (strcmp(password, "your_password_here") == 0) {
-    //            // Password is correct, display the form page
-    //            server->HandlePage(formPage);
-    //        }
-    //        else {
-    //            // Password is incorrect, display the login page with an error message
-    //            std::string errorMessage = "<p style=\"color: red;\">Incorrect password. Please try again.</p>";
-    //            std::string formattedLoginPage =
-    //                loginPage.replace(loginPage.find("%s"), 2, errorMessage);
-    //            server->HandlePage(formattedLoginPage);
-    //        }
-    //    }
-    //    else {
-    //        // Password parameter not found, display the login page without any error message
-    //        server->HandlePage(loginPage);
-    //    }
+void WebServer::SendJsonOverWebSocket(const nlohmann::json& json) 
+{
+    std::string message = json.dump(); // Convert JSON to string
+    SendMessageOverWebSocket(message);
+}
 
-    //    return 0;
-    //}, this);
+void WebServer::SendMessageOverWebSocket(const std::string& msg)
+{
+    std::lock_guard<std::mutex> lock(m_connectionLock);
 
+    // Iterate through connections and send message to each WebSocket client
+    for (auto& pair : m_connections)
+    {
+        struct mg_connection* conn = pair.first;
+
+        /*if (mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, msg.c_str(), msg.length()) <= 0)
+        {
+            std::cerr << "Failed to send message over WebSocket\n";
+        }*/
+    }
 }
 
 void WebServer::Stop()
@@ -151,6 +211,9 @@ void WebServer::HandlePage(mg_connection* c, Page page)
     case Page::Config:
         HandleLayoutPage(c, configPage);
         break;
+    case Page::Data:
+        HandleLayoutPage(c, dataPage);
+        break;
     case Page::Dev:
         HandleLayoutPage(c, devPage);
         break;
@@ -164,8 +227,13 @@ void WebServer::HandlePage(mg_connection* c, Page page)
         m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Received reboot request.");
         HandleLayoutPage(c, rebootPage);
         break;
+    case Page::Update:
+        m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Received update request.");
+        HandleLayoutPage(c, updatePage);
+        break;
     case Page::Error:
     default:
+        HandleLayoutPage(c, errorPage);
         break;
     };
 }
@@ -283,4 +351,30 @@ std::string WebServer::Parse(const std::string name, const char* data)
     catch (...) {}
 
     return value;
+}
+
+int WebServer::WebSocketConnectHandler(const struct mg_connection* conn, void* user_data) 
+{
+    WebServer* server = static_cast<WebServer*>(user_data);
+    std::lock_guard<std::mutex> lock(server->m_connectionLock);
+    //server->m_connections[conn] = true;
+    return 1;
+}
+
+void WebServer::WebSocketReadyHandler(struct mg_connection* conn, void* user_data) 
+{
+    // WebSocket connection is ready for sending/receiving data
+}
+
+int WebServer::WebsocketDataHandler(struct mg_connection* conn, int bits, char* data, size_t data_len, void* user_data) 
+{
+    // Only sending for now
+    return 1;
+}
+
+void WebServer::WebSocketCloseHandler(const struct mg_connection* conn, void* user_data) 
+{
+    WebServer* server = static_cast<WebServer*>(user_data);
+    std::lock_guard<std::mutex> lock(server->m_connectionLock);
+    server->m_connections.erase(const_cast<struct mg_connection*>(conn));
 }
