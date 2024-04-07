@@ -15,9 +15,9 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 const std::string configPage = R"(
-	<table style="font-size: 14px;">
+	<table style="font-size: 14px; height: 100%;">
 		<tr>
-			<td valign="top" style="width: 130px; padding: 25px; border-right: 1px solid #FFFFFF;">
+			<td valign="top" style="width: 130px; height: 100%; padding: 25px; border-right: 1px solid #FFFFFF;">
 				<div style="height: 25px; line-height: 25px;"><a href="/config?type=system">System</a></div>
 				<div style="height: 25px; line-height: 25px;"><a href="/config?type=mounting">Mounting</a></div>
 				<div style="height: 25px; line-height: 25px;"><a href="/config?type=gigdata">GIG Datalink</a></div>
