@@ -14,6 +14,126 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
+/* User defined data structure for websocket client context. */
+struct tClientContext {
+    uint32_t connectionNumber;
+    uint32_t demo_var;
+};
+
+
+/* Handler for new websocket connections. */
+static int
+ws_connect_handler(const struct mg_connection* conn, void* user_data)
+{
+    std::cout << "in handler\n";
+    (void)user_data; /* unused */
+
+    /* Allocate data for websocket client context, and initialize context. */
+    struct tClientContext* wsCliCtx =
+        (struct tClientContext*)calloc(1, sizeof(struct tClientContext));
+    if (!wsCliCtx) {
+        /* reject client */
+        return 1;
+    }
+    static uint32_t connectionCounter = 0;
+    wsCliCtx->connectionNumber = connectionCounter++;
+    mg_set_user_connection_data(
+        conn, wsCliCtx); /* client context assigned to connection */
+
+    /* DEBUG: New client connected (but not ready to receive data yet). */
+    const struct mg_request_info* ri = mg_get_request_info(conn);
+    printf("Client %u connected with subprotocol: %s\n",
+        wsCliCtx->connectionNumber,
+        ri->acceptedWebSocketSubprotocol);
+
+    return 0;
+}
+
+
+/* Handler indicating the client is ready to receive data. */
+static void
+ws_ready_handler(struct mg_connection* conn, void* user_data)
+{
+    std::cout << "in ready\n";
+
+    (void)user_data; /* unused */
+
+    /* Get websocket client context information. */
+    struct tClientContext* wsCliCtx =
+        (struct tClientContext*)mg_get_user_connection_data(conn);
+    const struct mg_request_info* ri = mg_get_request_info(conn);
+    (void)ri; /* in this example, we do not need the request_info */
+
+    /* Send "hello" message. */
+    const char* hello = "{}";
+    size_t hello_len = strlen(hello);
+    mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, hello, hello_len);
+
+    /* DEBUG: New client ready to receive data. */
+    printf("Client %u ready to receive data\n", wsCliCtx->connectionNumber);
+}
+
+
+/* Handler indicating the client sent data to the server. */
+static int
+ws_data_handler(struct mg_connection* conn,
+    int opcode,
+    char* data,
+    size_t datasize,
+    void* user_data)
+{
+    std::cout << "in data handler\n";
+    (void)user_data; /* unused */
+
+    /* Get websocket client context information. */
+    struct tClientContext* wsCliCtx =
+        (struct tClientContext*)mg_get_user_connection_data(conn);
+    const struct mg_request_info* ri = mg_get_request_info(conn);
+    (void)ri; /* in this example, we do not need the request_info */
+
+    /* DEBUG: Print data received from client. */
+    const char* messageType = "";
+    switch (opcode & 0xf) {
+    case MG_WEBSOCKET_OPCODE_TEXT:
+        messageType = "text";
+        break;
+    case MG_WEBSOCKET_OPCODE_BINARY:
+        messageType = "binary";
+        break;
+    case MG_WEBSOCKET_OPCODE_PING:
+        messageType = "ping";
+        break;
+    case MG_WEBSOCKET_OPCODE_PONG:
+        messageType = "pong";
+        break;
+    }
+    printf("Websocket received %lu bytes of %s data from client %u\n",
+        (unsigned long)datasize,
+        messageType,
+        wsCliCtx->connectionNumber);
+
+    return 1;
+}
+
+
+/* Handler indicating the connection to the client is closing. */
+static void
+ws_close_handler(const struct mg_connection* conn, void* user_data)
+{
+    std::cout << "in close handler\n";
+    (void)user_data; /* unused */
+
+    /* Get websocket client context information. */
+    struct tClientContext* wsCliCtx =
+        (struct tClientContext*)mg_get_user_connection_data(conn);
+
+    /* DEBUG: Client has left. */
+    printf("Client %u closing connection\n", wsCliCtx->connectionNumber);
+
+    /* Free memory allocated for client context in ws_connect_handler() call. */
+    free(wsCliCtx);
+}
+
 WebServer::WebServer(LogClient& logger, const int port, const std::string directory, 
     const int maxThreads) :
     m_name("WEB SVR"), m_logger(logger), m_port(port), m_directory(directory),
@@ -56,14 +176,9 @@ void WebServer::Start()
         0
     };
 
-    static const char subprotocol_bin[] = "Company.ProtoName.bin";
-    static const char subprotocol_json[] = "Company.ProtoName.json";
-    static const char* subprotocols[] = { subprotocol_bin, subprotocol_json, NULL };
-    static struct mg_websocket_subprotocols wsprot = { 2, subprotocols };
-
     // Print any error messages to console
-    struct mg_callbacks callbacks = { 0 };
-    callbacks.log_message = [](const struct mg_connection* conn, const char* message)
+    mg_callbacks callbacks = { 0 };
+    callbacks.log_message = [](const mg_connection* conn, const char* message)
     {
         std::cerr << message << "\n";
         return 1;
@@ -75,29 +190,37 @@ void WebServer::Start()
     // Start the web server
     m_context = mg_start(&callbacks, 0, options);
 
+    // Make sure we got a good context
+    if (!m_context)
+    {
+        m_logger.AddLog(m_name, LogClient::LogLevel::Error, "Failed to start server");
+        mg_exit_library();
+        return;
+    }
+
     // Setup the request handler for the reboot call
-    mg_set_request_handler(m_context, "/config$", [](struct mg_connection* c, void* cbdata)
+    mg_set_request_handler(m_context, "/config$", [](mg_connection* c, void* cbdata)
     {
         static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Config);
         return 1;
     }, this);
 
     // Setup the request handler for the reboot call
-    mg_set_request_handler(m_context, "/data$", [](struct mg_connection* c, void* cbdata)
+    mg_set_request_handler(m_context, "/data$", [](mg_connection* c, void* cbdata)
     {
         static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Data);
         return 1;
     }, this);
 
     // Setup the request handler for any directory 
-    mg_set_request_handler(m_context, "/$|/index$|/index.html$", [](struct mg_connection* c, void* cbdata)
+    mg_set_request_handler(m_context, "/$|/index$|/index.html$", [](mg_connection* c, void* cbdata)
     {
         static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Index);
         return 1;
     }, this);
 
     // Setup the request handler for the login page
-    mg_set_request_handler(m_context, "/login$", [](struct mg_connection* c, void* cbdata)
+    mg_set_request_handler(m_context, "/login$", [](mg_connection* c, void* cbdata)
     {
         // Extract the POST data from the request
         char post_data[WEB_BUFFER_SIZE];
@@ -138,35 +261,31 @@ void WebServer::Start()
     }, this);
 
     // Setup the request handler for the reboot call
-    mg_set_request_handler(m_context, "/reboot$", [](struct mg_connection* c, void* cbdata)
+    mg_set_request_handler(m_context, "/reboot$", [](mg_connection* c, void* cbdata)
     {
         static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Reboot);
         return 1;
     }, this);
 
     // Setup the request handler for the reboot call
-    mg_set_request_handler(m_context, "/update$", [](struct mg_connection* c, void* cbdata)
+    mg_set_request_handler(m_context, "/update$", [](mg_connection* c, void* cbdata)
         {
             static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Update);
             return 1;
         }, this);
 
     // Setup a default handler for any unmatched requests
-    mg_set_request_handler(m_context, "/*", [](struct mg_connection* c, void* cbdata)
+    mg_set_request_handler(m_context, "/*", [](mg_connection* c, void* cbdata)
     {
         static_cast<WebServer*>(cbdata)->HandlePage(c, Page::Error);
         return 1;
     }, this);
 
     // Start the websocket
-    //mg_set_websocket_handler_with_subprotocols(m_context,
-    //    "/websocket",
-    //    &wsprot,
-    //    ws_connect_handler,
-    //    ws_ready_handler,
-    //    ws_data_handler,
-    //    ws_close_handler,
-    //    user_data);
+    mg_set_websocket_handler(m_context, "/websocket", ws_connect_handler, ws_ready_handler,
+                            ws_data_handler,
+                            ws_close_handler,
+                            nullptr);
 }
 
 void WebServer::SendJsonOverWebSocket(const nlohmann::json& json) 
@@ -184,10 +303,10 @@ void WebServer::SendMessageOverWebSocket(const std::string& msg)
     {
         struct mg_connection* conn = pair.first;
 
-        /*if (mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, msg.c_str(), msg.length()) <= 0)
+        if (mg_websocket_write(conn, MG_WEBSOCKET_OPCODE_TEXT, msg.c_str(), msg.length()) <= 0)
         {
             std::cerr << "Failed to send message over WebSocket\n";
-        }*/
+        }
     }
 }
 
@@ -197,6 +316,7 @@ void WebServer::Stop()
     if (m_context != nullptr)
     {
         mg_stop(m_context);
+        mg_exit_library();
         m_context = nullptr;
     }
 

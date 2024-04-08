@@ -17,12 +17,12 @@
 const std::string dataPage = R"(
     <div id="messages"></div> <!-- Display received WebSocket messages here -->
     <form id="devForm">
-        <label for="x">X:</label>
-        <input type="text" id="x" name="x" readonly><br><br>
-        <label for="y">Y:</label>
-        <input type="text" id="y" name="y" readonly><br><br>
-        <label for="z">Z:</label>
-        <input type="text" id="z" name="z" readonly><br><br>
+        <label for="latitude">Latitude:</label>
+        <input type="number" id="latitude" name="latitude" readonly><br>
+        <label for="longitude">Longitude:</label>
+        <input type="number" id="longitude" name="longitude" readonly><br>
+        <label for="altitude">Altitude:</label>
+        <input type="number" id="altitude" name="altitude" readonly><br>
     </form>
     <script>
         var devForm = document.getElementById("devForm");
@@ -36,12 +36,14 @@ const std::string dataPage = R"(
             var message = JSON.parse(event.data);
             
             // Check if message follows the "dev" schema
-            if (message.hasOwnProperty("dev") && message.dev.hasOwnProperty("x") &&
-                message.dev.hasOwnProperty("y") && message.dev.hasOwnProperty("z")) {
-                // Populate form fields with x, y, and z values
-                document.getElementById("x").value = message.dev.x;
-                document.getElementById("y").value = message.dev.y;
-                document.getElementById("z").value = message.dev.z;
+            if (message.hasOwnProperty("dev")
+            {
+                if(message.dev.hasOwnProperty("latitude")) { document.getElementById("latitude").value = message.dev.latitude; }
+                if(message.dev.hasOwnProperty("longitude")) { document.getElementById("longitude").value = message.dev.longitude; }
+                if(message.dev.hasOwnProperty("altitude")) { document.getElementById("altitude").value = message.dev.altitude; }
+                if(message.dev.hasOwnProperty("hour")) { document.getElementById("hour").value = message.dev.hour; }
+                if(message.dev.hasOwnProperty("min")) { document.getElementById("min").value = message.dev.min; }
+                if(message.dev.hasOwnProperty("sec")) { document.getElementById("sec").value = message.dev.sec; }
             }
 
             // Display received JSON message

@@ -36,6 +36,9 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version.h"
 # CivetWeb needs this flag to use OpenSSL
 add_definitions(-DOPENSSL_API_1_1)
 
+# CivetWeb needs this flag to enable websocket
+add_definitions(-DUSE_WEBSOCKET)
+
 # Add source to this project's executable.
 add_executable (Wasp 
     "main.cpp" 
