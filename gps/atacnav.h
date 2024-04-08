@@ -13,16 +13,41 @@
 #include <string>                           // strings
 //
 #include "gps_type.h"                       // base class
+#include "atacnav_info.h"                   // atacnav info
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
 /// @brief 
 struct AtacnavData
 {
-    double roll;
-    double pitch;
-    double yaw;
-    bool error;
+    unsigned long     msg5007RxCount;
+    unsigned long     msg5007ChecksumErrorCount;
+    unsigned long     msg5010RxCount;
+    unsigned long     msg5010ChecksumErrorCount;
+
+    Atacnav::GIG::Message5007   lastRecieved5007; // whole msg for TM; most recently received (with valid checksum)
+    Atacnav::GIG::Message5010   lastRecieved5010; // whole msg for TM; most recently received (with valid checksum)
+
+    double ppsTow;                 // ToV of data, GPS ToW of 1-PPS, seconds
+    double lat;                    // rad
+    double lon;                    // rad
+    double alt;                    // m HAE
+    double undulation;             // m (HAE - MSL)
+    double pitch;                  // rad
+    double roll;                   // rad
+    double heading;                // rad
+    double vel_N;                  // m/s
+    double vel_E;                  // m/s
+    double vel_D;                  // m/s
+    double horizontalUncertainity; // m
+    double verticalUncertainity;   // m
+    int    gpsWeek;                // GPS Week number
+    int    leapSeconds;            // leap seconds (UTC offset)
+    bool   newPosDataAvailable;
+    bool   msg5007DataValid;
+    bool   msg5010DataValid;
+    bool   dataValid;              // overall ATACNAV data is valid
+
 };
 
 /// @brief 
@@ -32,7 +57,7 @@ public:
 
     /// @brief 
     AtacnavGps(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
-        GpsType("UBLOX", logger, path, baudrate) {}
+        GpsType("ATACNAV", logger, path, baudrate) {}
 
     /// @brief 
     ~AtacnavGps() {}

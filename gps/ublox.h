@@ -107,23 +107,23 @@ struct UbloxData
 	std::vector<Ublox::UBX::NAV::SAT::Satellite>	satellites;
 	std::vector<Ublox::UBX::NAV::ORB::Satellite>	orbits;
 
-	long UbxAckCount		= 0;
-	long UbxNackCount		= 0;
-	long UbxRxCount			= 0;
-	long UbxMonVerCount		= 0;
-	long UbxNavCovCount		= 0;
-	long UbxDopCount		= 0;
-	long UbxSatDataCount	= 0;
-	long UbxNavStatusCount	= 0;
-	long UbxPosEcefCount	= 0;
-	long UbxPosLlhCount		= 0;
-	long UbxVelEcefCount	= 0;
-	long UbxVelNedCount		= 0;
-	long UbxTimeUtcCount	= 0;
-	long UbxPvtCount		= 0;
-	long UbxGpsTimeCount	= 0;
-	long NmeaRxCount		= 0;
-	long ChecksumFailCount	= 0;
+	unsigned long UbxAckCount			= 0;
+	unsigned long UbxNackCount			= 0;
+	unsigned long UbxRxCount			= 0;
+	unsigned long UbxMonVerCount		= 0;
+	unsigned long UbxNavCovCount		= 0;
+	unsigned long UbxDopCount			= 0;
+	unsigned long UbxSatDataCount		= 0;
+	unsigned long UbxNavStatusCount		= 0;
+	unsigned long UbxPosEcefCount		= 0;
+	unsigned long UbxPosLlhCount		= 0;
+	unsigned long UbxVelEcefCount		= 0;
+	unsigned long UbxVelNedCount		= 0;
+	unsigned long UbxTimeUtcCount		= 0;
+	unsigned long UbxPvtCount			= 0;
+	unsigned long UbxGpsTimeCount		= 0;
+	unsigned long NmeaRxCount			= 0;
+	unsigned long ChecksumFailCount		= 0;
 };
 
 /// @brief 
