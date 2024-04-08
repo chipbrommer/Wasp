@@ -184,9 +184,6 @@ void WebServer::Start()
         return 1;
     };
 
-    // Log server stop
-    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Started on " + port);
-
     // Start the web server
     m_context = mg_start(&callbacks, 0, options);
 
@@ -197,6 +194,9 @@ void WebServer::Start()
         mg_exit_library();
         return;
     }
+
+    // Log server stop
+    m_logger.AddLog(m_name, LogClient::LogLevel::Info, "Started on " + port);
 
     // Setup the request handler for the reboot call
     mg_set_request_handler(m_context, "/config$", [](mg_connection* c, void* cbdata)
