@@ -1636,12 +1636,12 @@ void UbloxGps::ParseNavVelocityNedData(uint8_t* buffer)
 
 	// Update the PVT structure also as its main source of data to pull from. 
 	m_data.pvtData.gpsTowInMs = m_data.velocityNedData.gpsTowInMs;
-	m_data.pvtData.velocityNorthInMms = m_data.velocityNedData.velocityNorthInCms		* cm_to_mm;
-	m_data.pvtData.velocityEastInMms = m_data.velocityNedData.velocityEastInCms			* cm_to_mm;
-	m_data.pvtData.velocityDownInMms = m_data.velocityNedData.velocityDownInCms			* cm_to_mm;
-	m_data.pvtData.groundSpeedInMms = m_data.velocityNedData.groundSpeedInCms			* cm_to_mm;
+	m_data.pvtData.velocityNorthInMms = m_data.velocityNedData.velocityNorthInCms		* CM_TO_MM;
+	m_data.pvtData.velocityEastInMms = m_data.velocityNedData.velocityEastInCms			* CM_TO_MM;
+	m_data.pvtData.velocityDownInMms = m_data.velocityNedData.velocityDownInCms			* CM_TO_MM;
+	m_data.pvtData.groundSpeedInMms = m_data.velocityNedData.groundSpeedInCms			* CM_TO_MM;
 	m_data.pvtData.headingMotionInDeg = m_data.velocityNedData.headingOfMotionInDeg;
-	m_data.pvtData.speedAccuracyEstInMms = m_data.velocityNedData.speedAccuracyEstInCms * cm_to_mm;
+	m_data.pvtData.speedAccuracyEstInMms = m_data.velocityNedData.speedAccuracyEstInCms * CM_TO_MM;
 	m_data.pvtData.headingAccuracyEstInDeg = m_data.velocityNedData.headingAccuracyEstInDeg;
 }
  
@@ -1771,9 +1771,9 @@ void UbloxGps::UpdateCommonData()
 	m_commonData.hour = m_data.pvtData.hour;
 	m_commonData.min = m_data.pvtData.min;
 	m_commonData.sec = m_data.pvtData.sec;
-	m_commonData.latitude = m_data.pvtData.latitudeInDeg;
-	m_commonData.longitude = m_data.pvtData.longitudeInDeg;
-	m_commonData.altitude = m_data.pvtData.heightMslInMm;
+	m_commonData.latitude = m_data.pvtData.latitudeInDeg * 1e-7;
+	m_commonData.longitude = m_data.pvtData.longitudeInDeg * 1e-7;
+	m_commonData.altitude = m_data.pvtData.heightMslInMm * MM_TO_M;
 	m_commonData.rxCount = m_data.UbxRxCount + m_data.NmeaRxCount;
 	m_commonData.rxErrorCount = m_data.ChecksumFailCount;
 }

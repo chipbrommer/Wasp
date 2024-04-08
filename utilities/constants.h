@@ -18,7 +18,8 @@
 #endif
 /////////////////////////////////////////////////////////////////////////////////
 
-constexpr int cm_to_mm = 10;
+constexpr int CM_TO_MM = 10;
+constexpr int MM_TO_M = 1000;
 
 constexpr int BUFFER_SIZE       = 1024;
 constexpr int WEB_BUFFER_SIZE   = 50;

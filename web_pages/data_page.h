@@ -48,9 +48,26 @@ const std::string dataPage = R"(
                 if(message.data.hasOwnProperty("sec")) { document.getElementById("sec").value = message.data.sec; }
             }
 
-            // Display received JSON message
-            var messagesDiv = document.getElementById("messages");
-            messagesDiv.innerHTML += "<p>Received: " + JSON.stringify(message) + "</p>";
+            // Check if message has any new messages
+            if (message.hasOwnProperty("message"))
+            {
+                // Check if message has any new messages
+                if (message.message.hasOwnProperty("text")) 
+                {
+                    // Display received JSON message with timestamp
+                    var receivedTime = new Date().toLocaleTimeString();
+                    var messagesDiv = document.getElementById("messages");
+                    messagesDiv.innerHTML = "<p>Received at " + receivedTime + ": " + JSON.stringify(message.message.text) + "</p>";
+                }
+
+                if (message.message.hasOwnProperty("timeout"))
+                {
+                    // Start a timer to clear the content after timeout
+                    setTimeout(function() {
+                        messagesDiv.innerHTML = ""; // Clear the content
+                    }, message.message.timeout * 1000);
+                }
+            }
         };
 
         // WebSocket event handler for connection open

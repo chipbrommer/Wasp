@@ -102,6 +102,8 @@ namespace Ublox
         BIKE                  = 10,
     };
 
+#pragma pack(push, 1)
+
     /// @brief UBX related ID's
     namespace UBX
     {
@@ -944,4 +946,5 @@ namespace Ublox
         };
     }
 
+#pragma pack(pop)
 }
