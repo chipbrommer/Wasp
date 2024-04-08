@@ -42,7 +42,9 @@ public:
 	/// @param port - port to serve the server at
 	/// @param directory - directory for the server files
 	/// @param maxThreads - maximum number of threads for the web server
-	WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".", const int maxThreads = 5);
+	/// @param websocketName - name for the websocket connection
+	WebServer(LogClient& logger, const int port = 8080, const std::string directory = ".", 
+		const int maxThreads = 5, const std::string websocketName = "websocket");
 
 	/// @brief Default deconstructor
 	~WebServer();
@@ -65,11 +67,13 @@ public:
 
 	/// @brief Sends a JSON structure over WebSocket
 	/// @param json - [in] - JSON structure to send
-	void SendJsonOverWebSocket(const nlohmann::json& json);
+	/// @return 0 on error, else the total number of messages sent to websockets
+	int SendJsonOverWebSocket(const nlohmann::json& json);
 
 	/// @brief Sends a string over WebSocket
 	/// @param msg - [in] - string to send
-	void SendMessageOverWebSocket(const std::string& msg);
+	/// @return 0 on error, else the total number of messages sent to websockets
+	int SendMessageOverWebSocket(const std::string& msg);
 
 	/// @brief Stops the web server process.
 	void Stop();
@@ -103,26 +107,28 @@ private:
 	/// @return - the string format of the variable value
 	std::string Parse(const std::string name, const char* data);
 
-	static int WebSocketConnectHandler(const struct mg_connection* conn, void* user_data);
+	int WebSocketConnectHandler(const mg_connection* conn, void* user_data);
 
-	static void WebSocketReadyHandler(struct mg_connection* conn, void* user_data);
+	void WebSocketReadyHandler(const mg_connection* conn, void* user_data);
 
-	static int WebsocketDataHandler(struct mg_connection* conn, int bits, char* data, size_t data_len, void* user_data);
+	int WebsocketDataHandler(const mg_connection* conn, int bits, char* data, size_t data_len, void* user_data);
 
-	static void WebSocketCloseHandler(const struct mg_connection* conn, void* user_data);
+	void WebSocketCloseHandler(const mg_connection* conn, void* user_data);
 
 	std::atomic_bool	m_run					= false;
     std::string			m_name					= "";
     LogClient&			m_logger;
     int					m_port					= 0;
     std::string			m_directory				= "";
+	std::string			m_websocketName			= "";
 	mg_context*			m_context				= {};
 	std::string			m_listeningAddress		= "";
 	char				m_buffer[BUFFER_SIZE]	= {};
 	int					m_maxThreads			= 0;
 	inja::Environment	m_environment;
+	long				m_sendErrorCount		= 0;
 
 	// Items for websocket
 	std::mutex								m_connectionLock	= {};
-	std::map<struct mg_connection*, bool>	m_connections		= {};
+	std::map<mg_connection*, bool>			m_connections		= {};
 };

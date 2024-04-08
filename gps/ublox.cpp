@@ -255,10 +255,13 @@ int	UbloxGps::RestartDevice(Ublox::START_TYPE start, Ublox::RESET_TYPE reset)
 	if (rtn < 0)
 	{
 		// if error, notify and return.
+		m_commonData.txErrorCount++;
 		std::cerr << "ERROR: clearDataBackup : errno = " << errno << '\n';
+		return rtn;
 	}
 
 	// return success
+	m_commonData.txCount++;
 	return rtn;
 }
 
@@ -318,11 +321,13 @@ int UbloxGps::ConfigureMessageDataStream(uint8_t classId, uint8_t messageId, boo
 	if (m_comms.Write(reinterpret_cast<std::byte*>(&msg), sizeof(msg)) < 0)
 	{
 		// if error, notify and return.
+		m_commonData.txErrorCount++;
 		std::cerr << "ERROR: configureMessageDataStream : errno = " << errno << '\n';
 		return -1;
 	}
 
 	// return sucess
+	m_commonData.txCount++;
 	return 0;
 }
 
@@ -369,10 +374,12 @@ int UbloxGps::ConfigureMessageRate(uint8_t classId, uint8_t messageId, uint8_t r
 	{
 		// if error, notify and return.
 		std::cerr << "ERROR: configureMessageRate: errno = " << errno << '\n';
+		m_commonData.txErrorCount++;
 		return -1;
 	}
 
 	// return success
+	m_commonData.txCount++;
 	return rtn;
 }
 
@@ -418,10 +425,12 @@ int UbloxGps::ConfigureDynamics(Ublox::DYNAMICS dynamics)
 	{
 		// if error, notify and return.
 		std::cerr << "ERROR: configureDynamics : errno = " << errno << '\n';
+		m_commonData.txErrorCount++;
 		return -1;
 	}
 
 	// return success
+	m_commonData.txCount++;
 	return 0;
 }
 
@@ -477,10 +486,12 @@ int UbloxGps::ConfigureDevicePort(uint8_t portId, Ublox::BAUDRATE baud)
 	{
 		// if error, notify and return.
 		std::cerr << "ERROR: configureUartPort : errno = " << errno << '\n';
+		m_commonData.txErrorCount++;
 		return -1;
 	}
 
 	// return sucess
+	m_commonData.txCount++;
 	return 0;
 }
 
@@ -534,10 +545,12 @@ int UbloxGps::SetUbxMessageRate(uint8_t satelliteSource, uint8_t measurmentRate,
 	{
 		// if error, notify and return.
 		std::cerr << "ERROR: setUbxMessageRate : errno = " << errno << '\n';
+		m_commonData.txErrorCount++;
 		return -1;
 	}
 
 	// return sucess
+	m_commonData.txCount++;
 	return 0;
 }
 
@@ -578,9 +591,12 @@ int UbloxGps::RequestUbxData(uint8_t classId, uint8_t messageId)
 	{
 		// if error, notify and return. 
 		std::cerr << "ERROR: requestUbxData : errno = " << errno << '\n';
+		m_commonData.txErrorCount++;
 		return -1;
 	}
 
+	// return success
+	m_commonData.txCount++;
 	return numSent;
 }
 
@@ -1751,7 +1767,15 @@ void UbloxGps::UpdateRangeOfActiveNavigationSatellites(double range, int satelli
 void UbloxGps::UpdateCommonData()
 {
 	std::scoped_lock lock(m_commonDataMutex);
+
+	m_commonData.hour = m_data.pvtData.hour;
+	m_commonData.min = m_data.pvtData.min;
+	m_commonData.sec = m_data.pvtData.sec;
+	m_commonData.latitude = m_data.pvtData.latitudeInDeg;
+	m_commonData.longitude = m_data.pvtData.longitudeInDeg;
+	m_commonData.altitude = m_data.pvtData.heightMslInMm;
 	m_commonData.rxCount = m_data.UbxRxCount + m_data.NmeaRxCount;
+	m_commonData.rxErrorCount = m_data.ChecksumFailCount;
 }
 
 // Decoders

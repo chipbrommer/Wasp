@@ -90,7 +90,31 @@ void Wasp::Execute()
     while (m_run)
     {
         // Check for GPS updates
-        if (m_gpsManager.Read() < 0) break;
+        int gpsRead = m_gpsManager.Read();
+        if (gpsRead < 0) break;
+        else if (gpsRead > 0)
+        {
+            m_gpsData = m_gpsManager.GetCommonData();
+        }
+
+        nlohmann::json json = {
+            {"message", "This is a sample message."},
+            {"data", {
+                {"hour", m_gpsData.hour},
+                {"min", m_gpsData.min},
+                {"sec", m_gpsData.sec},
+                {"latitude", m_gpsData.latitude},
+                {"longitude", m_gpsData.longitude},
+                {"altitude", m_gpsData.altitude}
+            }}
+        };
+
+        static int sendCount = 0;
+
+        if (m_webServer.SendJsonOverWebSocket(json))
+        {
+            sendCount++;
+        }
 
         // Sleep a little
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

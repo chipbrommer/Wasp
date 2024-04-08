@@ -60,6 +60,10 @@ private:
     ImuManager                      m_imuManager;           /// Manager for IMU units
     WebServer                       m_webServer;            /// Web server interface
 
+    // Data Storage
+    GpsData                         m_gpsData;              /// Holds GPS Data
+    ImuData                         m_imuData;              /// Holds IMU Data
+
     // Utilities
     COT_Utility                     m_cot;                  /// Utility to generate and handle CoT stuff. 
 

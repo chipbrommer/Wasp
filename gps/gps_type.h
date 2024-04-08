@@ -21,6 +21,9 @@
 /// @brief The template of common GPS data
 struct GpsData
 {
+    int     hour            = 0;
+    int     min             = 0;
+    int     sec             = 0;
     double  latitude        = 0.0;
     double  longitude       = 0.0;
     double  altitude        = 0.0;
