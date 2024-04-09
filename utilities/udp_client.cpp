@@ -14,7 +14,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-UDP_Client::UDP_Client()
+UdpClient::UdpClient()
 {
 	m_name = "UDP Client";
 	m_lastError = ErrorCode::NONE;
@@ -40,7 +40,7 @@ UDP_Client::UDP_Client()
 	m_broadcastSocket = INVALID_SOCKET;
 }
 
-UDP_Client::UDP_Client(const std::string& clientsAddress, const int16_t clientsPort)
+UdpClient::UdpClient(const std::string& clientsAddress, const int16_t clientsPort)
 {
 	if (ValidateIP(clientsAddress) == -1)
 	{
@@ -83,7 +83,7 @@ UDP_Client::UDP_Client(const std::string& clientsAddress, const int16_t clientsP
 	m_broadcastSocket = INVALID_SOCKET;
 }
 
-UDP_Client::~UDP_Client()
+UdpClient::~UdpClient()
 {
 	CloseUnicast();
 	CloseBroadcast();
@@ -94,7 +94,12 @@ UDP_Client::~UDP_Client()
 #endif
 }
 
-int8_t UDP_Client::ConfigureThisClient(const std::string& address, const int16_t port)
+bool UdpClient::IsGood() const
+{
+	return m_socket != INVALID_SOCKET;
+}
+
+int8_t UdpClient::ConfigureThisClient(const std::string& address, const int16_t port)
 {
 	if (ValidateIP(address) == -1)
 	{
@@ -121,7 +126,7 @@ int8_t UDP_Client::ConfigureThisClient(const std::string& address, const int16_t
 	return 0;
 }
 
-int8_t  UDP_Client::SetUnicastDestination(const std::string& address, const int16_t port)
+int8_t  UdpClient::SetUnicastDestination(const std::string& address, const int16_t port)
 {
 	if (ValidateIP(address) == -1)
 	{
@@ -148,7 +153,7 @@ int8_t  UDP_Client::SetUnicastDestination(const std::string& address, const int1
 	return 0;
 }
 
-int8_t UDP_Client::EnableBroadcastSender(const int16_t port)
+int8_t UdpClient::EnableBroadcastSender(const int16_t port)
 {
 	if (m_broadcastSocket != INVALID_SOCKET)
 	{
@@ -189,7 +194,7 @@ int8_t UDP_Client::EnableBroadcastSender(const int16_t port)
 	return 0;
 }
 
-int8_t UDP_Client::AddBroadcastListener(const int16_t port)
+int8_t UdpClient::AddBroadcastListener(const int16_t port)
 {
 	SOCKET sock = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -224,7 +229,7 @@ int8_t UDP_Client::AddBroadcastListener(const int16_t port)
 	return 0;
 }
 
-int8_t UDP_Client::DisableBroadcast()
+int8_t UdpClient::DisableBroadcast()
 {
 	if (m_broadcastSocket == INVALID_SOCKET)
 	{
@@ -240,12 +245,12 @@ int8_t UDP_Client::DisableBroadcast()
 	return 0;
 }
 
-int8_t UDP_Client::EnableMulticast(const std::string& groupIP, const int16_t groupPort)
+int8_t UdpClient::EnableMulticast(const std::string& groupIP, const int16_t groupPort)
 {
 	return AddMulticastGroup(groupIP, groupPort);
 }
 
-int8_t UDP_Client::DisableMulticast()
+int8_t UdpClient::DisableMulticast()
 {
 	if (m_multicastSockets.size() < 1)
 	{
@@ -258,7 +263,7 @@ int8_t UDP_Client::DisableMulticast()
 	return 0;
 }
 
-int8_t UDP_Client::AddMulticastGroup(const std::string& groupIP, const int16_t groupPort)
+int8_t UdpClient::AddMulticastGroup(const std::string& groupIP, const int16_t groupPort)
 {
 	if (ValidateIP(groupIP) == -1)
 	{
@@ -375,7 +380,7 @@ int8_t UDP_Client::AddMulticastGroup(const std::string& groupIP, const int16_t g
 	return 0;
 }
 
-int8_t UDP_Client::OpenUnicast()
+int8_t UdpClient::OpenUnicast()
 {
 	if (m_socket != -1)
 	{
@@ -430,7 +435,7 @@ int8_t UDP_Client::OpenUnicast()
 	return 0;
 }
 
-int8_t UDP_Client::Send(const char* buffer, const uint32_t size, const SendType type)
+int8_t UdpClient::Send(const char* buffer, const uint32_t size, const SendType type)
 {
 	switch (type)
 	{
@@ -444,7 +449,7 @@ int8_t UDP_Client::Send(const char* buffer, const uint32_t size, const SendType 
 	return -1;
 }
 
-int8_t UDP_Client::SendUnicast(const char* buffer, const uint32_t size)
+int8_t UdpClient::SendUnicast(const char* buffer, const uint32_t size)
 {
 	// verify socket and then send datagram
 	if (m_socket != INVALID_SOCKET)
@@ -465,7 +470,7 @@ int8_t UDP_Client::SendUnicast(const char* buffer, const uint32_t size)
 	return -1;
 }
 
-int8_t UDP_Client::SendUnicast(const char* buffer, const uint32_t size, const std::string& ipAddress, const int16_t port)
+int8_t UdpClient::SendUnicast(const char* buffer, const uint32_t size, const std::string& ipAddress, const int16_t port)
 {
 	// verify socket and then send datagram
 	if (m_socket != INVALID_SOCKET)
@@ -510,7 +515,7 @@ int8_t UDP_Client::SendUnicast(const char* buffer, const uint32_t size, const st
 	return -1;
 }
 
-int8_t UDP_Client::SendBroadcast(const char* buffer, const uint32_t size)
+int8_t UdpClient::SendBroadcast(const char* buffer, const uint32_t size)
 {
 	// verify socket and then send datagram
 	if (m_broadcastSocket != INVALID_SOCKET)
@@ -531,7 +536,7 @@ int8_t UDP_Client::SendBroadcast(const char* buffer, const uint32_t size)
 	return -1;
 }
 
-int8_t UDP_Client::SendMulticast(const char* buffer, const uint32_t size, const std::string& groupIP)
+int8_t UdpClient::SendMulticast(const char* buffer, const uint32_t size, const std::string& groupIP)
 {
 	// verify socket and then send datagram
 	if (m_multicastSockets.size() > 0)
@@ -565,7 +570,7 @@ int8_t UDP_Client::SendMulticast(const char* buffer, const uint32_t size, const 
 	return -1;
 }
 
-int8_t UDP_Client::ReceiveUnicast(void* buffer, const uint32_t maxSize)
+int8_t UdpClient::ReceiveUnicast(void* buffer, const uint32_t maxSize)
 {
 	// Store the data source info
 	sockaddr_in sourceAddress{};
@@ -614,7 +619,7 @@ int8_t UDP_Client::ReceiveUnicast(void* buffer, const uint32_t maxSize)
 	return sizeRead;
 }
 
-int8_t UDP_Client::ReceiveUnicast(void* buffer, const uint32_t maxSize, std::string& recvFromAddr, int16_t& recvFromPort)
+int8_t UdpClient::ReceiveUnicast(void* buffer, const uint32_t maxSize, std::string& recvFromAddr, int16_t& recvFromPort)
 {
 	int8_t rtn = ReceiveUnicast(buffer, maxSize);
 
@@ -627,7 +632,7 @@ int8_t UDP_Client::ReceiveUnicast(void* buffer, const uint32_t maxSize, std::str
 	return rtn;;
 }
 
-int8_t UDP_Client::ReceiveBroadcast(void* buffer, const uint32_t maxSize)
+int8_t UdpClient::ReceiveBroadcast(void* buffer, const uint32_t maxSize)
 {
 	if (m_broadcastListeners.size() > 0)
 	{
@@ -697,7 +702,7 @@ int8_t UDP_Client::ReceiveBroadcast(void* buffer, const uint32_t maxSize)
 	return -1;
 }
 
-int8_t UDP_Client::ReceiveBroadcast(void* buffer, const uint32_t maxSize, int16_t& port)
+int8_t UdpClient::ReceiveBroadcast(void* buffer, const uint32_t maxSize, int16_t& port)
 {
 	int rtn = ReceiveBroadcast(buffer, maxSize);
 
@@ -708,7 +713,7 @@ int8_t UDP_Client::ReceiveBroadcast(void* buffer, const uint32_t maxSize, int16_
 	return rtn;
 }
 
-int8_t UDP_Client::ReceiveBroadcastFromListenerPort(void* buffer, const uint32_t maxSize, const int16_t port)
+int8_t UdpClient::ReceiveBroadcastFromListenerPort(void* buffer, const uint32_t maxSize, const int16_t port)
 {
 	if (m_broadcastListeners.size() > 0)
 	{
@@ -785,7 +790,7 @@ int8_t UDP_Client::ReceiveBroadcastFromListenerPort(void* buffer, const uint32_t
 	return -1;
 }
 
-int8_t UDP_Client::ReceiveMulticast(void* buffer, const uint32_t maxSize, std::string& multicastGroup)
+int8_t UdpClient::ReceiveMulticast(void* buffer, const uint32_t maxSize, std::string& multicastGroup)
 {
 	if (m_multicastSockets.size() > 0)
 	{
@@ -860,13 +865,13 @@ int8_t UDP_Client::ReceiveMulticast(void* buffer, const uint32_t maxSize, std::s
 	return -1;
 }
 
-void UDP_Client::CloseUnicast()
+void UdpClient::CloseUnicast()
 {
 	closesocket(m_socket);
 	m_socket = INVALID_SOCKET;
 }
 
-void UDP_Client::CloseBroadcast()
+void UdpClient::CloseBroadcast()
 {
 	closesocket(m_broadcastSocket);
 	m_broadcastSocket = INVALID_SOCKET;
@@ -879,7 +884,7 @@ void UDP_Client::CloseBroadcast()
 	m_broadcastListeners.clear();
 }
 
-void UDP_Client::CloseMulticast()
+void UdpClient::CloseMulticast()
 {
 	for (const auto& i : m_multicastSockets)
 	{
@@ -889,7 +894,7 @@ void UDP_Client::CloseMulticast()
 	m_multicastSockets.clear();
 }
 
-int8_t UDP_Client::SetTimeToLive(const int8_t ttl)
+int8_t UdpClient::SetTimeToLive(const int8_t ttl)
 {
 	if (ttl > 0 && ttl < 255)
 	{
@@ -915,7 +920,7 @@ int8_t UDP_Client::SetTimeToLive(const int8_t ttl)
 	return -1;
 }
 
-int8_t UDP_Client::SetTimeout(const int32_t timeoutMSecs)
+int8_t UdpClient::SetTimeout(const int32_t timeoutMSecs)
 {
 	m_timeout.tv_sec = timeoutMSecs / 1000;
 #if WIN32
@@ -926,22 +931,22 @@ int8_t UDP_Client::SetTimeout(const int32_t timeoutMSecs)
 	return 0;
 }
 
-std::string UDP_Client::GetIpOfLastReceive()
+std::string UdpClient::GetIpOfLastReceive()
 {
 	return m_lastReceiveInfo->ipAddress;
 }
 
-int16_t UDP_Client::GetPortOfLastReceive()
+int16_t UdpClient::GetPortOfLastReceive()
 {
 	return m_lastReceiveInfo->port;
 }
 
-std::string UDP_Client::GetLastError()
+std::string UdpClient::GetLastError()
 {
 	return UdpClientErrorMap[m_lastError];
 }
 
-int UDP_Client::ValidateIP(const std::string& ip)
+int UdpClient::ValidateIP(const std::string& ip)
 {
 	sockaddr_in sa4 = {};
 	sockaddr_in6 sa6 = {};
@@ -961,7 +966,7 @@ int UDP_Client::ValidateIP(const std::string& ip)
 	return -1;  // Invalid IP address
 }
 
-bool UDP_Client::ValidatePort(const int16_t port)
+bool UdpClient::ValidatePort(const int16_t port)
 {
 	return (port >= 0 && port <= 65535);
 }

@@ -84,8 +84,7 @@ int UbloxGps::ProcessData()
 	{
 		bytesInBuffer += bytesRead;
 	}
-	else if (bytesRead < 0) return -1;
-	else return 0;
+	else if (bytesRead <= 0) return bytesRead;
 
 	// do we have at least 2 bytes in buffer (size of sync bytes)
 	while (bytesInBuffer >= Ublox::NUM_SYNC_BYTES)

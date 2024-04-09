@@ -14,6 +14,7 @@
 //
 #include "gps_type.h"                       // base class
 #include "atacnav_info.h"                   // atacnav info
+//#include "../utilities/udp_client.h"        // UDP comms
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
@@ -25,8 +26,8 @@ struct AtacnavData
     unsigned long     msg5010RxCount;
     unsigned long     msg5010ChecksumErrorCount;
 
-    Atacnav::GIG::Message5007   lastRecieved5007; // whole msg for TM; most recently received (with valid checksum)
-    Atacnav::GIG::Message5010   lastRecieved5010; // whole msg for TM; most recently received (with valid checksum)
+    Atacnav::GIG::Message5007   lastReceived5007; // whole msg for TM; most recently received (with valid checksum)
+    Atacnav::GIG::Message5010   lastReceived5010; // whole msg for TM; most recently received (with valid checksum)
 
     double ppsTow;                 // ToV of data, GPS ToW of 1-PPS, seconds
     double lat;                    // rad
@@ -56,8 +57,7 @@ class AtacnavGps : public GpsType
 public:
 
     /// @brief 
-    AtacnavGps(LogClient& logger, const std::string path, const SerialClient::BaudRate baudrate) :
-        GpsType("ATACNAV", logger, path, baudrate) {}
+    AtacnavGps(LogClient& logger, const std::string ipAddress, const int port);
 
     /// @brief 
     ~AtacnavGps() {}
@@ -76,5 +76,9 @@ private:
     /// @brief 
     void UpdateCommonData() override;
 
-    AtacnavData m_data = {};              /// Data storage
+    // UDP items
+    //UdpClient m_udp;
+
+    /// Data storage
+    AtacnavData m_data = {};
 };

@@ -25,10 +25,10 @@ namespace Atacnav
         constexpr uint8_t SYNC_3 = 0xF3;
         constexpr uint8_t SYNC_4 = 0xFA;
 
-        enum class MSG_ID
+        enum class MSG_ID : int
         {
-            PPS_SYNC_NAV = 5007,
-            BLENDED_PPS_NAV = 5010,
+            MSG_5007 = 5007,
+            MSG_5010 = 5010,
         };
 
 #pragma pack(push, 1)

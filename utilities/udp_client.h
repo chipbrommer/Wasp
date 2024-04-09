@@ -35,7 +35,7 @@ const int SD_BOTH = SHUT_RDWR;
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-class UDP_Client
+class UdpClient
 {
 public:
 	/// @brief enum for error codes
@@ -90,13 +90,17 @@ public:
 	};
 
 	/// @brief Default Constructor
-	UDP_Client();
+	UdpClient();
 
 	/// @brief Constructor to receive an address and port
-	UDP_Client(const std::string& clientsAddress, const int16_t clientsPort);
+	UdpClient(const std::string& clientsAddress, const int16_t clientsPort);
 
 	/// @brief Default Deconstructor
-	~UDP_Client();
+	~UdpClient();
+
+	/// @brief Check if the main socket is good for communications
+	/// @return true if good, else false (Invalid Socket). 
+	bool IsGood() const;
 
 	/// @brief Configure the address and port of this client
 	/// @param address -[in]- Address of this client
