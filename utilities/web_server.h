@@ -107,13 +107,13 @@ private:
 	/// @return - the string format of the variable value
 	std::string Parse(const std::string name, const char* data);
 
-	int WebSocketConnectHandler(const mg_connection* conn, void* user_data);
+	int WebSocketConnectHandler(const mg_connection* conn);
 
-	void WebSocketReadyHandler(const mg_connection* conn, void* user_data);
+	void WebSocketReadyHandler(const mg_connection* conn);
 
-	int WebsocketDataHandler(const mg_connection* conn, int bits, char* data, size_t data_len, void* user_data);
+	int WebsocketDataHandler(const mg_connection* conn, int bits, char* data, size_t data_len);
 
-	void WebSocketCloseHandler(const mg_connection* conn, void* user_data);
+	void WebSocketCloseHandler(const mg_connection* conn);
 
 	std::atomic_bool	m_run					= false;
     std::string			m_name					= "";

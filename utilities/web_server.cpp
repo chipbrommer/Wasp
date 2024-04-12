@@ -14,109 +14,6 @@
 // 
 /////////////////////////////////////////////////////////////////////////////////
 
-/* User defined data structure for websocket client context. */
-struct tClientContext {
-    uint32_t connectionNumber;
-    uint32_t demo_var;
-};
-
-static mg_connection* g_conn;
-
-static int ws_write(const nlohmann::json& json)
-{
-    std::string msg = json.dump();
-    return mg_websocket_write(g_conn, MG_WEBSOCKET_OPCODE_TEXT, msg.c_str(), msg.length());
-}
-
-/* Handler for new websocket connections. */
-static int
-ws_connect_handler(const mg_connection* conn, void* user_data)
-{
-    (void)user_data; /* unused */
-
-    tClientContext* wsCliCtx = (tClientContext*)calloc(1, sizeof(tClientContext));
-    if (!wsCliCtx) 
-    {
-        /* reject client */
-    return 1;
-}
-    static uint32_t connectionCounter = 0;
-    wsCliCtx->connectionNumber = connectionCounter++;
-    mg_set_user_connection_data(
-        conn, wsCliCtx);
-
-    const mg_request_info* ri = mg_get_request_info(conn);
-
-    return 0;
-}
-
-
-/* Handler indicating the client is ready to receive data. */
-static void
-ws_ready_handler(mg_connection* conn, void* user_data)
-{
-    (void)user_data; /* unused */
-
-    /* Get websocket client context information. */
-    tClientContext* wsCliCtx =
-        (tClientContext*)mg_get_user_connection_data(conn);
-    const mg_request_info* ri = mg_get_request_info(conn);
-    (void)ri; /* in this example, we do not need the request_info */
-
-    g_conn = conn;
-}
-
-
-/* Handler indicating the client sent data to the server. */
-static int
-ws_data_handler(mg_connection* conn,
-    int opcode,
-    char* data,
-    size_t datasize,
-    void* user_data)
-{
-    (void)user_data; /* unused */
-
-    /* Get websocket client context information. */
-    tClientContext* wsCliCtx =
-        (tClientContext*)mg_get_user_connection_data(conn);
-    const mg_request_info* ri = mg_get_request_info(conn);
-    (void)ri;
-
-    /* DEBUG: Print data received from client. */
-    const char* messageType = "";
-    switch (opcode & 0xf) {
-    case MG_WEBSOCKET_OPCODE_TEXT:
-        messageType = "text";
-        break;
-    case MG_WEBSOCKET_OPCODE_BINARY:
-        messageType = "binary";
-        break;
-    case MG_WEBSOCKET_OPCODE_PING:
-        messageType = "ping";
-        break;
-    case MG_WEBSOCKET_OPCODE_PONG:
-        messageType = "pong";
-        break;
-    }
-
-    return 1;
-}
-
-/* Handler indicating the connection to the client is closing. */
-static void
-ws_close_handler(const mg_connection* conn, void* user_data)
-{
-    (void)user_data; /* unused */
-
-    /* Get websocket client context information. */
-    tClientContext* wsCliCtx =
-        (tClientContext*)mg_get_user_connection_data(conn);
-
-    /* Free memory allocated for client context in ws_connect_handler() call. */
-    free(wsCliCtx);
-}
-
 WebServer::WebServer(LogClient& logger, const int port, const std::string directory, 
     const int maxThreads, const std::string websocketName) :
     m_name("WEB SVR"), m_logger(logger), m_port(port), m_directory(directory),
@@ -265,17 +162,32 @@ void WebServer::Start()
     }, this);
 
     // Start the websocket
-    mg_set_websocket_handler(m_context, "/websocket", ws_connect_handler, ws_ready_handler,
-                            ws_data_handler,
-                            ws_close_handler,
-        nullptr);
+    mg_set_websocket_handler(m_context, "/websocket",
+        [](const mg_connection* conn, void* user_data) 
+        {
+            static_cast<WebServer*>(user_data)->WebSocketConnectHandler(conn);
+            return 0; 
+        },
+        [](mg_connection* conn, void* user_data)
+        {
+            static_cast<WebServer*>(user_data)->WebSocketReadyHandler(conn);
+        },
+        [](mg_connection* conn, int opcode, char* data, size_t datasize, void* user_data) 
+        {
+            static_cast<WebServer*>(user_data)->WebsocketDataHandler(conn, opcode, data, datasize);
+            return 0;
+        },
+        [](const mg_connection* conn, void* user_data)
+        {
+            static_cast<WebServer*>(user_data)->WebSocketCloseHandler(conn);
+        },
+        this);
 }
 
 int WebServer::SendJsonOverWebSocket(const nlohmann::json& json) 
 {
     std::string message = json.dump(); // Convert JSON to string
-    //return SendMessageOverWebSocket(message);
-    return ws_write(json);
+    return SendMessageOverWebSocket(message);
 }
 
 int WebServer::SendMessageOverWebSocket(const std::string& msg)
@@ -465,14 +377,14 @@ std::string WebServer::Parse(const std::string name, const char* data)
     return value;
 }
 
-int WebServer::WebSocketConnectHandler(const mg_connection* conn, void* user_data) 
+int WebServer::WebSocketConnectHandler(const mg_connection* conn) 
 {
     std::lock_guard<std::mutex> lock(m_connectionLock);
     m_connections.insert({const_cast<mg_connection*>(conn), false});
     return 1;
 }
 
-void WebServer::WebSocketReadyHandler(const mg_connection* conn, void* user_data) 
+void WebServer::WebSocketReadyHandler(const mg_connection* conn) 
 {
     // WebSocket connection is ready for sending/receiving data
     std::lock_guard<std::mutex> lock(m_connectionLock);
@@ -485,13 +397,13 @@ void WebServer::WebSocketReadyHandler(const mg_connection* conn, void* user_data
     }
 }
 
-int WebServer::WebsocketDataHandler(const mg_connection* conn, int bits, char* data, size_t data_len, void* user_data) 
+int WebServer::WebsocketDataHandler(const mg_connection* conn, int bits, char* data, size_t data_len) 
 {
     // Only sending for now
     return 1;
 }
 
-void WebServer::WebSocketCloseHandler(const mg_connection* conn, void* user_data) 
+void WebServer::WebSocketCloseHandler(const mg_connection* conn) 
 {
     std::lock_guard<std::mutex> lock(m_connectionLock);
     m_connections.erase(const_cast<mg_connection*>(conn));
